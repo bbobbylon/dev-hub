@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Dense reference / cheat sheet</span>
+    <button class="btn btn-secondary" style="font-size:13px">Print / PDF</button>
+  </nav>
+
+  <main style="max-width:1160px;margin:0 auto;padding:44px 48px 100px">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:6px">
+      <h1 style="font-family:var(--font-heading);font-weight:400;font-size:40px;margin:0;color:var(--color-accent-700)">Git cheat sheet</h1>
+      <span class="tag tag-neutral">THE 80% YOU USE DAILY</span>
+    </div>
+    <p style="font-size:14px;color:var(--color-neutral-600);margin:0 0 32px">Pin this. Column order follows a real working session: set up → daily loop → branches → fixing mistakes.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card" style="border-radius:var(--radius-lg);padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="width:26px;height:26px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:13px;color:var(--color-bg)">1</span><span style="font-family:var(--font-heading);font-size:16px">Start</span></div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git init</div>
+          <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">new repo in this folder</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git clone URL</div>
+          <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">copy an existing repo</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git remote -v</div>
+          <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 0">where push/pull go</div>
+        </div>
+        <div style="background:var(--color-accent-2-100);border-radius:var(--radius-lg);padding:16px 18px">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-2-700);margin-bottom:6px">Mnemonic</div>
+          <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-800)"><strong>A</strong>dd → <strong>C</strong>ommit → <strong>P</strong>ush. "<em>All Cats Pounce.</em>" That's the daily loop.</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-radius:var(--radius-lg);padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="width:26px;height:26px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:13px;color:var(--color-bg)">2</span><span style="font-family:var(--font-heading);font-size:16px">Daily loop</span></div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git status</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">what changed, what's staged</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git add -p</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">stage hunk by hunk — review as you go</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git commit -m "msg"</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">snapshot the staged set</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git pull --rebase</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">get teammates' commits first</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git push</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 0">publish your commits</div>
+      </div>
+
+      <div class="card" style="border-radius:var(--radius-lg);padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="width:26px;height:26px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:13px;color:var(--color-bg)">3</span><span style="font-family:var(--font-heading);font-size:16px">Branches</span></div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git switch -c feat/x</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">create + move to a branch</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git switch main</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">jump back</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git merge feat/x</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">weave a branch into this one</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git branch -d feat/x</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 10px">delete merged branch</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-700);font-weight:700">git log --oneline --graph</div>
+        <div style="font-size:12px;color:var(--color-neutral-700);margin:2px 0 0">see the shape of history</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:var(--color-accent-700);border-radius:var(--radius-lg);padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="width:26px;height:26px;border-radius:50%;background:var(--color-bg);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:13px;color:var(--color-accent-700)">4</span><span style="font-family:var(--font-heading);font-size:16px;color:var(--color-bg)">Oh no</span></div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-200);font-weight:700">git restore file</div>
+          <div style="font-size:12px;color:var(--color-accent-100);margin:2px 0 10px">discard unstaged edits</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-200);font-weight:700">git restore --staged file</div>
+          <div style="font-size:12px;color:var(--color-accent-100);margin:2px 0 10px">un-stage, keep edits</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-200);font-weight:700">git commit --amend</div>
+          <div style="font-size:12px;color:var(--color-accent-100);margin:2px 0 10px">fix the last commit / message</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-200);font-weight:700">git revert SHA</div>
+          <div style="font-size:12px;color:var(--color-accent-100);margin:2px 0 10px">undo publicly, safely</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--color-accent-200);font-weight:700">git reflog</div>
+          <div style="font-size:12px;color:var(--color-accent-100);margin:2px 0 0">the "undelete" of last resort</div>
+        </div>
+        <div style="background:var(--color-accent-100);border-radius:var(--radius-lg);padding:16px 18px">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-700);margin-bottom:6px">Danger zone</div>
+          <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-800)"><code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">reset --hard</code> and <code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">push --force</code> destroy work. Never on shared branches.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+</body>
+</html>

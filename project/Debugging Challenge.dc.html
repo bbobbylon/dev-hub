@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}@keyframes pop{0%{transform:scale(0.96);opacity:0}100%{transform:scale(1);opacity:1}}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Bug hunt / detective case</span>
+    <span class="tag tag-accent">CASE #017</span>
+  </nav>
+
+  <main style="max-width:880px;margin:0 auto;padding:48px 48px 110px">
+    <span class="tag tag-accent-2" style="display:inline-flex;margin-bottom:12px">PYTHON · OFF-BY-ONE</span>
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:40px;margin:0 0 12px;color:var(--color-accent-700)">The case of the missing invoice</h1>
+    <p style="font-size:15px;line-height:1.65;color:var(--color-neutral-800);max-width:620px;margin:0 0 28px">Accounting says the December invoice never gets processed. The function below is supposed to handle all 12 months — read it like a detective, then reveal hints only when you're stuck.</p>
+
+    <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:22px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(255,255,255,0.06)">
+        <span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent-600)"></span>
+        <span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent-2-600)"></span>
+        <span style="font-size:12px;color:var(--color-neutral-400);font-family:ui-monospace,Menlo,monospace;margin-left:6px">process_invoices.py</span>
+        <span style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(198,113,57,0.25);color:var(--color-accent-200)">1 bug hiding below</span>
+      </div>
+      <div style="padding:16px 8px 16px 0;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.85;color:var(--color-neutral-100)">
+        <div style="display:flex"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">1</span><span><span style="color:var(--color-accent-300)">def</span> <span style="color:var(--color-accent-2-300)">process_year</span>(invoices):</span></div>
+        <div style="display:flex"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">2</span><span>&nbsp;&nbsp;<span style="color:var(--color-neutral-500)"># invoices[1] = January … invoices[12] = December</span></span></div>
+        <div style="display:flex;background:{{ line3bg }}"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">3</span><span>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">for</span> month <span style="color:var(--color-accent-300)">in</span> <span style="color:var(--color-accent-2-300)">range</span>(1, 12):</span></div>
+        <div style="display:flex"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">4</span><span>&nbsp;&nbsp;&nbsp;&nbsp;invoice = invoices[month]</span></div>
+        <div style="display:flex"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">5</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">charge</span>(invoice)</span></div>
+        <div style="display:flex"><span style="width:40px;text-align:right;padding-right:14px;color:var(--color-neutral-600);flex:none">6</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">mark_processed</span>(invoice)</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+      <sc-if value="{{ h1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:14px;background:var(--color-neutral-100);border-radius:16px;padding:16px 20px;animation:pop 0.25s ease">
+          <span style="flex:none;font-family:var(--font-heading);color:var(--color-accent);font-size:15px">Hint 1</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--color-neutral-800)">The bug is not in what the loop <em>does</em> — it's in how many times it does it. Count the months it actually visits.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ h2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:14px;background:var(--color-neutral-100);border-radius:16px;padding:16px 20px;animation:pop 0.25s ease">
+          <span style="flex:none;font-family:var(--font-heading);color:var(--color-accent);font-size:15px">Hint 2</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--color-neutral-800)"><code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">range(1, 12)</code> yields 1, 2, 3 … and stops <em>before</em> the second number. What's the last month it produces?</span>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:10px">
+        <sc-if value="{{ canHint }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onClick="{{ nextHint }}">{{ hintLabel }}</button></sc-if>
+        <sc-if value="{{ notSolved }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-primary" onClick="{{ solve }}">I found it — show the fix</button></sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ solved }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:pop 0.3s ease">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="width:30px;height:30px;border-radius:50%;background:var(--color-accent-2);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-bg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h2 style="font-family:var(--font-heading);font-weight:400;font-size:24px;margin:0">Case closed: a classic off-by-one</h2>
+        </div>
+        <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);padding:16px 20px;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.9;margin-bottom:16px">
+          <div style="background:rgba(198,113,57,0.22);border-radius:8px;padding:2px 12px;color:var(--color-accent-200)">- for month in range(1, 12):&nbsp;&nbsp;# stops at 11 — November!</div>
+          <div style="background:rgba(122,138,94,0.25);border-radius:8px;padding:2px 12px;color:var(--color-accent-2-200)">+ for month in range(1, 13):&nbsp;&nbsp;# 1 through 12 inclusive</div>
+        </div>
+        <div style="background:var(--color-accent-2-100);border-radius:var(--radius-lg);padding:18px 22px">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-2-700);margin-bottom:6px">The takeaway</div>
+          <div style="font-size:14px;line-height:1.65;color:var(--color-neutral-800)"><code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">range(a, b)</code> is half-open: it includes <code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">a</code>, excludes <code style="background:var(--color-bg);padding:1px 6px;border-radius:5px">b</code>. Off-by-ones cluster at boundaries — whenever a bug report says "the last one is missing," check the loop bounds first.</div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { hints: 0, solved: false };
+  renderVals() {
+    const { hints, solved } = this.state;
+    return {
+      h1: hints >= 1, h2: hints >= 2,
+      canHint: hints < 2 && !solved,
+      hintLabel: hints === 0 ? 'Give me a hint' : 'One more hint',
+      notSolved: !solved, solved,
+      line3bg: solved ? 'rgba(198,113,57,0.22)' : 'transparent',
+      nextHint: () => this.setState({ hints: this.state.hints + 1 }),
+      solve: () => this.setState({ solved: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

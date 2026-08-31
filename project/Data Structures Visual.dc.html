@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Visual field guide (diagram-first)</span>
+    <span class="tag tag-neutral">DATA STRUCTURES</span>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:48px 48px 110px">
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:42px;margin:0 0 10px;color:var(--color-accent-700)">A field guide to data shapes</h1>
+    <p style="font-size:15.5px;line-height:1.65;color:var(--color-neutral-700);max-width:640px;margin:0 0 40px">Four structures, drawn the way you should picture them. Each card answers the same three questions: what does it look like, what's instant, what's slow.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:24px 26px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px"><span style="font-family:var(--font-heading);font-size:21px">Array</span><span style="font-size:12px;color:var(--color-neutral-600)">a row of numbered boxes</span></div>
+        <svg viewBox="0 0 380 92" style="width:100%;height:auto;margin-bottom:14px">
+          <rect x="20" y="18" width="56" height="44" rx="10" fill="#ffe1d0"/><text x="48" y="45" text-anchor="middle" font-size="16" font-weight="700" fill="#8c491a">12</text><text x="48" y="80" text-anchor="middle" font-size="11" fill="#82796a">[0]</text>
+          <rect x="82" y="18" width="56" height="44" rx="10" fill="#ffe1d0"/><text x="110" y="45" text-anchor="middle" font-size="16" font-weight="700" fill="#8c491a">7</text><text x="110" y="80" text-anchor="middle" font-size="11" fill="#82796a">[1]</text>
+          <rect x="144" y="18" width="56" height="44" rx="10" fill="#c67139"/><text x="172" y="45" text-anchor="middle" font-size="16" font-weight="700" fill="#f5ead8">31</text><text x="172" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#8c491a">[2]</text>
+          <rect x="206" y="18" width="56" height="44" rx="10" fill="#ffe1d0"/><text x="234" y="45" text-anchor="middle" font-size="16" font-weight="700" fill="#8c491a">9</text><text x="234" y="80" text-anchor="middle" font-size="11" fill="#82796a">[3]</text>
+          <rect x="268" y="18" width="56" height="44" rx="10" fill="#ffe1d0"/><text x="296" y="45" text-anchor="middle" font-size="16" font-weight="700" fill="#8c491a">24</text><text x="296" y="80" text-anchor="middle" font-size="11" fill="#82796a">[4]</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.5">
+          <div style="display:flex;gap:8px"><span class="tag tag-accent-2" style="flex:none">FAST</span><span style="color:var(--color-neutral-800)">Jump to any index — <code style="background:var(--color-neutral-100);padding:1px 5px;border-radius:5px">a[2]</code> is one hop, O(1)</span></div>
+          <div style="display:flex;gap:8px"><span class="tag tag-accent" style="flex:none">SLOW</span><span style="color:var(--color-neutral-800)">Insert at the front — every box shifts right, O(n)</span></div>
+        </div>
+      </div>
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:24px 26px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px"><span style="font-family:var(--font-heading);font-size:21px">Linked list</span><span style="font-size:12px;color:var(--color-neutral-600)">a treasure hunt of pointers</span></div>
+        <svg viewBox="0 0 380 92" style="width:100%;height:auto;margin-bottom:14px">
+          <defs><marker id="la" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#82796a"/></marker></defs>
+          <rect x="16" y="24" width="76" height="44" rx="14" fill="#f0fae1"/><text x="44" y="51" text-anchor="middle" font-size="15" font-weight="700" fill="#56633f">12</text><circle cx="78" cy="46" r="6" fill="#7a8a5e"/>
+          <line x1="86" y1="46" x2="130" y2="46" stroke="#82796a" stroke-width="2.5" marker-end="url(#la)"/>
+          <rect x="136" y="24" width="76" height="44" rx="14" fill="#f0fae1"/><text x="164" y="51" text-anchor="middle" font-size="15" font-weight="700" fill="#56633f">7</text><circle cx="198" cy="46" r="6" fill="#7a8a5e"/>
+          <line x1="206" y1="46" x2="250" y2="46" stroke="#82796a" stroke-width="2.5" marker-end="url(#la)"/>
+          <rect x="256" y="24" width="76" height="44" rx="14" fill="#f0fae1"/><text x="284" y="51" text-anchor="middle" font-size="15" font-weight="700" fill="#56633f">31</text><circle cx="318" cy="46" r="6" fill="#7a8a5e"/>
+          <line x1="326" y1="46" x2="356" y2="46" stroke="#82796a" stroke-width="2.5" stroke-dasharray="4 4"/>
+          <text x="366" y="51" font-size="13" fill="#82796a">∅</text>
+          <text x="44" y="14" text-anchor="middle" font-size="10.5" fill="#82796a">head</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.5">
+          <div style="display:flex;gap:8px"><span class="tag tag-accent-2" style="flex:none">FAST</span><span style="color:var(--color-neutral-800)">Insert/remove at a known spot — re-aim two pointers, O(1)</span></div>
+          <div style="display:flex;gap:8px"><span class="tag tag-accent" style="flex:none">SLOW</span><span style="color:var(--color-neutral-800)">Find item #k — walk the chain from the head, O(n)</span></div>
+        </div>
+      </div>
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:24px 26px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px"><span style="font-family:var(--font-heading);font-size:21px">Hash map</span><span style="font-size:12px;color:var(--color-neutral-600)">a coat check with math</span></div>
+        <svg viewBox="0 0 380 120" style="width:100%;height:auto;margin-bottom:14px">
+          <defs><marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b2622d"/></marker></defs>
+          <rect x="10" y="42" width="88" height="34" rx="17" fill="#ffe1d0"/><text x="54" y="64" text-anchor="middle" font-size="13" font-weight="700" fill="#8c491a">"ada"</text>
+          <rect x="128" y="42" width="96" height="34" rx="12" fill="#eee7db"/><text x="176" y="64" text-anchor="middle" font-size="12.5" fill="#645c50">hash("ada")</text>
+          <line x1="100" y1="59" x2="124" y2="59" stroke="#b2622d" stroke-width="2.5" marker-end="url(#ha)"/>
+          <line x1="226" y1="59" x2="252" y2="59" stroke="#b2622d" stroke-width="2.5" marker-end="url(#ha)"/>
+          <text x="238" y="46" text-anchor="middle" font-size="11" fill="#82796a">→ 3</text>
+          <rect x="258" y="6" width="110" height="24" rx="8" fill="#f9f4ed"/><text x="270" y="22" font-size="11" fill="#a19786">0 ·</text>
+          <rect x="258" y="34" width="110" height="24" rx="8" fill="#f9f4ed"/><text x="270" y="50" font-size="11" fill="#a19786">1 ·</text>
+          <rect x="258" y="62" width="110" height="24" rx="8" fill="#c67139"/><text x="270" y="78" font-size="11" fill="#ffe1d0">3 ·</text><text x="316" y="78" font-size="12" font-weight="700" fill="#f5ead8">score: 97</text>
+          <rect x="258" y="90" width="110" height="24" rx="8" fill="#f9f4ed"/><text x="270" y="106" font-size="11" fill="#a19786">4 ·</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.5">
+          <div style="display:flex;gap:8px"><span class="tag tag-accent-2" style="flex:none">FAST</span><span style="color:var(--color-neutral-800)">Get/set by key — the hash <em>computes</em> the shelf number, O(1)</span></div>
+          <div style="display:flex;gap:8px"><span class="tag tag-accent" style="flex:none">SLOW</span><span style="color:var(--color-neutral-800)">"Smallest key?" — no order at all, scan everything, O(n)</span></div>
+        </div>
+      </div>
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:24px 26px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px"><span style="font-family:var(--font-heading);font-size:21px">Binary search tree</span><span style="font-size:12px;color:var(--color-neutral-600)">smaller left, bigger right</span></div>
+        <svg viewBox="0 0 380 130" style="width:100%;height:auto;margin-bottom:14px">
+          <line x1="190" y1="30" x2="110" y2="72" stroke="#82796a" stroke-width="2.5"/>
+          <line x1="190" y1="30" x2="270" y2="72" stroke="#82796a" stroke-width="2.5"/>
+          <line x1="110" y1="72" x2="66" y2="112" stroke="#82796a" stroke-width="2.5"/>
+          <line x1="110" y1="72" x2="154" y2="112" stroke="#82796a" stroke-width="2.5"/>
+          <line x1="270" y1="72" x2="314" y2="112" stroke="#82796a" stroke-width="2.5"/>
+          <circle cx="190" cy="26" r="20" fill="#c67139"/><text x="190" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#f5ead8">50</text>
+          <circle cx="110" cy="72" r="18" fill="#f0fae1" stroke="#7a8a5e" stroke-width="2.5"/><text x="110" y="77" text-anchor="middle" font-size="13" font-weight="700" fill="#56633f">30</text>
+          <circle cx="270" cy="72" r="18" fill="#f0fae1" stroke="#7a8a5e" stroke-width="2.5"/><text x="270" y="77" text-anchor="middle" font-size="13" font-weight="700" fill="#56633f">70</text>
+          <circle cx="66" cy="112" r="16" fill="#eee7db"/><text x="66" y="117" text-anchor="middle" font-size="12" font-weight="700" fill="#645c50">20</text>
+          <circle cx="154" cy="112" r="16" fill="#eee7db"/><text x="154" y="117" text-anchor="middle" font-size="12" font-weight="700" fill="#645c50">40</text>
+          <circle cx="314" cy="112" r="16" fill="#eee7db"/><text x="314" y="117" text-anchor="middle" font-size="12" font-weight="700" fill="#645c50">80</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;line-height:1.5">
+          <div style="display:flex;gap:8px"><span class="tag tag-accent-2" style="flex:none">FAST</span><span style="color:var(--color-neutral-800)">Search sorted data — halve at every level, O(log n)</span></div>
+          <div style="display:flex;gap:8px"><span class="tag tag-accent" style="flex:none">SLOW</span><span style="color:var(--color-neutral-800)">Insert in sorted order (1,2,3…) — it degrades into a list, O(n)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;align-items:flex-start;background:var(--color-accent-2-100);border-radius:var(--radius-lg);padding:20px 24px;margin-top:26px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-2-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.2V16h6v-1.3c0-.9.4-1.7 1-2.2A6 6 0 0 0 12 2Z"/></svg>
+      <div style="font-size:14px;line-height:1.6;color:var(--color-neutral-800)"><strong>The one-question picker:</strong> need order? Array (by position) or BST (sorted). Need lookup by name? Hash map. Need cheap inserts mid-sequence? Linked list. Say the need out loud and the structure picks itself.</div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+</body>
+</html>

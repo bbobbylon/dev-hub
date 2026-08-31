@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}@keyframes pop{0%{transform:scale(0.95);opacity:0}100%{transform:scale(1);opacity:1}}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);display:flex;flex-direction:column">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Flashcards / spaced repetition</span>
+    <span class="tag tag-accent-2">{{ dueLabel }}</span>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px 64px">
+    <div style="width:100%;max-width:560px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+        <span style="font-family:var(--font-heading);font-size:16px;color:var(--color-accent-700)">HTTP Essentials deck</span>
+        <span style="font-size:13px;color:var(--color-neutral-600)">Card {{ cardNum }} of 5</span>
+      </div>
+
+      <button type="button" onClick="{{ flip }}" style="display:block;width:100%;cursor:pointer;border:none;background:none;padding:0;font-family:var(--font-body);text-align:inherit">
+        <sc-if value="{{ showFront }}" hint-placeholder-val="{{ true }}">
+          <div class="card elev-lg" style="border-radius:var(--radius-lg);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;animation:pop 0.22s ease">
+            <span class="tag tag-accent">{{ tag }}</span>
+            <div style="font-family:var(--font-heading);font-size:34px;line-height:1.2;text-align:center;color:var(--color-text)">{{ front }}</div>
+            <span style="font-size:12.5px;color:var(--color-neutral-500);display:flex;align-items:center;gap:6px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21 3 21 9 15 9"/></svg>tap to flip</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+          <div style="border-radius:var(--radius-lg);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;background:var(--color-accent-700);box-shadow:var(--shadow-lg);animation:pop 0.22s ease">
+            <div style="font-size:16.5px;line-height:1.65;text-align:center;color:var(--color-accent-100);max-width:420px">{{ back }}</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--color-bg);background:rgba(0,0,0,0.25);padding:8px 14px;border-radius:10px">{{ example }}</div>
+          </div>
+        </sc-if>
+      </button>
+
+      <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px;animation:pop 0.25s ease">
+          <button type="button" onClick="{{ again }}" style="cursor:pointer;padding:13px;border-radius:999px;border:2px solid var(--color-accent-600);background:var(--color-accent-100);color:var(--color-accent-700);font-family:var(--font-heading);font-size:14px">Again<span style="display:block;font-family:var(--font-body);font-size:11px;font-weight:400;margin-top:2px">&lt; 1 min</span></button>
+          <button type="button" onClick="{{ good }}" style="cursor:pointer;padding:13px;border-radius:999px;border:2px solid var(--color-neutral-400);background:var(--color-neutral-100);color:var(--color-neutral-800);font-family:var(--font-heading);font-size:14px">Good<span style="display:block;font-family:var(--font-body);font-size:11px;font-weight:400;margin-top:2px">2 days</span></button>
+          <button type="button" onClick="{{ easy }}" style="cursor:pointer;padding:13px;border-radius:999px;border:2px solid var(--color-accent-2-600);background:var(--color-accent-2-100);color:var(--color-accent-2-700);font-family:var(--font-heading);font-size:14px">Easy<span style="display:block;font-family:var(--font-body);font-size:11px;font-weight:400;margin-top:2px">5 days</span></button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showFront }}" hint-placeholder-val="{{ true }}">
+        <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--color-neutral-500)">Rate yourself after flipping — honest ratings drive the review schedule.</div>
+      </sc-if>
+
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:26px">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="5">
+          <span style="width:9px;height:9px;border-radius:50%;background:{{ d.color }}"></span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--color-neutral-300);padding:16px 32px;display:flex;gap:22px;align-items:center;justify-content:center;font-size:12.5px;color:var(--color-neutral-600)">
+    <span><strong style="color:var(--color-accent-2-700)">12</strong> mastered</span>
+    <span><strong style="color:var(--color-accent-700)">5</strong> due today</span>
+    <span><strong style="color:var(--color-neutral-800)">9</strong> new this week</span>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { i: 0, flipped: false, rated: [] };
+  cards = [
+    { tag: 'STATUS CODES', front: '404 vs 403 — what is the difference?', back: '404 Not Found: the resource does not exist (or the server hides it). 403 Forbidden: it exists, the server knows who you are, and you still may not have it.', example: 'GET /admin → 403' },
+    { tag: 'METHODS', front: 'Which HTTP methods are idempotent?', back: 'GET, PUT, DELETE, HEAD. Calling them N times has the same effect as once. POST is not idempotent — each call may create a new resource.', example: 'PUT /users/7 {name:"Ada"}' },
+    { tag: 'HEADERS', front: 'What does Content-Type tell the receiver?', back: 'How to parse the body — its MIME type. The server is not guessing: send JSON with the wrong Content-Type and many APIs will reject it.', example: 'Content-Type: application/json' },
+    { tag: 'CACHING', front: 'What does a 304 response contain?', back: 'No body at all. "Not Modified" tells the client its cached copy is still valid, saving the transfer.', example: 'If-None-Match: "abc123" → 304' },
+    { tag: 'STATE', front: 'Why is HTTP called stateless?', back: 'Each request stands alone — the server keeps no memory between them. Sessions are rebuilt per-request from cookies or tokens carried by the client.', example: 'Cookie: session=xyz' }
+  ];
+  flip() { this.setState({ flipped: !this.state.flipped }); }
+  rate(kind) { const { i, rated } = this.state; this.setState({ i: Math.min(i + 1, this.cards.length - 1), flipped: false, rated: [...rated, kind] }); }
+  renderVals() {
+    const { i, flipped, rated } = this.state;
+    const c = this.cards[i];
+    const dots = this.cards.map((_, di) => ({
+      color: di < rated.length ? (rated[di] === 'again' ? 'var(--color-accent-600)' : 'var(--color-accent-2)') : (di === i ? 'var(--color-accent)' : 'var(--color-neutral-300)')
+    }));
+    return {
+      cardNum: i + 1, tag: c.tag, front: c.front, back: c.back, example: c.example,
+      showFront: !flipped, showBack: flipped, dots,
+      dueLabel: (5 - Math.min(rated.length, 4)) + ' due today',
+      flip: () => this.flip(),
+      again: () => this.rate('again'), good: () => this.rate('good'), easy: () => this.rate('easy')
+    };
+  }
+}
+</script>
+</body>
+</html>

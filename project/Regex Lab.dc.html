@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}@keyframes pop{0%{opacity:0}100%{opacity:1}}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Live pattern lab</span>
+    <span class="tag tag-neutral">REGEX · LEVEL 1</span>
+  </nav>
+
+  <main style="max-width:960px;margin:0 auto;padding:48px 48px 110px">
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:42px;margin:0 0 10px;color:var(--color-accent-700)">Regex lab: watch the pattern hunt</h1>
+    <p style="font-size:15.5px;line-height:1.65;color:var(--color-neutral-700);max-width:620px;margin:0 0 30px">A regex is a description of text you're looking for. Pick a pattern below and watch what it catches in the same log lines — the highlights update instantly.</p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <sc-for list="{{ patterns }}" as="p" hint-placeholder-count="3">
+        <button type="button" onClick="{{ p.pick }}" style="cursor:pointer;padding:11px 18px;border-radius:999px;font-family:ui-monospace,Menlo,monospace;font-size:13.5px;font-weight:600;{{ p.style }}">{{ p.label }}</button>
+      </sc-for>
+    </div>
+
+    <div class="card elev-md" style="border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px">
+      <div style="padding:12px 20px;background:var(--color-neutral-100);display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--color-neutral-300)">
+        <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-neutral-600)">Pattern</span>
+        <code style="font-size:15px;color:var(--color-accent-700);font-weight:700">{{ activePattern }}</code>
+        <span style="margin-left:auto" class="tag tag-accent-2">{{ matchCount }} MATCHES</span>
+      </div>
+      <div style="padding:20px 22px;font-family:ui-monospace,Menlo,monospace;font-size:13.5px;line-height:2.1;color:var(--color-neutral-800)">
+        <sc-for list="{{ lines }}" as="line">
+          <div>
+            <sc-for list="{{ line.parts }}" as="seg">
+              <span style="{{ seg.style }}">{{ seg.text }}</span>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background:var(--color-accent-100);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:26px;animation:pop 0.3s ease">
+      <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-700);margin-bottom:6px">How this pattern reads, symbol by symbol</div>
+      <div style="font-size:14px;line-height:1.65;color:var(--color-neutral-800)">{{ explanation }}</div>
+    </div>
+
+    <h2 style="font-family:var(--font-heading);font-weight:400;font-size:22px;margin:0 0 14px">Pocket decoder</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">\d</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">any digit 0–9</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">\w</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">letter, digit, or _</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">+</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">one or more of it</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">*</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">zero or more</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">[abc]</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">one of a, b, or c</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">^ $</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">start · end of line</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">.</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">any single character</div></div>
+      <div style="background:var(--color-neutral-100);border-radius:14px;padding:12px 14px"><code style="color:var(--color-accent-700);font-weight:700">( )</code><div style="font-size:12px;color:var(--color-neutral-700);margin-top:3px">capture a group</div></div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { p: 0 };
+  defs = [
+    { label: '\\d+', explanation: '\\d means "any digit," + means "one or more in a row." Together: every unbroken run of digits — IDs, ports, timestamps, amounts.' },
+    { label: 'ERROR|WARN', explanation: 'The pipe | is "or." The engine tries ERROR first, then WARN, at every position. Great for log-level filtering.' },
+    { label: '\\w+@\\w+\\.dev', explanation: '\\w+ grabs the name, @ is literal, \\w+ the domain, \\. is a real dot (escaped — a bare . means "anything"), then the literal dev.' }
+  ];
+  logLines = [
+    '10:42:07 WARN  user ada@shop.dev retried 3 times',
+    '10:42:11 ERROR payment 8127 declined for bob@pay.dev',
+    '10:43:02 INFO  heartbeat ok on port 8080',
+    '10:44:56 ERROR timeout after 3000 ms'
+  ];
+  regexes = [/\d+/g, /ERROR|WARN/g, /\w+@\w+\.dev/g];
+  renderVals() {
+    const active = this.state.p;
+    const rx = this.regexes[active];
+    let count = 0;
+    const hi = 'background:var(--color-accent-200);color:var(--color-accent-800);border-radius:6px;padding:1px 3px;font-weight:700';
+    const lines = this.logLines.map(text => {
+      const parts = [];
+      let last = 0;
+      for (const m of text.matchAll(rx)) {
+        if (m.index > last) parts.push({ text: text.slice(last, m.index), style: '' });
+        parts.push({ text: m[0], style: hi });
+        count++;
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) parts.push({ text: text.slice(last), style: '' });
+      return { parts };
+    });
+    return {
+      patterns: this.defs.map((d, i) => ({
+        label: d.label,
+        style: i === active ? 'background:var(--color-accent);color:var(--color-bg);border:2px solid var(--color-accent)' : 'background:var(--color-neutral-100);color:var(--color-text);border:2px solid var(--color-neutral-300)',
+        pick: () => this.setState({ p: i })
+      })),
+      activePattern: this.defs[active].label,
+      explanation: this.defs[active].explanation,
+      matchCount: count,
+      lines
+    };
+  }
+}
+</script>
+</body>
+</html>

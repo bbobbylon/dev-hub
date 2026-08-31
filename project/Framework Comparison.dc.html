@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Side-by-side comparison</span>
+    <span class="tag tag-accent">FRONTEND</span>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:52px 48px 110px">
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:44px;margin:0 0 12px;color:var(--color-accent-700)">Same counter, three frameworks</h1>
+    <p style="font-size:15.5px;line-height:1.65;color:var(--color-neutral-700);max-width:640px;margin:0 0 40px">The fastest way to understand a framework is to read the same tiny app in each. Here is a click-counter in React, Vue, and Svelte — spot what each one makes you write, and what it writes for you.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:44px">
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="background:var(--color-accent);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:14px 20px;display:flex;align-items:baseline;gap:10px">
+          <span style="font-family:var(--font-heading);font-size:18px;color:var(--color-bg)">React</span>
+          <span style="font-size:11.5px;color:var(--color-accent-100)">state is explicit</span>
+        </div>
+        <div style="background:var(--color-neutral-900);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px 18px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.75;color:var(--color-neutral-100);flex:1">
+          <div><span style="color:var(--color-accent-300)">import</span> { useState } <span style="color:var(--color-accent-300)">from</span> <span style="color:#d9b98a">'react'</span>;</div>
+          <div>&nbsp;</div>
+          <div><span style="color:var(--color-accent-300)">function</span> <span style="color:var(--color-accent-2-300)">Counter</span>() {</div>
+          <div>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">const</span> [n, setN] = <span style="color:var(--color-accent-2-300)">useState</span>(0);</div>
+          <div>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">return</span> (</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;button onClick={() =&gt; <span style="color:var(--color-accent-2-300)">setN</span>(n + 1)}&gt;</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Clicked {n} times</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/button&gt;</div>
+          <div>&nbsp;&nbsp;);</div>
+          <div>}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="background:var(--color-accent-2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:14px 20px;display:flex;align-items:baseline;gap:10px">
+          <span style="font-family:var(--font-heading);font-size:18px;color:var(--color-bg)">Vue</span>
+          <span style="font-size:11.5px;color:var(--color-accent-2-100)">template + reactivity</span>
+        </div>
+        <div style="background:var(--color-neutral-900);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px 18px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.75;color:var(--color-neutral-100);flex:1">
+          <div>&lt;<span style="color:var(--color-accent-2-300)">script setup</span>&gt;</div>
+          <div><span style="color:var(--color-accent-300)">import</span> { ref } <span style="color:var(--color-accent-300)">from</span> <span style="color:#d9b98a">'vue'</span>;</div>
+          <div><span style="color:var(--color-accent-300)">const</span> n = <span style="color:var(--color-accent-2-300)">ref</span>(0);</div>
+          <div>&lt;/<span style="color:var(--color-accent-2-300)">script</span>&gt;</div>
+          <div>&nbsp;</div>
+          <div>&lt;<span style="color:var(--color-accent-2-300)">template</span>&gt;</div>
+          <div>&nbsp;&nbsp;&lt;button @click=<span style="color:#d9b98a">"n++"</span>&gt;</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;Clicked {{ nBrace }} times</div>
+          <div>&nbsp;&nbsp;&lt;/button&gt;</div>
+          <div>&lt;/<span style="color:var(--color-accent-2-300)">template</span>&gt;</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="background:var(--color-accent-700);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:14px 20px;display:flex;align-items:baseline;gap:10px">
+          <span style="font-family:var(--font-heading);font-size:18px;color:var(--color-bg)">Svelte</span>
+          <span style="font-size:11.5px;color:var(--color-accent-200)">compiler does the work</span>
+        </div>
+        <div style="background:var(--color-neutral-900);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:16px 18px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.75;color:var(--color-neutral-100);flex:1">
+          <div>&lt;<span style="color:var(--color-accent-2-300)">script</span>&gt;</div>
+          <div>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">let</span> n = 0;</div>
+          <div>&lt;/<span style="color:var(--color-accent-2-300)">script</span>&gt;</div>
+          <div>&nbsp;</div>
+          <div>&lt;button on:click={() =&gt; n += 1}&gt;</div>
+          <div>&nbsp;&nbsp;Clicked {n} times</div>
+          <div>&lt;/button&gt;</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font-family:var(--font-heading);font-weight:400;font-size:24px;margin:0 0 16px">What actually differs</h2>
+    <table class="table" style="width:100%;margin-bottom:40px">
+      <thead><tr><th style="text-align:left">Dimension</th><th style="text-align:left">React</th><th style="text-align:left">Vue</th><th style="text-align:left">Svelte</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600">How updates happen</td><td>Re-render + virtual DOM diff</td><td>Proxy-based reactive tracking</td><td>Compiled — updates written at build time</td></tr>
+        <tr><td style="font-weight:600">State declaration</td><td><code>useState</code> hook</td><td><code>ref()</code> / <code>reactive()</code></td><td>Plain <code>let</code> variable</td></tr>
+        <tr><td style="font-weight:600">Markup lives in</td><td>JSX inside JS</td><td>Separate <code>&lt;template&gt;</code></td><td>Top-level HTML in the file</td></tr>
+        <tr><td style="font-weight:600">Runtime shipped</td><td>~44 kB</td><td>~34 kB</td><td>~2 kB</td></tr>
+        <tr><td style="font-weight:600">Job-market demand</td><td>Highest</td><td>Strong</td><td>Growing</td></tr>
+      </tbody>
+    </table>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="card" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <span class="tag tag-accent" style="margin-bottom:10px;display:inline-flex;align-self:flex-start">PICK REACT IF…</span>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-800);margin:8px 0 0">You want the biggest ecosystem and job market, and you're comfortable with "everything is JavaScript."</p>
+      </div>
+      <div class="card" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <span class="tag tag-accent-2" style="margin-bottom:10px;display:inline-flex;align-self:flex-start">PICK VUE IF…</span>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-800);margin:8px 0 0">You like HTML-first templates, gentle learning curves, and batteries-included official routers/stores.</p>
+      </div>
+      <div class="card" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <span class="tag tag-neutral" style="margin-bottom:10px;display:inline-flex;align-self:flex-start">PICK SVELTE IF…</span>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-800);margin:8px 0 0">You want the least code and smallest bundles, and don't need the largest hiring pool — yet.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return { nBrace: '{{ n }}' }; }
+}
+</script>
+</body>
+</html>

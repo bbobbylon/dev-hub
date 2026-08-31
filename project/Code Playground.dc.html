@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}@keyframes pop{0%{transform:scale(0.96);opacity:0}100%{transform:scale(1);opacity:1}}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);display:flex;flex-direction:column">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Code playground / challenge</span>
+    <span class="tag tag-neutral">CHALLENGE 4 OF 12</span>
+  </nav>
+
+  <div style="flex:1;display:grid;grid-template-columns:340px 1fr;max-width:1240px;margin:0 auto;width:100%">
+    <aside style="border-right:1px solid var(--color-neutral-300);padding:36px 28px">
+      <span class="tag tag-accent" style="margin-bottom:12px;display:inline-flex">PYTHON · LOOPS</span>
+      <h1 style="font-family:var(--font-heading);font-weight:400;font-size:30px;margin:10px 0 12px;color:var(--color-accent-700)">FizzBuzz</h1>
+      <p style="font-size:14px;line-height:1.65;color:var(--color-neutral-800);margin:0 0 18px">Print numbers 1–15. For multiples of 3 print <code style="background:var(--color-neutral-100);padding:1px 6px;border-radius:6px">Fizz</code>, multiples of 5 print <code style="background:var(--color-neutral-100);padding:1px 6px;border-radius:6px">Buzz</code>, multiples of both print <code style="background:var(--color-neutral-100);padding:1px 6px;border-radius:6px">FizzBuzz</code>.</p>
+      <div style="background:var(--color-accent-100);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-700);margin-bottom:5px">Why the order matters</div>
+        <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-800)">Check "both" first. If you test <code style="background:var(--color-bg);padding:1px 5px;border-radius:5px">% 3</code> before <code style="background:var(--color-bg);padding:1px 5px;border-radius:5px">% 15</code>, the number 15 prints "Fizz" and never reaches your FizzBuzz branch.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t1c }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Prints 15 lines</div>
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t2c }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>3, 6, 9, 12 → Fizz</div>
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t3c }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>5, 10 → Buzz</div>
+        <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t4c }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>15 → FizzBuzz</div>
+      </div>
+    </aside>
+
+    <section style="display:flex;flex-direction:column;padding:36px 40px;gap:16px">
+      <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md)">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(255,255,255,0.06)">
+          <span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent-600)"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent-2-600)"></span>
+          <span style="font-size:12px;color:var(--color-neutral-400);font-family:ui-monospace,Menlo,monospace;margin-left:6px">solution.py</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--color-neutral-500)">editable in the real app</span>
+        </div>
+        <div style="padding:18px 8px 18px 0;font-family:ui-monospace,Menlo,monospace;font-size:13.5px;line-height:1.8;color:var(--color-neutral-100)">
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">1</span><span><span style="color:var(--color-accent-300)">for</span> i <span style="color:var(--color-accent-300)">in</span> <span style="color:var(--color-accent-2-300)">range</span>(1, 16):</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">2</span><span>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">if</span> i % 15 == 0:</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">3</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">print</span>(<span style="color:#d9b98a">"FizzBuzz"</span>)</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">4</span><span>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">elif</span> i % 3 == 0:</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">5</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">print</span>(<span style="color:#d9b98a">"Fizz"</span>)</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">6</span><span>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">elif</span> i % 5 == 0:</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">7</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">print</span>(<span style="color:#d9b98a">"Buzz"</span>)</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">8</span><span>&nbsp;&nbsp;<span style="color:var(--color-accent-300)">else</span>:</span></div>
+          <div style="display:flex"><span style="width:44px;text-align:right;padding-right:16px;color:var(--color-neutral-600);flex:none">9</span><span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-accent-2-300)">print</span>(i)</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <button type="button" class="btn btn-primary" onClick="{{ run }}">▶ Run tests</button>
+        <button type="button" class="btn btn-ghost" onClick="{{ resetRun }}">Clear output</button>
+        <sc-if value="{{ passed }}"><span class="tag tag-accent-2" style="animation:pop 0.3s ease">ALL 4 TESTS PASSED</span></sc-if>
+      </div>
+
+      <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);padding:16px 20px;min-height:120px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.7">
+        <sc-if value="{{ passed }}">
+          <div style="animation:pop 0.25s ease">
+            <div style="color:var(--color-neutral-400)">$ python solution.py</div>
+            <div style="color:var(--color-neutral-100)">1&nbsp;&nbsp;2&nbsp;&nbsp;Fizz&nbsp;&nbsp;4&nbsp;&nbsp;Buzz&nbsp;&nbsp;Fizz&nbsp;&nbsp;7&nbsp;&nbsp;8&nbsp;&nbsp;Fizz&nbsp;&nbsp;Buzz&nbsp;&nbsp;11&nbsp;&nbsp;Fizz&nbsp;&nbsp;13&nbsp;&nbsp;14&nbsp;&nbsp;FizzBuzz</div>
+            <div style="color:var(--color-accent-2-300);margin-top:8px">✓ prints 15 lines&nbsp;&nbsp;✓ Fizz on multiples of 3&nbsp;&nbsp;✓ Buzz on multiples of 5&nbsp;&nbsp;✓ FizzBuzz on 15</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ idle }}" hint-placeholder-val="{{ true }}"><div style="color:var(--color-neutral-500)">Output appears here. Run the tests when you think the solution is right.</div></sc-if>
+      </div>
+    </section>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { passed: false };
+  renderVals() {
+    const ok = this.state.passed;
+    const pending = 'var(--color-neutral-500)';
+    const done = 'var(--color-accent-2-700)';
+    return {
+      passed: ok, idle: !ok,
+      t1c: ok ? done : pending, t2c: ok ? done : pending, t3c: ok ? done : pending, t4c: ok ? done : pending,
+      run: () => this.setState({ passed: true }),
+      resetRun: () => this.setState({ passed: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

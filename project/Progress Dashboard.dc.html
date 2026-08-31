@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Personal stats dashboard</span>
+    <span class="tag tag-accent">4-DAY STREAK</span>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:44px 48px 110px">
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:38px;margin:0 0 6px;color:var(--color-accent-700)">Nice pace, Ada</h1>
+    <p style="font-size:14.5px;color:var(--color-neutral-700);margin:0 0 30px">Your week in learning — streaks, minutes, and what to hit next.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:8px">Streak</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:var(--font-heading);font-size:34px;color:var(--color-accent-700)">4</span><span style="font-size:13px;color:var(--color-neutral-600)">days</span></div>
+        <div style="font-size:12px;color:var(--color-accent-2-700);margin-top:6px">Best: 11 — keep going</div>
+      </div>
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:8px">This week</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:var(--font-heading);font-size:34px;color:var(--color-accent-700)">3.2</span><span style="font-size:13px;color:var(--color-neutral-600)">hours</span></div>
+        <div style="font-size:12px;color:var(--color-neutral-600);margin-top:6px">Goal: 4 h · 80% there</div>
+      </div>
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:8px">Concepts done</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:var(--font-heading);font-size:34px;color:var(--color-accent-700)">8</span><span style="font-size:13px;color:var(--color-neutral-600)">of 23</span></div>
+        <div style="font-size:12px;color:var(--color-neutral-600);margin-top:6px">Backend path · 34%</div>
+      </div>
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:20px 22px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:8px">Quiz accuracy</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:var(--font-heading);font-size:34px;color:var(--color-accent-2-700)">86%</span></div>
+        <div style="font-size:12px;color:var(--color-neutral-600);margin-top:6px">First-try, last 30 days</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:22px;align-items:start">
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:22px 24px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:16px">Minutes per day, last two weeks</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;height:150px">
+          <sc-for list="{{ days }}" as="d" hint-placeholder-count="14">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+              <div style="width:100%;border-radius:8px 8px 4px 4px;height:{{ d.h }}%;background:{{ d.color }}" title="{{ d.min }} min"></div>
+              <span style="font-size:10px;color:var(--color-neutral-500)">{{ d.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;font-size:12px;color:var(--color-neutral-600);margin-top:12px">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--color-accent)"></span>hit daily goal (20 min)</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--color-neutral-300)"></span>under goal</span>
+        </div>
+      </div>
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:22px 24px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:16px">Path completion</div>
+        <div style="display:flex;align-items:center;gap:18px">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="46" fill="none" stroke="var(--color-neutral-300)" stroke-width="12"/>
+            <circle cx="55" cy="55" r="46" fill="none" stroke="var(--color-accent-2)" stroke-width="12" stroke-linecap="round" stroke-dasharray="98 191" transform="rotate(-90 55 55)"/>
+            <text x="55" y="61" text-anchor="middle" font-family="Caprasimo,serif" font-size="22" fill="var(--color-accent-2-700)">34%</text>
+          </svg>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <span style="display:flex;align-items:center;gap:8px;color:var(--color-neutral-800)"><span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent-2)"></span>8 mastered</span>
+            <span style="display:flex;align-items:center;gap:8px;color:var(--color-neutral-800)"><span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent)"></span>2 in progress</span>
+            <span style="display:flex;align-items:center;gap:8px;color:var(--color-neutral-800)"><span style="width:9px;height:9px;border-radius:50%;background:var(--color-neutral-400)"></span>13 locked</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--color-neutral-300)">
+          <div style="font-size:12px;color:var(--color-neutral-600);margin-bottom:8px">Weakest topic by quiz score</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:700">Exit codes</span>
+            <a href="Quiz Mode.dc.html" style="font-size:13px;color:var(--color-accent-700);font-weight:600;text-decoration:none">Review →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:22px 24px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:14px">Badges</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <div style="text-align:center;width:86px">
+            <div style="width:62px;height:62px;border-radius:50%;background:var(--color-accent-100);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;border:2px solid var(--color-accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+            <span style="font-size:11.5px;color:var(--color-neutral-700);line-height:1.3;display:block">Terminal Tamer</span>
+          </div>
+          <div style="text-align:center;width:86px">
+            <div style="width:62px;height:62px;border-radius:50%;background:var(--color-accent-2-100);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;border:2px solid var(--color-accent-2)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-2-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.9 4.9 2.9 2.9"/><path d="m16.2 16.2 2.9 2.9"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.9 19.1 2.9-2.9"/><path d="m16.2 7.8 2.9-2.9"/></svg></div>
+            <span style="font-size:11.5px;color:var(--color-neutral-700);line-height:1.3;display:block">7-Day Flame</span>
+          </div>
+          <div style="text-align:center;width:86px">
+            <div style="width:62px;height:62px;border-radius:50%;background:var(--color-neutral-100);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;border:2px dashed var(--color-neutral-400)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+            <span style="font-size:11.5px;color:var(--color-neutral-500);line-height:1.3;display:block">Bug Hunter<br/>2 of 5 cases</span>
+          </div>
+          <div style="text-align:center;width:86px">
+            <div style="width:62px;height:62px;border-radius:50%;background:var(--color-neutral-100);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;border:2px dashed var(--color-neutral-400)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></svg></div>
+            <span style="font-size:11.5px;color:var(--color-neutral-500);line-height:1.3;display:block">First Path<br/>34%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card elev-sm" style="border-radius:var(--radius-lg);padding:22px 24px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:14px">Up next — 15 minutes total</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="Flashcards.dc.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--color-accent-100);text-decoration:none">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="16" height="12" rx="3"/><path d="M22 8v10a2 2 0 0 1-2 2H8"/></svg>
+            <span style="flex:1;font-size:13.5px;font-weight:600;color:var(--color-accent-800)">5 flashcards due (HTTP deck)</span>
+            <span style="font-size:12px;color:var(--color-accent-700)">4 min</span>
+          </a>
+          <a href="Quiz Mode.dc.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--color-neutral-100);text-decoration:none">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span style="flex:1;font-size:13.5px;font-weight:600;color:var(--color-neutral-800)">Retry: exit codes checkpoint</span>
+            <span style="font-size:12px;color:var(--color-neutral-600)">5 min</span>
+          </a>
+          <a href="Git Branching.dc.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--color-neutral-100);text-decoration:none">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a3 3 0 0 0 3 3h6"/></svg>
+            <span style="flex:1;font-size:13.5px;font-weight:600;color:var(--color-neutral-800)">Continue: Branching &amp; Merging</span>
+            <span style="font-size:12px;color:var(--color-neutral-600)">6 min</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const mins = [25, 0, 40, 22, 15, 0, 30, 45, 20, 0, 35, 28, 24, 31];
+    const labels = ['M','T','W','T','F','S','S','M','T','W','T','F','S','S'];
+    return {
+      days: mins.map((m, i) => ({
+        min: m, label: labels[i],
+        h: Math.max(4, Math.round((m / 45) * 100)),
+        color: m >= 20 ? 'var(--color-accent)' : 'var(--color-neutral-300)'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

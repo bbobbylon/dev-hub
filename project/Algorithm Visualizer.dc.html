@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Algorithm visualizer</span>
+    <span class="tag tag-accent">DATA STRUCTURES &amp; ALGORITHMS</span>
+  </nav>
+
+  <main style="max-width:1000px;margin:0 auto;padding:48px 48px 100px">
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:42px;margin:0 0 10px;color:var(--color-accent-700)">Bubble sort, one comparison at a time</h1>
+    <p style="font-size:15.5px;line-height:1.6;color:var(--color-neutral-700);max-width:620px;margin:0 0 36px">Step through the algorithm and watch the largest value bubble to the end of each pass. The highlighted pseudocode line is the one that just ran.</p>
+
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start">
+      <div class="card elev-md" style="border-radius:var(--radius-lg);padding:28px">
+        <div style="display:flex;align-items:flex-end;gap:14px;height:220px;margin-bottom:6px">
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+              <div style="width:100%;border-radius:14px 14px 6px 6px;transition:height 0.3s ease,background 0.2s ease;height:{{ b.h }}px;background:{{ b.color }};box-shadow:var(--shadow-sm)"></div>
+              <span style="font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:700;color:{{ b.labelColor }}">{{ b.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;color:var(--color-neutral-800);background:var(--color-neutral-100);border-radius:14px;padding:10px 16px">{{ note }}</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
+          <button type="button" class="btn btn-secondary" onClick="{{ prev }}">← Back</button>
+          <button type="button" class="btn btn-primary" onClick="{{ next }}">{{ nextLabel }}</button>
+          <button type="button" class="btn btn-ghost" onClick="{{ reset }}">Reset</button>
+        </div>
+        <div style="display:flex;gap:5px;margin-top:16px">
+          <sc-for list="{{ progress }}" as="p" hint-placeholder-count="10">
+            <div style="flex:1;height:5px;border-radius:999px;background:{{ p.color }}"></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);padding:20px 22px">
+          <div style="font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400);margin-bottom:12px">Pseudocode</div>
+          <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.7">
+            <sc-for list="{{ codeLines }}" as="l" hint-placeholder-count="4">
+              <div style="padding:3px 10px;border-radius:8px;white-space:pre;color:{{ l.color }};background:{{ l.bg }}">{{ l.text }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div class="card" style="border-radius:var(--radius-lg);padding:18px 20px">
+          <div style="font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:10px">Live counters</div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0"><span style="color:var(--color-neutral-700)">Comparisons</span><strong>{{ comparisons }}</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0"><span style="color:var(--color-neutral-700)">Swaps</span><strong>{{ swaps }}</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0"><span style="color:var(--color-neutral-700)">Pass</span><strong>{{ pass }}</strong></div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--color-neutral-300);font-size:13px;line-height:1.55;color:var(--color-neutral-700)">Worst case <strong style="font-family:ui-monospace,monospace">O(n²)</strong> — every pair compared. Already-sorted input finishes in one pass: <strong style="font-family:ui-monospace,monospace">O(n)</strong>.</div>
+        </div>
+        <div style="display:flex;gap:14px;font-size:12.5px;color:var(--color-neutral-700);flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:4px;background:var(--color-accent)"></span>comparing</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:4px;background:var(--color-accent-2)"></span>sorted</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:4px;background:var(--color-neutral-400)"></span>unsorted</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { f: 0 };
+  frames = [
+    { a: [5,2,8,3,6], cmp: [0,1], sorted: [], note: 'Compare 5 and 2 — 5 > 2, so swap.', line: 2, c: 1, s: 0, pass: 1 },
+    { a: [2,5,8,3,6], cmp: [1,2], sorted: [], note: 'Compare 5 and 8 — already in order, no swap.', line: 2, c: 2, s: 1, pass: 1 },
+    { a: [2,5,8,3,6], cmp: [2,3], sorted: [], note: 'Compare 8 and 3 — 8 > 3, swap.', line: 3, c: 3, s: 2, pass: 1 },
+    { a: [2,5,3,8,6], cmp: [3,4], sorted: [], note: 'Compare 8 and 6 — 8 > 6, swap. 8 reaches the end.', line: 3, c: 4, s: 3, pass: 1 },
+    { a: [2,5,3,6,8], cmp: [], sorted: [4], note: 'Pass 1 done — the largest value bubbled to the last slot. It never moves again.', line: 0, c: 4, s: 3, pass: 1 },
+    { a: [2,5,3,6,8], cmp: [0,1], sorted: [4], note: 'Pass 2. Compare 2 and 5 — no swap.', line: 2, c: 5, s: 3, pass: 2 },
+    { a: [2,5,3,6,8], cmp: [1,2], sorted: [4], note: 'Compare 5 and 3 — swap.', line: 3, c: 6, s: 4, pass: 2 },
+    { a: [2,3,5,6,8], cmp: [2,3], sorted: [4], note: 'Compare 5 and 6 — no swap.', line: 2, c: 7, s: 4, pass: 2 },
+    { a: [2,3,5,6,8], cmp: [], sorted: [3,4], note: 'Pass 2 done — 6 locked in.', line: 0, c: 7, s: 4, pass: 2 },
+    { a: [2,3,5,6,8], cmp: [], sorted: [0,1,2,3,4], note: 'Pass 3 makes zero swaps — the array is sorted, so bubble sort stops early.', line: 4, c: 9, s: 4, pass: 3 }
+  ];
+  code = ['for i in 0 .. n-1:', '  for j in 0 .. n-i-2:', '    if a[j] > a[j+1]:', '      swap(a[j], a[j+1])', 'stop when a pass makes no swaps'];
+  renderVals() {
+    const f = this.frames[this.state.f];
+    const bars = f.a.map((v, i) => {
+      const comparing = f.cmp.includes(i);
+      const sorted = f.sorted.includes(i);
+      const color = comparing ? 'var(--color-accent)' : sorted ? 'var(--color-accent-2)' : 'var(--color-neutral-400)';
+      return { v, h: v * 26, color, labelColor: comparing ? 'var(--color-accent-700)' : sorted ? 'var(--color-accent-2-700)' : 'var(--color-neutral-600)' };
+    });
+    const codeLines = this.code.map((text, i) => ({
+      text,
+      color: (i + 1 === f.line || (f.line === 0 && i === 0)) ? 'var(--color-bg)' : 'var(--color-neutral-400)',
+      bg: (i + 1 === f.line || (f.line === 0 && i === 0)) ? 'var(--color-accent-700)' : 'transparent'
+    }));
+    return {
+      bars, codeLines, note: f.note, comparisons: f.c, swaps: f.s, pass: f.pass + ' of 3',
+      progress: this.frames.map((_, i) => ({ color: i <= this.state.f ? 'var(--color-accent)' : 'var(--color-neutral-300)' })),
+      nextLabel: this.state.f >= this.frames.length - 1 ? 'Done' : 'Step →',
+      next: () => this.setState({ f: Math.min(this.state.f + 1, this.frames.length - 1) }),
+      prev: () => this.setState({ f: Math.max(this.state.f - 1, 0) }),
+      reset: () => this.setState({ f: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>

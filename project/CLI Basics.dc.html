@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo:wght@400&family=Figtree:wght@400;600;700&display=swap');
+:root{
+  --bg:#f5ead8;--surface:#ebddc5;--surface2:#eee7db;--text:#201e1d;
+  --accent:#c67139;--accent-100:#fff2eb;--accent-200:#ffe1d0;--accent-600:#b2622d;--accent-700:#8c491a;
+  --accent2:#7a8a5e;--accent2-100:#f0fae1;--accent2-600:#728157;--accent2-700:#56633f;
+  --neutral-100:#f9f4ed;--neutral-300:#dcd3c4;--neutral-400:#c0b6a5;--neutral-500:#a19786;--neutral-600:#82796a;--neutral-700:#645c50;--neutral-800:#474238;--neutral-900:#2e2b25;
+  --divider:rgba(32,30,29,0.16);
+  --font-h:'Caprasimo',system-ui,sans-serif;--font-b:'Figtree',system-ui,sans-serif;
+  --radius-sm:8px;--radius-md:16px;--radius-lg:32px;
+  --shadow-sm:0 1px 2px rgba(46,43,37,0.14);--shadow-md:0 3px 10px rgba(46,43,37,0.16);--shadow-lg:0 12px 32px rgba(46,43,37,0.22);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-b);color:var(--text);background:var(--bg)}
+::selection{background:rgba(198,113,57,0.3)}
+a{color:var(--accent-700);text-decoration:none}
+a:hover{color:var(--accent-600)}
+@keyframes pop{0%{transform:scale(0.92);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);font-family:var(--font-b);color:var(--text)">
+
+  <nav style="position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:28px;padding:14px 32px;background:var(--bg);border-bottom:1px solid var(--divider)">
+    <a href="Dev Hub.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-h);font-size:19px;color:var(--text)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Dev Hub
+    </a>
+    <div style="display:flex;gap:20px;font-size:14px;margin-right:auto">
+      <a href="#" style="color:var(--accent-700);font-weight:600">Concepts</a>
+      <a href="#" style="color:var(--text)">Roadmap</a>
+      <a href="#" style="color:var(--text)">Playground</a>
+    </div>
+    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:999px;background:var(--accent-100);color:var(--accent-700)">🔥 4 day streak</span>
+  </nav>
+
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:260px 1fr">
+
+    <aside style="position:sticky;top:57px;align-self:start;height:calc(100vh - 57px);overflow-y:auto;padding:28px 20px;border-right:1px solid var(--divider)">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--neutral-600);margin:0 8px 8px">Terminal &amp; Shell</div>
+      <a href="#" aria-current="page" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;background:var(--accent-100);color:var(--accent-700);font-weight:600;font-size:14px;margin-bottom:2px">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--accent-700)"></span>CLI Basics</a>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--text);font-size:14px;margin-bottom:2px">
+        <span style="width:7px;height:7px;border-radius:50%;border:1.5px solid var(--neutral-400)"></span>Shell Scripting</a>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--neutral-600);font-size:14px;margin-bottom:2px;opacity:0.6">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Environment Variables</a>
+
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--neutral-600);margin:24px 8px 8px">Version Control</div>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--neutral-600);font-size:14px;margin-bottom:2px;opacity:0.6">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Git Basics</a>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--neutral-600);font-size:14px;margin-bottom:2px;opacity:0.6">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Branching &amp; Merging</a>
+
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--neutral-600);margin:24px 8px 8px">Data Structures</div>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--neutral-600);font-size:14px;margin-bottom:2px;opacity:0.6">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Arrays &amp; Lists</a>
+      <a href="#" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;color:var(--neutral-600);font-size:14px;margin-bottom:2px;opacity:0.6">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Hash Maps</a>
+    </aside>
+
+    <main style="padding:48px 56px 120px;max-width:800px">
+
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <span style="font-size:11px;letter-spacing:0.05em;padding:4px 11px;border-radius:999px;background:var(--accent2-100);color:var(--accent2-700)">BEGINNER</span>
+        <span style="font-size:11px;letter-spacing:0.05em;padding:4px 11px;border-radius:999px;background:var(--neutral-100);color:var(--neutral-700)">15 MIN READ</span>
+      </div>
+      <h1 style="font-family:var(--font-h);font-weight:400;font-size:52px;line-height:1.05;margin:0 0 16px;color:var(--accent-700)">CLI Basics</h1>
+      <p style="font-size:17px;line-height:1.65;color:var(--neutral-700);max-width:640px;margin:0 0 36px">
+        The command line is just a <strong style="color:var(--text)">conversation</strong>: the shell prints a <em>prompt</em>, you type a command, it runs and prints the result, then prompts again. Master a dozen commands — move around, look at files, create and delete things, and ask for help — and you can drive any machine. This page shows them in <strong style="color:var(--text)">Bash</strong>, <strong style="color:var(--text)">PowerShell</strong>, and <strong style="color:var(--text)">CMD</strong> together.
+      </p>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;background:var(--surface2);border-radius:calc(var(--radius-lg)*1.1);padding:22px 26px;margin-bottom:44px">
+        <div style="flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        </div>
+        <p style="font-size:19px;line-height:1.45;font-weight:700;color:var(--accent-700);margin:2px 0 0">
+          What is the command line — and why does every developer eventually need to know at least 12 commands that work on any machine?
+        </p>
+      </div>
+
+      <section style="margin-bottom:40px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">The idea</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 12px">What is the CLI, really?</h3>
+        <p style="font-size:15.5px;line-height:1.7;color:var(--neutral-800);margin:0">
+          The command-line interface (CLI) is a text-based way to interact with an operating system and its programs. Instead of clicking icons in a GUI, you type commands that the shell interprets and executes. The shell is the program that accepts your commands, figures out which program to run, runs it, and shows you the output. On Linux/macOS the default shell is usually Bash or Zsh. On Windows, PowerShell is the modern shell, with CMD (cmd.exe) being the legacy option.
+        </p>
+      </section>
+
+      <section style="margin-bottom:40px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Motivation</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 16px">Why learn the CLI at all?</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:var(--surface);border-radius:calc(var(--radius-lg)*1.15);padding:16px 18px">
+            <div style="font-family:var(--font-h);font-size:20px;color:var(--accent);margin-bottom:6px">01</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Many tools are CLI-only</div>
+            <div style="font-size:13px;color:var(--neutral-700);line-height:1.5">Most CI/CD pipelines, Docker, Kubernetes, cloud CLIs (az, aws, gcloud), and deployment scripts are CLI-based.</div>
+          </div>
+          <div style="background:var(--surface);border-radius:calc(var(--radius-lg)*1.15);padding:16px 18px">
+            <div style="font-family:var(--font-h);font-size:20px;color:var(--accent);margin-bottom:6px">02</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Automation</div>
+            <div style="font-size:13px;color:var(--neutral-700);line-height:1.5">If you can do something in the CLI, you can script it. Click-based UIs can't be scripted.</div>
+          </div>
+          <div style="background:var(--surface);border-radius:calc(var(--radius-lg)*1.15);padding:16px 18px">
+            <div style="font-family:var(--font-h);font-size:20px;color:var(--accent);margin-bottom:6px">03</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Remote access</div>
+            <div style="font-size:13px;color:var(--neutral-700);line-height:1.5">When you SSH into a server, there's no GUI — you only have a CLI.</div>
+          </div>
+          <div style="background:var(--surface);border-radius:calc(var(--radius-lg)*1.15);padding:16px 18px">
+            <div style="font-family:var(--font-h);font-size:20px;color:var(--accent);margin-bottom:6px">04</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Speed</div>
+            <div style="font-size:13px;color:var(--neutral-700);line-height:1.5">Experienced developers navigate and manipulate files faster in the CLI than in any file browser.</div>
+          </div>
+        </div>
+      </section>
+
+      <section style="margin-bottom:40px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Try it — click a part</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 14px">Anatomy of a CLI command</h3>
+        <p style="font-size:14.5px;color:var(--neutral-700);margin:0 0 16px">A command is typically <code style="background:var(--surface);padding:2px 6px;border-radius:6px">[command] [flags/options] [arguments]</code>. Click each part of the example below.</p>
+        <div style="display:flex;gap:10px;margin-bottom:16px;font-family:ui-monospace,Menlo,monospace;font-size:19px;flex-wrap:wrap">
+          <button type="button" onClick="{{ selectCommand }}" style="cursor:pointer;padding:10px 16px;border-radius:12px;font-family:inherit;font-size:inherit;style-hover:opacity:0.85;{{ anatomyCommandStyle }}">ls</button>
+          <button type="button" onClick="{{ selectFlags }}" style="cursor:pointer;padding:10px 16px;border-radius:12px;font-family:inherit;font-size:inherit;{{ anatomyFlagsStyle }}">-la</button>
+          <button type="button" onClick="{{ selectArgs }}" style="cursor:pointer;padding:10px 16px;border-radius:12px;font-family:inherit;font-size:inherit;{{ anatomyArgsStyle }}">/var/log</button>
+        </div>
+        <div style="background:var(--surface2);border-radius:20px;padding:16px 20px;min-height:60px">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-700);font-weight:600;margin-bottom:4px">{{ anatomyDefLabel }}</div>
+          <div style="font-size:15px;line-height:1.5">{{ anatomyDefText }}</div>
+        </div>
+      </section>
+
+      <section style="margin-bottom:40px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Reference</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 16px">The 12 commands you must know</h3>
+
+        <div style="font-size:12px;font-weight:600;color:var(--neutral-600);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Navigation</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">pwd</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Where am I?</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">ls / dir</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">What's here?</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">cd</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Change directory</div></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--neutral-600);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">File operations</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">cat / type</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Show file contents</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">mkdir</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Create directory</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">rm / del</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Delete</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">cp / copy</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Copy</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">mv / move</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Rename / move</div></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:var(--neutral-600);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Power tools</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">grep</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Search in files</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">find</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Find files</div></div>
+          <div style="background:var(--surface);border-radius:16px;padding:12px 14px"><code style="color:var(--accent-700);font-weight:700">| and man</code><div style="font-size:12.5px;color:var(--neutral-700);margin-top:4px">Chain commands · read the manual</div></div>
+        </div>
+      </section>
+
+      <section style="margin-bottom:40px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Every command answers with one</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 14px">Exit codes</h3>
+        <p style="font-size:15px;line-height:1.65;color:var(--neutral-800);margin:0 0 16px">Every command exits with a numeric code. In scripts and CI/CD, exit codes chain commands — <code style="background:var(--surface);padding:2px 6px;border-radius:6px">command1 &amp;&amp; command2</code> runs command2 ONLY if command1 succeeded. CI/CD pipelines fail the build if any command exits non-zero.</p>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--accent2-100);color:var(--accent2-700);padding:8px 16px;border-radius:999px;font-family:ui-monospace,monospace;font-size:14px;font-weight:600">0 = success</span>
+          <span style="color:var(--neutral-500);font-size:14px">vs.</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--accent-100);color:var(--accent-700);padding:8px 16px;border-radius:999px;font-family:ui-monospace,monospace;font-size:14px;font-weight:600">anything else = error</span>
+        </div>
+      </section>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;background:var(--accent2-100);border-radius:calc(var(--radius-lg)*1.1);padding:20px 24px;margin-bottom:44px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent2-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M12 22a9 9 0 1 0-9-9 8.9 8.9 0 0 0 1.3 4.6L3 22l4.6-1.3A9 9 0 0 0 12 22Z"/></svg>
+        <div>
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2-700);font-weight:700;margin-bottom:6px">There are no dumb questions</div>
+          <div style="font-size:14.5px;font-weight:700;margin-bottom:4px">"Do I need to memorize every flag?"</div>
+          <div style="font-size:14px;line-height:1.55;color:var(--neutral-800)">No. Muscle memory comes from repetition, not memorization. Run the commands in the walkthrough below a few times and the common ones will stick — keep <code style="background:var(--bg);padding:1px 5px;border-radius:5px">man</code> or <code style="background:var(--bg);padding:1px 5px;border-radius:5px">--help</code> open for the rest.</div>
+        </div>
+      </div>
+
+      <section style="margin-bottom:44px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:10px">Cheat sheet — Bash, PowerShell, and general pipes/exit codes side by side</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+
+          <div style="background:var(--neutral-900);border-radius:20px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.06)">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--neutral-100);text-transform:uppercase">Navigation + file ops · Bash</span>
+              <button type="button" onClick="{{ copyBash }}" style="background:none;border:none;cursor:pointer;color:var(--neutral-100);padding:2px" aria-label="Copy">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <sc-if value="{{ copiedBash }}"><div style="padding:4px 14px;font-size:11px;color:var(--accent2)">Copied!</div></sc-if>
+            <div style="margin:0;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;color:var(--neutral-100);overflow-x:auto">
+              <div>pwd <span style="color:var(--neutral-400)"># print working directory</span></div>
+              <div>ls -la <span style="color:var(--neutral-400)"># -l=long, -a=all (hidden too)</span></div>
+              <div>cd /var/log <span style="color:var(--neutral-400)"># absolute path</span></div>
+              <div>cd .. <span style="color:var(--neutral-400)"># up one level</span></div>
+              <div>cd ~/projects <span style="color:var(--neutral-400)"># ~ = home directory</span></div>
+              <div><span style="color:var(--neutral-400)"># create / delete:</span></div>
+              <div>mkdir -p a/b/c <span style="color:var(--neutral-400)"># -p = parents, no error if exists</span></div>
+              <div>rm -rf ./build <span style="color:var(--neutral-400)"># DANGER: no undo!</span></div>
+              <div>touch file.txt <span style="color:var(--neutral-400)"># create / touch a file</span></div>
+              <div>cp -r src/ dest/ <span style="color:var(--neutral-400)"># -r = recursive</span></div>
+              <div>mv old.txt new.txt <span style="color:var(--neutral-400)"># rename / move</span></div>
+              <div><span style="color:var(--neutral-400)"># view contents:</span></div>
+              <div>cat file.txt <span style="color:var(--neutral-400)"># whole file</span></div>
+              <div>less file.txt <span style="color:var(--neutral-400)"># page through (q to quit)</span></div>
+              <div>head -20 file.txt <span style="color:var(--neutral-400)"># first 20 lines</span></div>
+            </div>
+          </div>
+
+          <div style="background:var(--neutral-900);border-radius:20px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.06)">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--neutral-100);text-transform:uppercase">Navigation + file ops · PowerShell</span>
+              <button type="button" onClick="{{ copyPs }}" style="background:none;border:none;cursor:pointer;color:var(--neutral-100);padding:2px" aria-label="Copy">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <sc-if value="{{ copiedPs }}"><div style="padding:4px 14px;font-size:11px;color:var(--accent2)">Copied!</div></sc-if>
+            <div style="margin:0;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;color:var(--neutral-100);overflow-x:auto">
+              <div>Get-Location <span style="color:var(--neutral-400)"># = pwd</span></div>
+              <div>Get-ChildItem -la <span style="color:var(--neutral-400)"># = ls -la</span></div>
+              <div>Set-Location path <span style="color:var(--neutral-400)"># = cd</span></div>
+              <div><span style="color:var(--neutral-400)"># create / delete:</span></div>
+              <div>New-Item -ItemType Directory -Force a/b/c <span style="color:var(--neutral-400)"># mkdir -p</span></div>
+              <div>Remove-Item -Recurse -Force ./build <span style="color:var(--neutral-400)"># rm -rf</span></div>
+              <div>New-Item -ItemType File file.txt <span style="color:var(--neutral-400)"># touch</span></div>
+              <div>Copy-Item -Recurse src/ dest/ <span style="color:var(--neutral-400)"># cp -r</span></div>
+              <div>Move-Item old.txt new.txt <span style="color:var(--neutral-400)"># mv</span></div>
+              <div><span style="color:var(--neutral-400)"># view contents:</span></div>
+              <div>Get-Content file.txt <span style="color:var(--neutral-400)"># cat</span></div>
+              <div>Get-Content file.txt -Head 20 <span style="color:var(--neutral-400)"># head -20</span></div>
+              <div>Get-Content app.log -Wait <span style="color:var(--neutral-400)"># tail -f</span></div>
+              <div>(Get-Content file.txt).Count <span style="color:var(--neutral-400)"># wc -l</span></div>
+              <div><span style="color:var(--neutral-400)"># find / search:</span></div>
+              <div>Get-ChildItem -Recurse -Filter "*.java" <span style="color:var(--neutral-400)"># find</span></div>
+              <div>Select-String "spring" app.log <span style="color:var(--neutral-400)"># grep</span></div>
+            </div>
+          </div>
+
+          <div style="background:var(--neutral-900);border-radius:20px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.06)">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--neutral-100);text-transform:uppercase">Pipes, redirection, exit codes</span>
+              <button type="button" onClick="{{ copyPipes }}" style="background:none;border:none;cursor:pointer;color:var(--neutral-100);padding:2px" aria-label="Copy">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <sc-if value="{{ copiedPipes }}"><div style="padding:4px 14px;font-size:11px;color:var(--accent2)">Copied!</div></sc-if>
+            <div style="margin:0;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;color:var(--neutral-100);overflow-x:auto">
+              <div><span style="color:var(--neutral-400)"># pipes: one command's output → next's input</span></div>
+              <div>ls -l | grep ".java" <span style="color:var(--neutral-400)"># only .java files</span></div>
+              <div>cat app.log | grep ERROR | head -10 <span style="color:var(--neutral-400)"># first 10 errors</span></div>
+              <div>ps aux | grep "spring" | wc -l <span style="color:var(--neutral-400)"># count matches</span></div>
+              <div><span style="color:var(--neutral-400)"># redirection:</span></div>
+              <div>echo "hello" &gt; file.txt <span style="color:var(--neutral-400)"># overwrite</span></div>
+              <div>echo "world" &gt;&gt; file.txt <span style="color:var(--neutral-400)"># append</span></div>
+              <div>mvn test 2&gt;errors.txt <span style="color:var(--neutral-400)"># stderr to file</span></div>
+              <div>mvn test &gt;out.txt 2&gt;&amp;1 <span style="color:var(--neutral-400)"># both streams</span></div>
+              <div><span style="color:var(--neutral-400)"># exit codes (critical for CI/CD):</span></div>
+              <div>ls /var/log; echo "exit: $?" <span style="color:var(--neutral-400)"># $? in Bash</span></div>
+              <div>$LASTEXITCODE <span style="color:var(--neutral-400)"># in PowerShell</span></div>
+              <div>mvn clean install &amp;&amp; docker build . <span style="color:var(--neutral-400)"># docker only if mvn succeeded</span></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;background:var(--accent-100);border-radius:calc(var(--radius-lg)*1.1);padding:20px 24px;margin-bottom:52px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-700)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.2V16h6v-1.3c0-.9.4-1.7 1-2.2A6 6 0 0 0 12 2Z"/></svg>
+        <div>
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-700);font-weight:700;margin-bottom:6px">Brain power</div>
+          <div style="font-size:15px;line-height:1.6;font-style:italic;color:var(--neutral-800)">Before you keep scrolling: what single command would you run to find every <code style="background:var(--bg);padding:1px 5px;border-radius:5px;font-style:normal">.log</code> file larger than 10MB inside <code style="background:var(--bg);padding:1px 5px;border-radius:5px;font-style:normal">/var</code>? Take a guess — the walkthrough below builds up to the real answer, one step at a time.</div>
+        </div>
+      </div>
+
+      <section style="margin-bottom:52px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Check yourself</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 16px">Quick quiz</h3>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ quiz }}" as="q" hint-placeholder-count="3">
+            <div style="background:var(--surface);border-radius:calc(var(--radius-lg)*1.15);padding:20px 22px">
+              <div style="font-size:15px;font-weight:700;margin-bottom:12px">{{ q.question }}</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ q.options }}" as="opt" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ opt.onClick }}" style="text-align:left;cursor:pointer;padding:10px 14px;border-radius:12px;font-family:inherit;font-size:14px;{{ opt.style }}">{{ opt.text }}</button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ q.answered }}">
+                <div style="margin-top:12px;font-size:13.5px;line-height:1.5">
+                  <span style="font-weight:700;color:{{ q.resultColor }}">{{ q.resultText }} </span>{{ q.explanation }}
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="margin-bottom:24px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-700);font-weight:600;margin-bottom:6px">Let's use this for real</div>
+        <h3 style="font-family:var(--font-h);font-weight:400;font-size:24px;margin:0 0 6px">Find every huge log file</h3>
+        <p style="font-size:14.5px;color:var(--neutral-700);margin:0 0 20px">A step-by-step terminal walkthrough. Reveal each command's output before moving to the next step.</p>
+
+        <div style="display:flex;flex-direction:column;gap:0">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;opacity:{{ s.opacity }}">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center">
+                <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--accent);color:var(--bg)">
+                  <sc-if value="{{ s.isPast }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                  <sc-if value="{{ s.isCurrent }}" hint-placeholder-val="{{ false }}">{{ s.n }}</sc-if>
+                  <sc-if value="{{ s.isFuture }}" hint-placeholder-val="{{ false }}">{{ s.n }}</sc-if>
+                </div>
+                <div style="width:2px;flex:1;background:var(--divider);min-height:24px"></div>
+              </div>
+              <div style="flex:1;padding-bottom:28px">
+                <div style="font-size:15px;font-weight:700;margin-bottom:8px">{{ s.instruction }}</div>
+                <div style="background:var(--neutral-900);border-radius:16px;padding:12px 16px;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--accent-200)">$ {{ s.command }}</div>
+                <sc-if value="{{ s.revealed }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:var(--neutral-800);border-radius:0 0 16px 16px;margin-top:-4px;padding:12px 16px;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--neutral-100);white-space:pre-wrap;animation:pop 0.25s ease">{{ s.output }}</div>
+                  <div style="font-size:13.5px;color:var(--neutral-700);margin-top:10px;line-height:1.5">{{ s.explain }}</div>
+                </sc-if>
+                <sc-if value="{{ s.showRevealBtn }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" onClick="{{ s.onReveal }}" style="margin-top:10px;cursor:pointer;padding:8px 16px;border-radius:999px;background:var(--accent);color:var(--bg);border:none;font-family:var(--font-h);font-size:13px">Run it →</button>
+                </sc-if>
+                <sc-if value="{{ s.showNextBtn }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" onClick="{{ s.onNext }}" style="margin-top:10px;cursor:pointer;padding:8px 16px;border-radius:999px;background:var(--surface);color:var(--text);border:1px solid var(--divider);font-family:var(--font-h);font-size:13px">Next step →</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <div style="border:2px dashed var(--neutral-400);border-radius:24px;padding:24px;text-align:center;color:var(--neutral-600);font-size:13px">
+        Your existing full step-by-step playthrough component mounts here — restyle it with the same tokens (rounded terminal panels, accent-2 for success states) used above.
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { anatomy: 'command', quiz: {}, step: 0, revealed: {} };
+
+  anatomyData = {
+    command: { label: 'Command', text: "ls is the command — it tells the shell which program to run. Here, 'list directory contents'." },
+    flags: { label: 'Flags', text: "-la are flags that modify behavior: -l = long format (permissions, size, date), -a = include hidden files." },
+    args: { label: 'Argument', text: "/var/log is the argument — the thing the command acts on. Here, which directory to list." }
+  };
+
+  quizData = [
+    { question: "Which command shows your current directory?", options: ["pwd", "ls", "cd", "cat"], correct: 0, explanation: 'pwd — "print working directory" — always answers "where am I?"' },
+    { question: "You run a command and get exit code 2. What does that mean?", options: ["It succeeded", "It failed — 2 identifies the kind of error", "It's still running", "Nothing, exit codes are cosmetic"], correct: 1, explanation: "0 is the only success code. Any non-zero code signals failure, and CI/CD pipelines watch for it." },
+    { question: 'What does ls -l | grep ".java" do?', options: ['Lists files, then filters to ones matching ".java"', "Deletes all .java files", "Renames .java files", "Counts folders"], correct: 0, explanation: "The pipe (|) sends ls -l's output into grep, which filters it down to matching lines." }
+  ];
+
+  walkData = [
+    { instruction: "Where am I?", command: "pwd", output: "/home/dev", explain: "Always start by getting your bearings." },
+    { instruction: "What's in here?", command: "ls -la", output: "drwxr-xr-x  app  logs  README.md  .env", explain: "ls -la shows everything, including hidden files like .env." },
+    { instruction: "Find every .log file on the system", command: 'find / -name "*.log"', output: "/var/log/syslog\n/var/log/app/error.log\n/var/log/nginx/access.log", explain: "find searches the whole tree for anything matching the pattern." },
+    { instruction: "Now filter to files over 10MB and count them", command: 'find /var -name "*.log" -size +10M | wc -l', output: "3", explain: "The pipe chains find's matches straight into wc -l, which counts lines instead of printing them." }
+  ];
+
+  selectAnatomy(key) { this.setState({ anatomy: key }); }
+  answerQuiz(qi, oi) {
+    if (this.state.quiz[qi] !== undefined) return;
+    this.setState({ quiz: { ...this.state.quiz, [qi]: oi } });
+  }
+  revealStep(i) { this.setState({ revealed: { ...this.state.revealed, [i]: true } }); }
+  nextStep() { this.setState({ step: this.state.step + 1 }); }
+  copy(text, key) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+    this.setState({ copied: key });
+    clearTimeout(this._copyTimer);
+    this._copyTimer = setTimeout(() => this.setState({ copied: null }), 1500);
+  }
+
+  renderVals() {
+    const activeStyle = "background:var(--accent);color:var(--bg);border:1px solid var(--accent)";
+    const inactiveStyle = "background:var(--surface);color:var(--text);border:1px solid var(--divider)";
+    const anatomy = this.state.anatomy;
+
+    const quiz = this.quizData.map((q, qi) => {
+      const ans = this.state.quiz[qi];
+      const answered = ans !== undefined;
+      const options = q.options.map((text, oi) => {
+        let style = "background:var(--surface);color:var(--text);border:1.5px solid var(--divider)";
+        if (answered) {
+          if (oi === q.correct) style = "background:var(--accent2-100);color:var(--accent2-700);border:1.5px solid var(--accent2-600)";
+          else if (oi === ans) style = "background:var(--accent-100);color:var(--accent-700);border:1.5px solid var(--accent-600)";
+          else style = "background:var(--surface);color:var(--text);border:1.5px solid var(--divider);opacity:0.5";
+        }
+        return { text, style, onClick: () => this.answerQuiz(qi, oi) };
+      });
+      return {
+        question: q.question, options, answered,
+        explanation: q.explanation,
+        resultText: answered ? (ans === q.correct ? "Correct." : "Not quite.") : "",
+        resultColor: answered ? (ans === q.correct ? "var(--accent2-700)" : "var(--accent-700)") : "transparent"
+      };
+    });
+
+    const steps = this.walkData.map((s, i) => {
+      const isCurrent = i === this.state.step;
+      const isPast = i < this.state.step;
+      const isFuture = i > this.state.step;
+      const revealed = !!this.state.revealed[i];
+      return {
+        n: i + 1, instruction: s.instruction, command: s.command, output: s.output, explain: s.explain,
+        isCurrent, isPast, isFuture, revealed,
+        opacity: isFuture ? "0.4" : "1",
+        showRevealBtn: isCurrent && !revealed,
+        showNextBtn: isCurrent && revealed && i < this.walkData.length - 1,
+        onReveal: () => this.revealStep(i),
+        onNext: () => this.nextStep()
+      };
+    });
+
+    const bashCode = 'pwd\nls -la\ncd /var/log\ncd ..\ncd ~/projects\nmkdir -p a/b/c\nrm -rf ./build\ntouch file.txt\ncp -r src/ dest/\nmv old.txt new.txt\ncat file.txt\nless file.txt\nhead -20 file.txt';
+    const psCode = 'Get-Location\nGet-ChildItem -la\nSet-Location path\nNew-Item -ItemType Directory -Force a/b/c\nRemove-Item -Recurse -Force ./build\nNew-Item -ItemType File file.txt\nCopy-Item -Recurse src/ dest/\nMove-Item old.txt new.txt\nGet-Content file.txt\nGet-Content file.txt -Head 20\nGet-Content app.log -Wait\n(Get-Content file.txt).Count\nGet-ChildItem -Recurse -Filter "*.java"\nSelect-String "spring" app.log';
+    const pipesCode = 'ls -l | grep ".java"\ncat app.log | grep ERROR | head -10\nps aux | grep "spring" | wc -l\necho "hello" > file.txt\necho "world" >> file.txt\nmvn test 2>errors.txt\nmvn test >out.txt 2>&1\nls /var/log; echo "exit: $?"\nmvn clean install && docker build .';
+
+    return {
+      anatomyCommandStyle: anatomy === 'command' ? activeStyle : inactiveStyle,
+      anatomyFlagsStyle: anatomy === 'flags' ? activeStyle : inactiveStyle,
+      anatomyArgsStyle: anatomy === 'args' ? activeStyle : inactiveStyle,
+      anatomyDefLabel: this.anatomyData[anatomy].label,
+      anatomyDefText: this.anatomyData[anatomy].text,
+      selectCommand: () => this.selectAnatomy('command'),
+      selectFlags: () => this.selectAnatomy('flags'),
+      selectArgs: () => this.selectAnatomy('args'),
+      quiz,
+      steps,
+      copiedBash: this.state.copied === 'bash',
+      copiedPs: this.state.copied === 'ps',
+      copiedPipes: this.state.copied === 'pipes',
+      copyBash: () => this.copy(bashCode, 'bash'),
+      copyPs: () => this.copy(psCode, 'ps'),
+      copyPipes: () => this.copy(pipesCode, 'pipes')
+    };
+  }
+}
+</script>
+</body>
+</html>

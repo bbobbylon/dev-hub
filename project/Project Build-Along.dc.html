@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg)">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Capstone project brief</span>
+    <span class="tag tag-accent-2">{{ pct }}% BUILT</span>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:48px 48px 110px">
+    <span class="tag tag-accent" style="display:inline-flex;margin-bottom:14px">CAPSTONE · TERMINAL &amp; SHELL PATH</span>
+    <h1 style="font-family:var(--font-heading);font-weight:400;font-size:42px;margin:0 0 12px;color:var(--color-accent-700)">Build: a log-watching CLI tool</h1>
+    <p style="font-size:15.5px;line-height:1.65;color:var(--color-neutral-800);max-width:640px;margin:0 0 34px">No tutorial hand-holding here — a real brief, acceptance criteria, and milestones you check off yourself. Everything you need was covered in the last five concepts; each milestone links back if you're stuck.</p>
+
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="5">
+          <button type="button" onClick="{{ m.toggle }}" style="display:flex;gap:14px;align-items:flex-start;text-align:left;cursor:pointer;padding:18px 20px;border-radius:var(--radius-lg);font-family:var(--font-body);{{ m.style }}">
+            <span style="flex:none;width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-top:1px;{{ m.boxStyle }}">
+              <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-bg)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+            </span>
+            <span style="flex:1">
+              <span style="display:block;font-size:15px;font-weight:700;{{ m.titleStyle }}">{{ m.title }}</span>
+              <span style="display:block;font-size:13px;line-height:1.55;color:var(--color-neutral-700);margin-top:3px">{{ m.desc }}</span>
+              <span style="display:inline-flex;margin-top:8px;font-size:11.5px;color:var(--color-accent-700);font-weight:600">↩ covered in: {{ m.ref }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card elev-md" style="border-radius:var(--radius-lg);padding:20px 22px">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);font-weight:700;margin-bottom:12px">Definition of done</div>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;line-height:1.5;color:var(--color-neutral-800)">
+            <div style="display:flex;gap:9px"><span style="color:var(--color-accent)">◆</span><span><code style="background:var(--color-neutral-100);padding:1px 6px;border-radius:5px">watchlog app.log</code> follows the file live, like tail -f</span></div>
+            <div style="display:flex;gap:9px"><span style="color:var(--color-accent)">◆</span><span><code style="background:var(--color-neutral-100);padding:1px 6px;border-radius:5px">--filter ERROR</code> shows only matching lines</span></div>
+            <div style="display:flex;gap:9px"><span style="color:var(--color-accent)">◆</span><span>Exit code 1 when the file doesn't exist, with a clear message on stderr</span></div>
+            <div style="display:flex;gap:9px"><span style="color:var(--color-accent)">◆</span><span>A README with install + usage — someone else can run it</span></div>
+          </div>
+        </div>
+        <div style="background:var(--color-neutral-900);border-radius:var(--radius-lg);padding:18px 20px">
+          <div style="font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-400);margin-bottom:10px">Suggested file layout</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.9;color:var(--color-neutral-100)">
+            <div>watchlog/</div>
+            <div>├── <span style="color:var(--color-accent-2-300)">watchlog.sh</span> <span style="color:var(--color-neutral-500)"># entry point</span></div>
+            <div>├── <span style="color:var(--color-accent-2-300)">lib/filter.sh</span> <span style="color:var(--color-neutral-500)"># grep wrapper</span></div>
+            <div>├── <span style="color:var(--color-accent-2-300)">test/run_tests.sh</span></div>
+            <div>└── <span style="color:var(--color-accent-2-300)">README.md</span></div>
+          </div>
+        </div>
+        <div style="background:var(--color-accent-100);border-radius:var(--radius-lg);padding:16px 18px">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;color:var(--color-accent-700);margin-bottom:6px">Stuck for 20+ minutes?</div>
+          <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-800)">That's the productive kind of stuck. Re-read the linked concept, try one more approach, <em>then</em> peek at the reference solution below.</div>
+          <button class="btn btn-secondary" style="margin-top:10px;font-size:12.5px">Reveal reference solution</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { done: [true, true, false, false, false] };
+  data = [
+    { title: '1 · Print the last 10 lines of a file', desc: 'Argument parsing + tail. Error message and exit 1 if the file is missing.', ref: 'CLI Basics' },
+    { title: '2 · Follow the file as it grows', desc: 'The live loop — new lines appear as they are written.', ref: 'CLI Basics · pipes' },
+    { title: '3 · Add --filter PATTERN', desc: 'Only lines matching the pattern pass through. Pipe through your grep wrapper.', ref: 'Regex Lab' },
+    { title: '4 · Exit codes + stderr', desc: 'Errors to stderr, meaningful exit codes — make it scriptable by others.', ref: 'CLI Basics · exit codes' },
+    { title: '5 · README + ship it', desc: 'Write usage docs, init a repo, commit history that tells the story.', ref: 'Git Basics' }
+  ];
+  toggle(i) { const d = [...this.state.done]; d[i] = !d[i]; this.setState({ done: d }); }
+  renderVals() {
+    const done = this.state.done;
+    return {
+      pct: Math.round((done.filter(Boolean).length / done.length) * 100),
+      milestones: this.data.map((m, i) => ({
+        ...m, done: done[i],
+        toggle: () => this.toggle(i),
+        style: done[i] ? 'background:var(--color-accent-2-100);border:2px solid var(--color-accent-2)' : 'background:var(--color-neutral-100);border:2px solid var(--color-neutral-300)',
+        boxStyle: done[i] ? 'background:var(--color-accent-2);border:2px solid var(--color-accent-2)' : 'background:var(--color-bg);border:2px solid var(--color-neutral-400)',
+        titleStyle: done[i] ? 'color:var(--color-accent-2-800);text-decoration:line-through' : 'color:var(--color-text)'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

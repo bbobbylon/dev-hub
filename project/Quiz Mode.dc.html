@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/styles.css">
+<script src="_ds/organic-ab05932b-6d5a-456e-995e-fa0b87975463/_ds_bundle.js"></script>
+<style>body{margin:0}@keyframes pop{0%{transform:scale(0.92);opacity:0}100%{transform:scale(1);opacity:1}}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);display:flex;flex-direction:column">
+  <nav style="display:flex;align-items:center;gap:24px;padding:14px 32px;background:var(--color-bg);border-bottom:1px solid var(--color-neutral-300)">
+    <a href="Page Gallery.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:19px;color:var(--color-text);text-decoration:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Dev Hub</a>
+    <span style="font-size:13px;color:var(--color-neutral-600);margin-right:auto">Page type · Quiz / checkpoint</span>
+    <button class="btn btn-ghost" style="font-size:13px">Exit quiz</button>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:44px 32px 80px">
+    <div style="width:100%;max-width:640px">
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+        <span style="font-family:var(--font-heading);font-size:15px;color:var(--color-accent-700)">Git Basics — Checkpoint</span>
+        <span style="margin-left:auto;font-size:13px;color:var(--color-neutral-600)">Question {{ qNum }} of 5</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:34px">
+        <sc-for list="{{ palette }}" as="p" hint-placeholder-count="5">
+          <div style="flex:1;height:8px;border-radius:999px;background:{{ p.color }}"></div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+        <div class="card elev-md" style="border-radius:var(--radius-lg);padding:30px 32px;animation:pop 0.25s ease">
+          <span class="tag tag-accent" style="margin-bottom:14px;display:inline-flex;align-self:flex-start">{{ qTopic }}</span>
+          <h1 style="font-family:var(--font-heading);font-weight:400;font-size:26px;line-height:1.3;margin:8px 0 22px">{{ qText }}</h1>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ options }}" as="o" hint-placeholder-count="4">
+              <button type="button" onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;padding:14px 16px;border-radius:16px;font-family:var(--font-body);font-size:15px;line-height:1.4;{{ o.style }}">
+                <span style="flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;{{ o.badgeStyle }}">{{ o.letter }}</span>
+                <span>{{ o.text }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ showFeedback }}">
+            <div style="margin-top:18px;padding:14px 18px;border-radius:16px;background:{{ feedbackBg }};animation:pop 0.25s ease">
+              <div style="font-size:14px;font-weight:700;color:{{ feedbackColor }};margin-bottom:3px">{{ feedbackTitle }}</div>
+              <div style="font-size:13.5px;line-height:1.55;color:var(--color-neutral-800)">{{ feedbackText }}</div>
+            </div>
+          </sc-if>
+          <div style="display:flex;justify-content:space-between;margin-top:22px">
+            <button type="button" class="btn btn-ghost" onClick="{{ skip }}">Skip</button>
+            <sc-if value="{{ canCheck }}"><button type="button" class="btn btn-primary" onClick="{{ check }}">Check answer</button></sc-if>
+            <sc-if value="{{ canNext }}"><button type="button" class="btn btn-primary" onClick="{{ next }}">{{ nextLabel }}</button></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ done }}" hint-placeholder-val="{{ false }}">
+        <div class="card elev-lg" style="border-radius:var(--radius-lg);padding:44px 40px;text-align:center;animation:pop 0.3s ease">
+          <div style="width:88px;height:88px;border-radius:50%;background:var(--color-accent-2-100);display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+            <span style="font-family:var(--font-heading);font-size:26px;color:var(--color-accent-2-700)">{{ score }}/5</span>
+          </div>
+          <h1 style="font-family:var(--font-heading);font-weight:400;font-size:30px;margin:0 0 10px;color:var(--color-accent-700)">{{ verdict }}</h1>
+          <p style="font-size:15px;color:var(--color-neutral-700);margin:0 0 26px;line-height:1.6">{{ verdictSub }}</p>
+          <div style="display:flex;gap:12px;justify-content:center">
+            <button type="button" class="btn btn-secondary" onClick="{{ restart }}">Retry missed questions</button>
+            <button type="button" class="btn btn-primary">Next concept</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { i: 0, sel: null, checked: false, results: [] };
+  qs = [
+    { topic: 'MENTAL MODEL', text: 'What does a git commit actually store?', options: ['A diff of the lines you changed', 'A full snapshot of the tracked files at that moment', 'Only the files you staged, forever detached from history', 'A zip of your working directory'], correct: 1, why: 'Git stores snapshots, not diffs. Each commit points to a complete tree; diffs are computed on demand.' },
+    { topic: 'STAGING', text: 'You edited a file but git commit ignores it. Most likely cause?', options: ['The file is corrupt', 'You never ran git add to stage the change', 'The branch is locked', 'Git only commits once per day'], correct: 1, why: 'Commits record the staging area, not the working directory. Unstaged edits stay behind.' },
+    { topic: 'BRANCHES', text: 'A branch in git is best described as…', options: ['A copy of the whole repository', 'A movable pointer to a commit', 'A separate folder on disk', 'A backup created by GitHub'], correct: 1, why: 'A branch is just a 41-byte pointer file. Creating one is instant because nothing is copied.' },
+    { topic: 'UNDO', text: 'Which command un-stages a file without losing your edits?', options: ['git restore --staged file.txt', 'git reset --hard', 'git rm file.txt', 'git checkout -- file.txt'], correct: 0, why: 'restore --staged only pulls the file out of the index. reset --hard would destroy the edits.' },
+    { topic: 'COLLABORATION', text: 'git pull is equivalent to…', options: ['git fetch then git merge', 'git clone but faster', 'git push in reverse, deleting remote commits', 'git stash then git pop'], correct: 0, why: 'pull = fetch (download new commits) + merge (weave them into your branch).' }
+  ];
+  pick(oi) { if (!this.state.checked) this.setState({ sel: oi }); }
+  check() { if (this.state.sel === null) return; const ok = this.state.sel === this.qs[this.state.i].correct; this.setState({ checked: true, results: [...this.state.results, ok] }); }
+  skip() { this.setState({ i: this.state.i + 1, sel: null, checked: false, results: [...this.state.results, false] }); }
+  next() { this.setState({ i: this.state.i + 1, sel: null, checked: false }); }
+  restart() { this.setState({ i: 0, sel: null, checked: false, results: [] }); }
+  renderVals() {
+    const { i, sel, checked, results } = this.state;
+    const done = i >= this.qs.length;
+    const q = this.qs[Math.min(i, this.qs.length - 1)];
+    const letters = ['A', 'B', 'C', 'D'];
+    const options = q.options.map((text, oi) => {
+      let style = 'background:var(--color-neutral-100);color:var(--color-text);border:2px solid var(--color-neutral-300)';
+      let badgeStyle = 'background:var(--color-neutral-300);color:var(--color-neutral-700)';
+      if (!checked && sel === oi) { style = 'background:var(--color-accent-100);color:var(--color-accent-800);border:2px solid var(--color-accent)'; badgeStyle = 'background:var(--color-accent);color:var(--color-bg)'; }
+      if (checked && oi === q.correct) { style = 'background:var(--color-accent-2-100);color:var(--color-accent-2-800);border:2px solid var(--color-accent-2-600)'; badgeStyle = 'background:var(--color-accent-2-600);color:var(--color-bg)'; }
+      else if (checked && oi === sel) { style = 'background:var(--color-accent-100);color:var(--color-accent-800);border:2px solid var(--color-accent-600);opacity:0.85'; badgeStyle = 'background:var(--color-accent-600);color:var(--color-bg)'; }
+      else if (checked) { style += ';opacity:0.5'; }
+      return { text, letter: letters[oi], style, badgeStyle, pick: () => this.pick(oi) };
+    });
+    const palette = this.qs.map((_, pi) => ({
+      color: pi < results.length ? (results[pi] ? 'var(--color-accent-2)' : 'var(--color-accent-600)') : (pi === i ? 'var(--color-accent-300)' : 'var(--color-neutral-300)')
+    }));
+    const correct = checked && sel === q.correct;
+    const score = results.filter(Boolean).length;
+    return {
+      qNum: Math.min(i + 1, 5), qTopic: q.topic, qText: q.text, options, palette,
+      notDone: !done, done,
+      showFeedback: checked,
+      feedbackBg: correct ? 'var(--color-accent-2-100)' : 'var(--color-accent-100)',
+      feedbackColor: correct ? 'var(--color-accent-2-700)' : 'var(--color-accent-700)',
+      feedbackTitle: correct ? 'Correct.' : 'Not quite — the answer is ' + letters[q.correct] + '.',
+      feedbackText: q.why,
+      canCheck: !checked && !done, canNext: checked && !done,
+      nextLabel: i === this.qs.length - 1 ? 'See results' : 'Next question',
+      check: () => this.check(), next: () => this.next(), skip: () => this.skip(), restart: () => this.restart(),
+      score, verdict: score >= 4 ? 'Checkpoint passed!' : 'Worth another pass',
+      verdictSub: score >= 4 ? 'You have the git mental model down. Branching & Merging is unlocked.' : 'Review the snapshot model and staging area, then retry — you only need 4 of 5.'
+    };
+  }
+}
+</script>
+</body>
+</html>
