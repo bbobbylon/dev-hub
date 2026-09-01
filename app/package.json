@@ -12,7 +12,8 @@
     "verify:responsive": "node scripts/verify-responsive.mjs",
     "verify:routes": "node scripts/verify-routes.mjs",
     "verify:interactions": "node scripts/verify-interactions.mjs",
-    "audit:content": "node scripts/audit-content.mjs"
+    "audit:content": "node scripts/audit-content.mjs",
+    "audit:a11y": "node scripts/audit-a11y.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
