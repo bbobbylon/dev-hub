@@ -240,7 +240,7 @@ export default function VideoLesson() {
 
           {/* transcript — the active paragraph is tinted */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ display: 'flex', gap: 16, padding: '14px 18px', borderRadius: 16 }}>
+            <div className="transcript-row" style={{ display: 'flex', gap: 16, padding: '14px 18px', borderRadius: 16 }}>
               <span
                 style={{
                   flex: 'none',
@@ -266,6 +266,7 @@ export default function VideoLesson() {
             </div>
 
             <div
+              className="transcript-row"
               style={{
                 display: 'flex',
                 gap: 16,
@@ -319,7 +320,7 @@ export default function VideoLesson() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 16, padding: '14px 18px', borderRadius: 16 }}>
+            <div className="transcript-row" style={{ display: 'flex', gap: 16, padding: '14px 18px', borderRadius: 16 }}>
               <span
                 style={{
                   flex: 'none',

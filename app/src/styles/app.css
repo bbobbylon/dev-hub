@@ -75,6 +75,20 @@ body { margin: 0; }
 
 /* — card grids — */
 .grid { display: grid; gap: 14px; }
+
+/* Grid items default to min-width:auto, so a wide child — a `white-space: pre`
+   code block — widens its whole track and scrolls the page. Let tracks shrink;
+   the code blocks carry their own overflow-x. */
+.grid > *,
+.split-layout > *,
+.lesson-layout > *,
+.viz-layout > *,
+.mission-layout > *,
+.playground-layout > *,
+.decorator-sandbox > * { min-width: 0; }
+
+/* Same treatment for flex rows holding a code block — the transcript. */
+.transcript-row > * { min-width: 0; }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
@@ -84,7 +98,10 @@ body { margin: 0; }
 @media (max-width: 680px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .page-header, .page-main { padding-inline: 24px; }
-  .topnav { padding-inline: 20px; }
+  /* The bar can't fit brand + links + streak chip on one line; let it wrap
+     rather than push the page into a horizontal scroll. */
+  .topnav { padding-inline: 20px; gap: 16px; row-gap: 10px; flex-wrap: wrap; }
+  .topnav-links { gap: 16px; }
 }
 
 /* — the gallery's link cards — */

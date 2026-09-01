@@ -25,6 +25,9 @@ npm run verify           # routes + interactions
 
 - `verify:routes` — loads all 24 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
+- `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
+  names the offending elements when it finds any. The breakpoints in `app.css` were written from
+  reasoning about each layout; this is what holds them honest.
 - `verify:interactions` — drives every page that carried state in the prototypes (quiz flow and
   scoring, flashcard flip/rate, sort stepping, regex matching, terminal mission, hint reveal,
   decorator cost arithmetic, walkthrough gating, milestone checklist, test runner) and asserts the
