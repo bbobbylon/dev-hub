@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag, type TagTone } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const CERT = {
   name: 'Ada Moreno',

@@ -3,16 +3,8 @@
  * horizontal overflow. Run against `npm run preview`.
  */
 import { BASE, openPage } from './browser.mjs'
+import { ROUTES } from './routes.mjs'
 
-const ROUTES = [
-  '/', '/dev-hub', '/cli-basics', '/decorator-pattern', '/video-lesson',
-  '/architecture-deep-dive', '/git-branching', '/big-o-performance',
-  '/data-structures-visual', '/api-anatomy', '/framework-comparison',
-  '/quiz-mode', '/flashcards', '/algorithm-visualizer', '/code-playground',
-  '/terminal-simulator', '/debugging-challenge', '/regex-lab',
-  '/project-build-along', '/cheat-sheet', '/glossary', '/roadmap',
-  '/progress-dashboard', '/course-complete',
-]
 
 const { browser, page } = await openPage()
 

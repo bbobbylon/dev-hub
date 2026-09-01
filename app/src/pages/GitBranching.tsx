@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
+import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -280,54 +281,16 @@ export default function GitBranching() {
           ))}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 16,
-            alignItems: 'flex-start',
-            background: 'var(--color-accent-2-100)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '20px 24px',
-            marginTop: 32,
-          }}
+        <Aside
+          icon="speech"
+          kicker="There are no dumb questions"
+          heading={'"If branching is so cheap, why do teams fear merges?"'}
+          style={{ marginTop: 32 }}
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--color-accent-2-700)"
-            strokeWidth={2.75}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ flex: 'none', marginTop: 2 }}
-            aria-hidden="true"
-          >
-            <path d="M12 22a9 9 0 1 0-9-9 8.9 8.9 0 0 0 1.3 4.6L3 22l4.6-1.3A9 9 0 0 0 12 22Z" />
-          </svg>
-          <div>
-            <div
-              style={{
-                fontSize: 11,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--color-accent-2-700)',
-                fontWeight: 700,
-                marginBottom: 6,
-              }}
-            >
-              There are no dumb questions
-            </div>
-            <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 4 }}>
-              "If branching is so cheap, why do teams fear merges?"
-            </div>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-neutral-800)' }}>
-              Because fear grows with divergence. Two lines that drift apart for weeks touch the same
-              files; two lines merged daily barely overlap. The cure isn't avoiding branches — it's
-              merging often.
-            </div>
-          </div>
-        </div>
+          Because fear grows with divergence. Two lines that drift apart for weeks touch the same
+          files; two lines merged daily barely overlap. The cure isn't avoiding branches — it's
+          merging often.
+        </Aside>
       </main>
     </div>
   )

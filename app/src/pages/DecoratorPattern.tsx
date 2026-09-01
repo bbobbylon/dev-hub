@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 /* ── content ───────────────────────────────────────────────────────────── */
 

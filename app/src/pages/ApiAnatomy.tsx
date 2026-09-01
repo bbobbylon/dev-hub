@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag, type TagTone } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 

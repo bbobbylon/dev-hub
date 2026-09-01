@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
-import { Icon } from '../components/Icon'
+import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const INK = 'var(--color-neutral-600)'
 const MUTED = 'var(--color-neutral-500)'
@@ -364,24 +364,11 @@ export default function DataStructuresVisual() {
           ))}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 16,
-            alignItems: 'flex-start',
-            background: 'var(--color-accent-2-100)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '20px 24px',
-            marginTop: 26,
-          }}
-        >
-          <Icon name="lightbulb" size={22} color="var(--color-accent-2-700)" style={{ marginTop: 2 }} />
-          <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-neutral-800)' }}>
-            <strong>The one-question picker:</strong> need order? Array (by position) or BST
-            (sorted). Need lookup by name? Hash map. Need cheap inserts mid-sequence? Linked list.
-            Say the need out loud and the structure picks itself.
-          </div>
-        </div>
+        <Aside style={{ marginTop: 26 }}>
+          <strong>The one-question picker:</strong> need order? Array (by position) or BST (sorted).
+          Need lookup by name? Hash map. Need cheap inserts mid-sequence? Linked list. Say the need
+          out loud and the structure picks itself.
+        </Aside>
       </main>
     </div>
   )

@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { TopNav } from '../components/TopNav'
+import { Aside } from '../components/Aside'
 import { ConceptSidebar } from '../components/ConceptSidebar'
 import { CopyPanel, commandsOf } from '../components/CopyPanel'
 import { SectionHead } from '../components/SectionHead'
 import { Icon } from '../components/Icon'
 import { Code } from '../components/ui'
 import { useCopy } from '../components/useCopy'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 import {
   ANATOMY,
   ANATOMY_ORDER,
@@ -620,57 +621,18 @@ export default function CliBasics() {
             </div>
           </section>
 
-          {/* "no dumb questions" aside */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 16,
-              alignItems: 'flex-start',
-              background: 'var(--color-accent-2-100)',
-              borderRadius: 'calc(var(--radius-lg) * 1.1)',
-              padding: '20px 24px',
-              marginBottom: 44,
-            }}
+          <Aside
+            icon="speech"
+            kicker="There are no dumb questions"
+            heading={'"Do I need to memorize every flag?"'}
+            rounder
+            lineHeight={1.55}
+            style={{ marginBottom: 44 }}
           >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--color-accent-2-700)"
-              strokeWidth={2.75}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ flex: 'none', marginTop: 2 }}
-              aria-hidden="true"
-            >
-              <path d="M12 22a9 9 0 1 0-9-9 8.9 8.9 0 0 0 1.3 4.6L3 22l4.6-1.3A9 9 0 0 0 12 22Z" />
-            </svg>
-            <div>
-              <div
-                style={{
-                  fontSize: 11,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-accent-2-700)',
-                  fontWeight: 700,
-                  marginBottom: 6,
-                }}
-              >
-                There are no dumb questions
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 4 }}>
-                "Do I need to memorize every flag?"
-              </div>
-              <div
-                style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--color-neutral-800)' }}
-              >
-                No. Muscle memory comes from repetition, not memorization. Run the commands in the
-                walkthrough below a few times and the common ones will stick — keep{' '}
-                <Code>man</Code> or <Code>--help</Code> open for the rest.
-              </div>
-            </div>
-          </div>
+            No. Muscle memory comes from repetition, not memorization. Run the commands in the
+            walkthrough below a few times and the common ones will stick — keep <Code>man</Code> or{' '}
+            <Code>--help</Code> open for the rest.
+          </Aside>
 
           <section style={{ marginBottom: 44 }}>
             <div
@@ -707,58 +669,17 @@ export default function CliBasics() {
             </div>
           </section>
 
-          {/* Brain Power prompt */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 16,
-              alignItems: 'flex-start',
-              background: 'var(--color-accent-100)',
-              borderRadius: 'calc(var(--radius-lg) * 1.1)',
-              padding: '20px 24px',
-              marginBottom: 52,
-            }}
-          >
-            <Icon
-              name="lightbulb"
-              size={22}
-              color="var(--color-accent-700)"
-              style={{ marginTop: 2 }}
-            />
-            <div>
-              <div
-                style={{
-                  fontSize: 11,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-accent-700)',
-                  fontWeight: 700,
-                  marginBottom: 6,
-                }}
-              >
-                Brain power
-              </div>
-              <div
-                style={{
-                  fontSize: 15,
-                  lineHeight: 1.6,
-                  fontStyle: 'italic',
-                  color: 'var(--color-neutral-800)',
-                }}
-              >
-                Before you keep scrolling: what single command would you run to find every{' '}
-                <span style={{ fontStyle: 'normal' }}>
-                  <Code>.log</Code>
-                </span>{' '}
-                file larger than 10MB inside{' '}
-                <span style={{ fontStyle: 'normal' }}>
-                  <Code>/var</Code>
-                </span>
-                ? Take a guess — the walkthrough below builds up to the real answer, one step at a
-                time.
-              </div>
-            </div>
-          </div>
+          <Aside tone="accent" kicker="Brain power" rounder emphasis style={{ marginBottom: 52 }}>
+            Before you keep scrolling: what single command would you run to find every{' '}
+            <span style={{ fontStyle: 'normal' }}>
+              <Code>.log</Code>
+            </span>{' '}
+            file larger than 10MB inside{' '}
+            <span style={{ fontStyle: 'normal' }}>
+              <Code>/var</Code>
+            </span>
+            ? Take a guess — the walkthrough below builds up to the real answer, one step at a time.
+          </Aside>
 
           <QuickQuiz />
 

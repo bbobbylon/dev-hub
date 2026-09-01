@@ -3,7 +3,7 @@ import { TopNav } from '../components/TopNav'
 import { CodeListing, syn } from '../components/CodeListing'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 

@@ -71,14 +71,34 @@ src/
 | Component | What it is |
 | --- | --- |
 | `TopNav` | The sticky bar every page carries; the brand mark routes back to the gallery. |
-| `Page` | Standard light page: nav + display heading + lede + main column. |
+| `Aside` | The Head First tinted aside — icon, kicker, question, body. Used by six pages. |
 | `ConceptSidebar` | The lesson rail with done / current / locked states. |
 | `SectionHead` | The kicker + heading pair that opens each concept section. |
 | `CodeListing` | Dark editor pane with a filename, line numbers, and `syn` syntax roles. |
 | `CopyPanel` | Dark cheat-sheet column with a working copy button. |
 | `ImageSlot` | Placeholder for artwork not yet supplied (the video poster frame). |
 | `Icon` | Lucide paths at stroke-width 2.75, per the design system. |
-| `ui.tsx` | `Tag`, `Callout`, `Panel`, `Meter`, `CodeBlock`, `Code`, `Kicker`. |
+| `ui.tsx` | `Tag`, `Code`, `Meter`. |
+| `useDocumentTitle` | Names the tab after the page, restores on unmount. |
+
+Every page composes its own chrome directly rather than through a page-shell component. That was
+tried and dropped: each design wants a different nav, hero and column layout, so the shell earned
+nothing and hid what each page actually does.
+
+### Proving a refactor changed nothing
+
+`scripts/snapshot.mjs` full-page-screenshots every route and compares hashes, so a refactor can be
+shown to be visually neutral rather than assumed to be:
+
+```bash
+node scripts/snapshot.mjs .snapshots/before
+# …refactor…
+node scripts/snapshot.mjs .snapshots/after
+node scripts/snapshot.mjs --compare .snapshots/before .snapshots/after
+```
+
+It disables animations before capturing so frames are comparable. The `Aside` consolidation above
+was verified this way: 24/24 pixel-identical.
 
 ## Notes on the port
 

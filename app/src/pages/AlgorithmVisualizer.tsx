@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 /**
  * Each frame is one comparison of a bubble sort — the array as it stands, which

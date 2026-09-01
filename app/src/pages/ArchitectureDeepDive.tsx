@@ -1,7 +1,7 @@
 import { TopNav } from '../components/TopNav'
-import { Icon } from '../components/Icon'
+import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const INK = 'var(--color-neutral-600)'
 const SURFACE = 'var(--color-neutral-200)'
@@ -279,29 +279,12 @@ export default function ArchitectureDeepDive() {
           ))}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 16,
-            alignItems: 'flex-start',
-            background: 'var(--color-accent-2-100)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '20px 24px',
-          }}
-        >
-          <Icon
-            name="lightbulb"
-            size={22}
-            color="var(--color-accent-2-700)"
-            style={{ marginTop: 2 }}
-          />
-          <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-neutral-800)' }}>
-            <strong>Trace it yourself:</strong> the numbers are the order for a cache-miss payment.
-            Now re-trace the same click assuming the cache <em>has</em> the user's session — which
-            stops disappear? (Answer: 4's read; the write still happens. Money always hits the
-            database.)
-          </div>
-        </div>
+        <Aside>
+          <strong>Trace it yourself:</strong> the numbers are the order for a cache-miss payment.
+          Now re-trace the same click assuming the cache <em>has</em> the user's session — which
+          stops disappear? (Answer: 4's read; the write still happens. Money always hits the
+          database.)
+        </Aside>
       </main>
     </div>
   )

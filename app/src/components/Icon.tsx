@@ -13,7 +13,10 @@ const PATHS = {
   copy: <><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></>,
   search: <><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></>,
   flame: <path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-6 1-8Z" />,
-  lightbulb: <><path d="M9 18h6" /><path d="M10 22h4" /><path d="M12 2a7 7 0 0 0-4 12.7V18h8v-3.3A7 7 0 0 0 12 2Z" /></>,
+  // Traced from the prototypes rather than stock Lucide — the design draws a
+  // narrower bulb with a visible neck.
+  lightbulb: <><path d="M9 18h6" /><path d="M10 22h4" /><path d="M12 2a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.2V16h6v-1.3c0-.9.4-1.7 1-2.2A6 6 0 0 0 12 2Z" /></>,
+  speech: <path d="M12 22a9 9 0 1 0-9-9 8.9 8.9 0 0 0 1.3 4.6L3 22l4.6-1.3A9 9 0 0 0 12 22Z" />,
   brain: <><path d="M12 5a3 3 0 0 0-6 0 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1Z" /><path d="M12 5a3 3 0 0 1 6 0 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1Z" /></>,
   bug: <><path d="M8 2 9.5 4.5" /><path d="m16 2-1.5 2.5" /><rect x="7" y="6" width="10" height="14" rx="5" /><path d="M3 11h4M17 11h4M3 17h4M17 17h4" /></>,
   chevronRight: <path d="m9 18 6-6-6-6" />,

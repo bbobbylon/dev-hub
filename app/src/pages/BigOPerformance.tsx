@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
-import { Icon } from '../components/Icon'
+import { Aside } from '../components/Aside'
 import { Tag, type TagTone } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -277,23 +277,11 @@ export default function BigOPerformance() {
           </table>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 16,
-            alignItems: 'flex-start',
-            background: 'var(--color-neutral-100)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '20px 24px',
-          }}
-        >
-          <Icon name="lightbulb" size={22} color="var(--color-accent-700)" style={{ marginTop: 2 }} />
-          <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-neutral-800)' }}>
-            <strong>Rule of thumb for interviews:</strong> see a nested loop over the same data? Say
-            "O(n²) — can I trade memory for time with a hash map?" That single sentence solves a
-            third of all interview problems.
-          </div>
-        </div>
+        <Aside tone="neutral">
+          <strong>Rule of thumb for interviews:</strong> see a nested loop over the same data? Say
+          "O(n²) — can I trade memory for time with a hash map?" That single sentence solves a third
+          of all interview problems.
+        </Aside>
       </main>
     </div>
   )

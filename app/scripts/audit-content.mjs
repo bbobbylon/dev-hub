@@ -93,7 +93,13 @@ function sourceText(files) {
       const src = readFileSync(`${SRC}/${f}`, 'utf8')
       // Copy also rides in props (note=, placeholder=, title=…) and in the
       // escaped newlines of multi-line data strings, so keep both.
-      const attrs = [...src.matchAll(/\b\w+="([^"]{12,})"/g)].map((m) => m[1]).join('\n')
+      const attrs = [
+        ...src.matchAll(/\b\w+="([^"]{12,})"/g), // note="…"
+        ...src.matchAll(/\b\w+=\{'([^']{12,})'\}/g), // heading={'…'}
+        ...src.matchAll(/\b\w+=\{"([^"]{12,})"\}/g), // heading={"…"}
+      ]
+        .map((m) => m[1])
+        .join('\n')
       const unescaped = src.replace(/\\n/g, ' ').replace(/\\'/g, "'")
       const body = unescaped
         .replace(/\{\/\*[\s\S]*?\*\/\}/g, ' ') // JSX comments

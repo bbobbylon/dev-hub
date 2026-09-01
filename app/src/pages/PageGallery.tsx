@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 import { GROUP_TITLES, PAGES, PAGES_BY_GROUP, type PageEntry, type PageGroup } from '../data/pages'
 
 function GalleryCard({ page }: { page: PageEntry }) {

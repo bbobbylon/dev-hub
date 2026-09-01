@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 interface ScriptLine {
   cwd: string

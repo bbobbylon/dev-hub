@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
-import { useDocumentTitle } from '../components/Page'
+import { useDocumentTitle } from '../components/useDocumentTitle'
 
 interface Card {
   tag: string
