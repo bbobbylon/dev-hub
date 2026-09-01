@@ -231,7 +231,7 @@ function OrderBuilder() {
               fontSize: 10.5,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               marginBottom: 10,
             }}
           >
@@ -637,7 +637,7 @@ export default function DecoratorPattern() {
                   fontSize: 10.5,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: 'var(--color-neutral-600)',
+                  color: 'var(--color-neutral-700)',
                   marginBottom: 12,
                 }}
               >
@@ -788,7 +788,7 @@ export default function DecoratorPattern() {
                           {layer}
                         </span>
                         {outermost ? null : (
-                          <span style={{ textAlign: 'center', color: 'var(--color-neutral-500)' }}>
+                          <span style={{ textAlign: 'center', color: 'var(--color-neutral-700)' }}>
                             ↓
                           </span>
                         )}

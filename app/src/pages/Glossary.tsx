@@ -186,7 +186,7 @@ export default function Glossary() {
                 }}
               >
                 <span style={{ fontFamily: 'var(--font-heading)', fontSize: 21 }}>{t.term}</span>
-                <span style={{ fontSize: 12, color: 'var(--color-neutral-500)' }}>
+                <span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>
                   {t.pronunciation}
                 </span>
                 <Tag tone={t.tone} style={{ marginLeft: 'auto' }}>
@@ -209,6 +209,9 @@ export default function Glossary() {
                 <div
                   style={{
                     background: 'var(--color-neutral-900)',
+                    // The prototype set no colour here, so unstyled runs like
+                    // "(name):" inherited body ink and vanished into the panel.
+                    color: 'var(--color-neutral-100)',
                     borderRadius: 14,
                     padding: '12px 16px',
                     fontFamily: mono,

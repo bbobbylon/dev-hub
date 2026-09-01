@@ -92,7 +92,7 @@ function PanelLabel({ children, tone = 'neutral' }: { children: string; tone?: '
         fontSize: 11,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
-        color: tone === 'accent-2' ? 'var(--color-accent-2-700)' : 'var(--color-neutral-600)',
+        color: tone === 'accent-2' ? 'var(--color-accent-2-700)' : 'var(--color-neutral-700)',
         fontWeight: 700,
         marginBottom: tone === 'accent-2' ? 8 : 12,
       }}
@@ -246,7 +246,7 @@ export default function VideoLesson() {
                   flex: 'none',
                   fontFamily: mono,
                   fontSize: 12,
-                  color: 'var(--color-neutral-500)',
+                  color: 'var(--color-neutral-700)',
                   width: 44,
                 }}
               >
@@ -326,7 +326,7 @@ export default function VideoLesson() {
                   flex: 'none',
                   fontFamily: mono,
                   fontSize: 12,
-                  color: 'var(--color-neutral-500)',
+                  color: 'var(--color-neutral-700)',
                   width: 44,
                 }}
               >
@@ -375,7 +375,7 @@ export default function VideoLesson() {
                       style={{
                         fontFamily: mono,
                         fontSize: 11.5,
-                        color: current ? 'var(--color-accent-700)' : 'var(--color-neutral-500)',
+                        color: current ? 'var(--color-accent-700)' : 'var(--color-neutral-700)',
                       }}
                     >
                       {c.at}

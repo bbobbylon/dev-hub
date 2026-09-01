@@ -191,7 +191,7 @@ export default function ProjectBuildAlong() {
                   fontSize: 11,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: 'var(--color-neutral-600)',
+                  color: 'var(--color-neutral-700)',
                   fontWeight: 700,
                   marginBottom: 12,
                 }}

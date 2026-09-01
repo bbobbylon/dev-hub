@@ -146,7 +146,7 @@ export default function BigOPerformance() {
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: 'var(--color-neutral-600)',
+                color: 'var(--color-neutral-700)',
                 fontWeight: 700,
                 marginBottom: 14,
               }}
@@ -201,7 +201,7 @@ export default function BigOPerformance() {
             <div
               style={{
                 fontSize: 12.5,
-                color: 'var(--color-neutral-600)',
+                color: 'var(--color-neutral-700)',
                 marginTop: 10,
                 lineHeight: 1.5,
               }}

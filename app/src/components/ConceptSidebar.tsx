@@ -37,7 +37,7 @@ export function ConceptSidebar({ groups, top = 57 }: { groups: SidebarGroup[]; t
               fontSize: 10,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               margin: gi === 0 ? '0 8px 8px' : '24px 8px 8px',
             }}
           >
@@ -74,7 +74,7 @@ function SidebarLink({ item }: { item: SidebarItem }) {
         }
       : item.state === 'open'
         ? { ...base, color: 'var(--color-text)' }
-        : { ...base, color: 'var(--color-neutral-600)', opacity: 0.6 }
+        : { ...base, color: 'var(--color-neutral-700)', opacity: 0.6 }
 
   const mark =
     item.state === 'current' ? (

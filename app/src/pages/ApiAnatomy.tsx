@@ -254,7 +254,7 @@ export default function ApiAnatomy() {
                 <span style={body}> /v1/orders/8127</span>
                 <Marker n={6} label="WHERE IT LIVES" tone="accent-2" />
               </div>
-              <div style={{ color: 'var(--color-neutral-600)' }}>&nbsp;</div>
+              <div style={{ color: 'var(--color-neutral-700)' }}>&nbsp;</div>
               <div>
                 <span style={body}>{'{ '}</span>
                 <span style={str}>"id"</span>
@@ -313,7 +313,7 @@ export default function ApiAnatomy() {
           <span
             style={{
               fontSize: 12.5,
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               alignSelf: 'center',
               marginRight: 4,
             }}

@@ -66,10 +66,15 @@ Checks WCAG text contrast, accessible names on every control, and reports what i
 **Passing:** every interactive control has an accessible name (0 unnamed), keyboard focus draws the
 design system's 2px accent ring on all of them, and tab order follows the visual order.
 
-**Known issue, inherited from the design, not yet changed:** 137 text-contrast failures across 51
-distinct colour pairs. They come from `--color-neutral-600` (and the `-500`/`-600` accent steps)
-used for small muted text — the prototypes use those same tokens in those same places, so this is a
-property of the Organic palette rather than a porting defect. Measured against the two grounds:
+**Contrast:** muted body text was promoted from the `-500`/`-600` ramp steps to `-700`, applying
+the design system's own rule — *"for paragraph-size text in the accent use a deep ramp step rather
+than the accent itself"* — to the neutral ramp, which the prototypes had not done. That took the
+audit from 137 failures across 51 colour pairs down to **31 across 18**, with zero new failures
+introduced (verified by diffing the failure sets before and after). Tokens on dark grounds — the
+terminal, code panes, gutters — were deliberately left alone, since darkening them would *reduce*
+contrast.
+
+Measured against the two light grounds, the ramp splits cleanly at step 700:
 
 | token | on `--color-bg` | on `--color-surface` | body text (4.5:1) |
 | --- | --- | --- | --- |
@@ -77,16 +82,16 @@ property of the Organic palette rather than a porting defect. Measured against t
 | `neutral-600` | 3.61:1 | 3.21:1 | fails |
 | `neutral-700` | 5.53:1 | 4.92:1 | passes |
 | `accent` | 3.03:1 | 2.69:1 | fails |
-| `accent-600` | 3.77:1 | 3.35:1 | fails |
 | `accent-700` | 5.72:1 | 5.09:1 | passes |
 | `accent-2-600` | 3.53:1 | 3.14:1 | fails |
 | `accent-2-700` | 5.43:1 | 4.82:1 | passes |
 
-The ramp splits exactly at step 700, which matches the design system's own guidance: *"for
-paragraph-size text in the accent use a deep ramp step (`--color-accent-700` on this ground) rather
-than the accent itself."* The fix is to apply that rule to the neutral ramp too — promote muted body
-text from `-600` to `-700`. That darkens muted text on ~20 routes, so it's a deliberate deviation
-from the approved mockups and hasn't been made unilaterally.
+**What remains, and why it wasn't changed:** all 18 surviving pairs are the accent fill itself —
+cream-on-terracotta primary buttons, `.btn-ghost` accent text, accent-tinted labels on accent
+panels, and the terminal's accent-on-dark. They measure 2.7–3.9:1, which is precisely the ~3:1 the
+Organic guide says the accent pair is tuned to ("enough for icons, large text and interface chrome,
+not for body copy"). Clearing them means changing the accent colour itself — a brand decision, not
+a porting one.
 
 ## How it's organised
 

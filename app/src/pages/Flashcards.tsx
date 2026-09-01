@@ -124,7 +124,7 @@ export default function Flashcards() {
             <h1 style={{ fontSize: 16, margin: 0, color: 'var(--color-accent-700)' }}>
               HTTP Essentials deck
             </h1>
-            <span style={{ fontSize: 13, color: 'var(--color-neutral-600)' }}>
+            <span style={{ fontSize: 13, color: 'var(--color-neutral-700)' }}>
               Card {index + 1} of {CARDS.length}
             </span>
           </div>
@@ -166,7 +166,7 @@ export default function Flashcards() {
                 <span
                   style={{
                     fontSize: 12.5,
-                    color: 'var(--color-neutral-500)',
+                    color: 'var(--color-neutral-700)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
@@ -274,7 +274,7 @@ export default function Flashcards() {
                 textAlign: 'center',
                 marginTop: 18,
                 fontSize: 13,
-                color: 'var(--color-neutral-500)',
+                color: 'var(--color-neutral-700)',
               }}
             >
               Rate yourself after flipping — honest ratings drive the review schedule.
@@ -306,7 +306,7 @@ export default function Flashcards() {
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 12.5,
-          color: 'var(--color-neutral-600)',
+          color: 'var(--color-neutral-700)',
         }}
       >
         <span>

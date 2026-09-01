@@ -188,7 +188,7 @@ export default function CodePlayground() {
                   alignItems: 'center',
                   gap: 9,
                   fontSize: 13.5,
-                  color: passed ? 'var(--color-accent-2-700)' : 'var(--color-neutral-500)',
+                  color: passed ? 'var(--color-accent-2-700)' : 'var(--color-neutral-700)',
                 }}
               >
                 <Icon name="check" size={14} />

@@ -50,7 +50,7 @@ function Chip({
         : {
             ...base,
             background: 'var(--color-neutral-100)',
-            color: 'var(--color-neutral-600)',
+            color: 'var(--color-neutral-700)',
           }
 
   const mark =
@@ -134,7 +134,7 @@ function NumberNode({ n, state }: { n: number; state: 'current' | 'locked' }) {
         fontFamily: 'var(--font-heading)',
         fontSize: 18,
         background: state === 'current' ? 'var(--color-accent)' : 'var(--color-neutral-300)',
-        color: state === 'current' ? 'var(--color-bg)' : 'var(--color-neutral-600)',
+        color: state === 'current' ? 'var(--color-bg)' : 'var(--color-neutral-700)',
         boxShadow: state === 'current' ? 'var(--shadow-md)' : undefined,
       }}
     >
@@ -307,7 +307,7 @@ export default function Roadmap() {
                   </h2>
                   <LockedTag>{stage.lock}</LockedTag>
                 </div>
-                <p style={{ fontSize: 13.5, color: 'var(--color-neutral-600)', margin: 0 }}>
+                <p style={{ fontSize: 13.5, color: 'var(--color-neutral-700)', margin: 0 }}>
                   {stage.syllabus}
                 </p>
               </div>

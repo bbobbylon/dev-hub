@@ -3,7 +3,7 @@ import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
-const INK = 'var(--color-neutral-600)'
+const INK = 'var(--color-neutral-700)'
 const SURFACE = 'var(--color-neutral-200)'
 const SAGE_SURFACE = 'var(--color-accent-2-100)'
 

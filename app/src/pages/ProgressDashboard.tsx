@@ -215,7 +215,7 @@ function PanelLabel({ children }: { children: ReactNode }) {
         fontSize: 11,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
-        color: 'var(--color-neutral-600)',
+        color: 'var(--color-neutral-700)',
         fontWeight: 700,
         marginBottom: 14,
       }}
@@ -265,13 +265,13 @@ export default function ProgressDashboard() {
                   {s.value}
                 </span>
                 {s.unit ? (
-                  <span style={{ fontSize: 13, color: 'var(--color-neutral-600)' }}>{s.unit}</span>
+                  <span style={{ fontSize: 13, color: 'var(--color-neutral-700)' }}>{s.unit}</span>
                 ) : null}
               </div>
               <div
                 style={{
                   fontSize: 12,
-                  color: s.noteColor ?? 'var(--color-neutral-600)',
+                  color: s.noteColor ?? 'var(--color-neutral-700)',
                   marginTop: 6,
                 }}
               >
@@ -321,7 +321,7 @@ export default function ProgressDashboard() {
                         m >= DAILY_GOAL ? 'var(--color-accent)' : 'var(--color-neutral-300)',
                     }}
                   />
-                  <span style={{ fontSize: 10, color: 'var(--color-neutral-500)' }}>
+                  <span style={{ fontSize: 10, color: 'var(--color-neutral-700)' }}>
                     {DAY_LABELS[i]}
                   </span>
                 </div>
@@ -332,7 +332,7 @@ export default function ProgressDashboard() {
                 display: 'flex',
                 gap: 14,
                 fontSize: 12,
-                color: 'var(--color-neutral-600)',
+                color: 'var(--color-neutral-700)',
                 marginTop: 12,
                 flexWrap: 'wrap',
               }}
@@ -421,7 +421,7 @@ export default function ProgressDashboard() {
                 borderTop: '1px solid var(--color-neutral-300)',
               }}
             >
-              <div style={{ fontSize: 12, color: 'var(--color-neutral-600)', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: 'var(--color-neutral-700)', marginBottom: 8 }}>
                 Weakest topic by quiz score
               </div>
               <div
@@ -474,7 +474,7 @@ export default function ProgressDashboard() {
                   <span
                     style={{
                       fontSize: 11.5,
-                      color: b.earned ? 'var(--color-neutral-700)' : 'var(--color-neutral-500)',
+                      color: b.earned ? 'var(--color-neutral-700)' : 'var(--color-neutral-700)',
                       lineHeight: 1.3,
                       display: 'block',
                     }}
@@ -526,7 +526,7 @@ export default function ProgressDashboard() {
                       fontSize: 12,
                       color: item.accented
                         ? 'var(--color-accent-700)'
-                        : 'var(--color-neutral-600)',
+                        : 'var(--color-neutral-700)',
                     }}
                   >
                     {item.time}

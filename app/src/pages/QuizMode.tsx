@@ -191,7 +191,7 @@ export default function QuizMode() {
               Git Basics — Checkpoint
             </span>
             <span
-              style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--color-neutral-600)' }}
+              style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--color-neutral-700)' }}
             >
               Question {Math.min(index + 1, QUESTIONS.length)} of {QUESTIONS.length}
             </span>

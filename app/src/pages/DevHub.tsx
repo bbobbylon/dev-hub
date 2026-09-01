@@ -222,7 +222,7 @@ export default function DevHub() {
                 }}
               >
                 <h2 style={{ fontSize: 22, margin: 0 }}>{topic.title}</h2>
-                <span style={{ fontSize: 12, color: 'var(--color-neutral-600)' }}>
+                <span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>
                   {done} of {topic.concepts.length} done
                 </span>
               </div>

@@ -33,7 +33,7 @@ body { margin: 0; }
   color: var(--color-text); text-decoration: none;
 }
 .topnav-brand:hover { color: var(--color-accent-700); }
-.topnav-note { font-size: 13px; color: var(--color-neutral-600); margin-right: auto; }
+.topnav-note { font-size: 13px; color: var(--color-neutral-700); margin-right: auto; }
 .topnav-links { display: flex; gap: 20px; font-size: 14px; margin-right: auto; }
 .topnav-links a { color: var(--color-text); text-decoration: none; }
 .topnav-links a:hover { color: var(--color-accent-600); }

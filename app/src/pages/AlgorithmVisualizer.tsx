@@ -102,7 +102,7 @@ export default function AlgorithmVisualizer() {
                   ? 'var(--color-accent-700)'
                   : sorted
                     ? 'var(--color-accent-2-700)'
-                    : 'var(--color-neutral-600)'
+                    : 'var(--color-neutral-700)'
                 return (
                   <div
                     key={i}
@@ -250,7 +250,7 @@ export default function AlgorithmVisualizer() {
                   fontSize: 10.5,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: 'var(--color-neutral-600)',
+                  color: 'var(--color-neutral-700)',
                   marginBottom: 10,
                 }}
               >

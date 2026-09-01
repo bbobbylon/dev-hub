@@ -148,7 +148,7 @@ export default function RegexLab() {
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                color: 'var(--color-neutral-600)',
+                color: 'var(--color-neutral-700)',
               }}
             >
               Pattern

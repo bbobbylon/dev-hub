@@ -4,8 +4,8 @@ import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
-const INK = 'var(--color-neutral-600)'
-const MUTED = 'var(--color-neutral-500)'
+const INK = 'var(--color-neutral-700)'
+const MUTED = 'var(--color-neutral-700)'
 
 function Mono({ children }: { children: string }) {
   return (
@@ -341,7 +341,7 @@ export default function DataStructuresVisual() {
                 style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}
               >
                 <span style={{ fontFamily: 'var(--font-heading)', fontSize: 21 }}>{s.name}</span>
-                <span style={{ fontSize: 12, color: 'var(--color-neutral-600)' }}>{s.tagline}</span>
+                <span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>{s.tagline}</span>
               </div>
               {s.diagram}
               <div

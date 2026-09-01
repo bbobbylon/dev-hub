@@ -17,7 +17,7 @@ const MAIN_PILL = 'var(--color-accent-200)'
 const MAIN_PILL_INK = 'var(--color-accent-700)'
 const BRANCH_PILL = 'var(--color-accent-2-100)'
 const BRANCH_PILL_INK = 'var(--color-accent-2-700)'
-const CAPTION = 'var(--color-neutral-600)'
+const CAPTION = 'var(--color-neutral-700)'
 
 function Code({ children }: { children: string }) {
   return (

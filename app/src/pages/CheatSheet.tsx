@@ -182,7 +182,7 @@ export default function CheatSheet() {
           </h1>
           <Tag tone="neutral">THE 80% YOU USE DAILY</Tag>
         </div>
-        <p style={{ fontSize: 14, color: 'var(--color-neutral-600)', margin: '0 0 32px' }}>
+        <p style={{ fontSize: 14, color: 'var(--color-neutral-700)', margin: '0 0 32px' }}>
           Pin this. Column order follows a real working session: set up → daily loop → branches →
           fixing mistakes.
         </p>

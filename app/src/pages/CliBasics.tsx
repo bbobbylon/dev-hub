@@ -533,7 +533,7 @@ export default function CliBasics() {
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: 'var(--color-neutral-600)',
+                    color: 'var(--color-neutral-700)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
                     marginBottom: 8,
@@ -601,7 +601,7 @@ export default function CliBasics() {
               >
                 0 = success
               </span>
-              <span style={{ color: 'var(--color-neutral-500)', fontSize: 14 }}>vs.</span>
+              <span style={{ color: 'var(--color-neutral-700)', fontSize: 14 }}>vs.</span>
               <span
                 style={{
                   display: 'inline-flex',
@@ -691,7 +691,7 @@ export default function CliBasics() {
               borderRadius: 24,
               padding: 24,
               textAlign: 'center',
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               fontSize: 13,
             }}
           >

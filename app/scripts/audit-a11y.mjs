@@ -67,6 +67,9 @@ const IN_PAGE = () => {
     if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue
     const rect = el.getBoundingClientRect()
     if (rect.width === 0 || rect.height === 0) continue
+    // Screen-reader-only text is clipped to 1px and never painted, so its
+    // contrast is meaningless.
+    if (rect.width <= 1 || rect.height <= 1 || cs.clip !== 'auto') continue
 
     const fg = parse(cs.color)
     if (!fg) continue

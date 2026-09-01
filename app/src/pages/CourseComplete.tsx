@@ -117,7 +117,7 @@ export default function CourseComplete() {
               fontSize: 11,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               marginBottom: 18,
             }}
           >
@@ -166,7 +166,7 @@ export default function CourseComplete() {
               justifyContent: 'center',
               gap: 44,
               fontSize: 12.5,
-              color: 'var(--color-neutral-600)',
+              color: 'var(--color-neutral-700)',
               flexWrap: 'wrap',
             }}
           >
@@ -197,7 +197,7 @@ export default function CourseComplete() {
               >
                 {CERT.date}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--color-neutral-500)', marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 2 }}>
                 date
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function CourseComplete() {
               >
                 {CERT.id}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--color-neutral-500)', marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 2 }}>
                 shareable id
               </div>
             </div>
