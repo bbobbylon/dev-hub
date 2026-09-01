@@ -150,7 +150,8 @@ export const PIPES_LINES: CodeLine[] = [
   { text: 'mvn test >out.txt 2>&1', comment: '# both streams' },
   { comment: '# exit codes (critical for CI/CD):' },
   { text: 'ls /var/log; echo "exit: $?"', comment: '# $? in Bash' },
-  { text: '$LASTEXITCODE', comment: '# in PowerShell' },
+  // Quoted for contrast with Bash's $? — not part of the copyable snippet.
+  { text: '$LASTEXITCODE', comment: '# in PowerShell', displayOnly: true },
   { text: 'mvn clean install && docker build .', comment: '# docker only if mvn succeeded' },
 ]
 

@@ -5,6 +5,11 @@ export interface CodeLine {
   text?: string
   /** Trailing `# …` note, dimmed. Passing only `comment` makes a comment line. */
   comment?: string
+  /**
+   * Shown, but left out of the clipboard payload — for a line quoted from
+   * another shell purely for contrast, which would break the copied snippet.
+   */
+  displayOnly?: boolean
 }
 
 /**
@@ -90,6 +95,6 @@ export function CopyPanel({
 /** The plain-text payload the copy button puts on the clipboard. */
 export const commandsOf = (lines: CodeLine[]) =>
   lines
-    .filter((l) => l.text)
+    .filter((l) => l.text && !l.displayOnly)
     .map((l) => l.text)
     .join('\n')

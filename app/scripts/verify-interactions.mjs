@@ -30,6 +30,10 @@ const quizEnd = await body()
 // B is correct on Q1–Q3, wrong on Q4–Q5 → 3/5, below the 4/5 pass mark.
 check('quiz: score screen shows 3/5', quizEnd.includes('3/5'), quizEnd.match(/\d\/5/)?.[0])
 check('quiz: sub-pass verdict shown', quizEnd.includes('Worth another pass'))
+check(
+  'quiz: verdict names the pass mark',
+  quizEnd.includes('you only need 4 of 5'),
+)
 await page.getByRole('button', { name: 'Retry missed questions' }).click()
 check('quiz: restart returns to Q1', (await body()).includes('Question 1 of 5'))
 
@@ -120,6 +124,16 @@ check(
   // nth(1) — nth(0) is the "ls" token in the anatomy clicker above.
   await page.getByRole('button', { name: 'ls', exact: true }).nth(1).isDisabled(),
 )
+// The cheat-sheet copy buttons must hand over a runnable snippet — the
+// PowerShell $LASTEXITCODE line is shown for contrast but must not be copied.
+await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+await page.getByRole('button', { name: 'Copy Pipes, redirection, exit codes' }).click()
+const clip = await page.evaluate(() => navigator.clipboard.readText())
+check('cli: copy payload is 9 lines', clip.split('\n').length === 9, `${clip.split('\n').length}`)
+check('cli: copy payload omits $LASTEXITCODE', !clip.includes('$LASTEXITCODE'))
+check('cli: copy payload keeps the bash lines', clip.includes('ls /var/log; echo "exit: $?"'))
+check('cli: copy acknowledges', (await body()).includes('Copied!'))
+
 check('cli: step 2 hidden until step 1 runs', !(await body()).includes('Next step'))
 await page.getByRole('button', { name: 'Run it →' }).click()
 const walk = await body()

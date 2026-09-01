@@ -33,6 +33,25 @@ npm run verify           # routes + interactions
 Both block outbound requests, so the Google Fonts link is not fetched during verification. The
 running app still loads Caprasimo and Figtree normally.
 
+There's also a content-fidelity audit — a reviewing aid rather than a test, so it isn't part of
+`npm run verify`:
+
+```bash
+npm run audit:content    # needs no server
+```
+
+It pulls every substantial run of prose out of each `.dc.html` prototype and checks it survived
+into the corresponding React source. It currently reports **3 phrases to review, all known
+extractor artifacts**, not omissions:
+
+- Two CLI Basics entries are the prototype's flat clipboard payload strings. Here those are derived
+  from the `CodeLine` arrays via `commandsOf()`, so the copy exists line by line rather than as one
+  blob. The payloads are asserted byte-for-byte against the prototype in `verify:interactions`.
+- One Quiz Mode entry is a sentence that's now a template literal (`you only need ${PASS_MARK} of
+  ${QUESTIONS.length}`). The rendered wording is asserted in `verify:interactions`.
+
+If that count rises, something was dropped — go read what it flags.
+
 ## How it's organised
 
 ```

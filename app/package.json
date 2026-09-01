@@ -10,7 +10,8 @@
     "typecheck": "tsc -b --noEmit",
     "verify": "npm run verify:routes && npm run verify:interactions",
     "verify:routes": "node scripts/verify-routes.mjs",
-    "verify:interactions": "node scripts/verify-interactions.mjs"
+    "verify:interactions": "node scripts/verify-interactions.mjs",
+    "audit:content": "node scripts/audit-content.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
