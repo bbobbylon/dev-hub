@@ -165,6 +165,57 @@ check('nav: gallery card routes to the page', page.url().endsWith('/quiz-mode'))
 await page.getByRole('link', { name: 'Dev Hub' }).click()
 check('nav: brand mark returns to the gallery', new URL(page.url()).pathname === '/')
 
+/* ── Boundaries: the paths the happy-path checks never reach ─────────── */
+
+// Quiz, all correct. Answers are B,B,B,A,A — this exercises the pass branch
+// and the unlock message, which no other check touches.
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+const aced = await body()
+check('quiz edge: perfect run scores 5/5', aced.includes('5/5'))
+check('quiz edge: pass verdict shown', aced.includes('Checkpoint passed!'))
+check('quiz edge: unlock message shown', aced.includes('Branching & Merging is unlocked'))
+
+// Quiz, skipping everything — every answer recorded wrong, no crash.
+await go('/quiz-mode')
+for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Skip' }).click()
+const skipped = await body()
+check('quiz edge: skipping all scores 0/5', skipped.includes('0/5'))
+
+// Decorator sandbox at the empty boundary — Undo/Reset with nothing stacked.
+await go('/decorator-pattern')
+await page.getByRole('button', { name: 'Undo' }).click()
+await page.getByRole('button', { name: 'Reset', exact: true }).click()
+const empty = await body()
+check('decorator edge: empty stack survives undo/reset', empty.includes('$0.89'))
+check('decorator edge: description is the bare drink', empty.includes('"House Blend"'))
+
+// Milestones at both extremes.
+await go('/project-build-along')
+const boxes = page.getByRole('button', { name: /covered in:/ })
+const total = await boxes.count()
+for (let i = 0; i < total; i++) {
+  const b = boxes.nth(i)
+  if ((await b.getAttribute('aria-pressed')) === 'true') await b.click()
+}
+check('build edge: all unchecked → 0%', (await body()).includes('0% BUILT'))
+for (let i = 0; i < total; i++) await boxes.nth(i).click()
+check('build edge: all checked → 100%', (await body()).includes('100% BUILT'))
+
+// Flashcards past the final card — the deck clamps rather than overrunning.
+await go('/flashcards')
+for (let i = 0; i < 7; i++) {
+  await page.getByRole('button', { name: /Show (answer|question)/ }).click()
+  await page.getByRole('button', { name: /Easy/ }).click()
+}
+const overrun = await body()
+check('cards edge: clamps at the last card', overrun.includes('Card 5 of 5'))
+check('cards edge: still renders a card', overrun.includes('Why is HTTP called stateless?'))
+
 const failed = results.filter((r) => !r.pass)
 console.log(`\n${results.length - failed.length}/${results.length} interaction checks passed`)
 await browser.close()
