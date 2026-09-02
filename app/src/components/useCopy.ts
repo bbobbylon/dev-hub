@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
  */
 export function useCopy(resetAfterMs = 1500) {
   const [copied, setCopied] = useState<string | null>(null)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => () => clearTimeout(timer.current), [])
 
