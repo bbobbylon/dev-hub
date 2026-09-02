@@ -1,4 +1,6 @@
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
+import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
@@ -77,8 +79,12 @@ const QUESTIONS: Question[] = [
 const LETTERS = ['A', 'B', 'C', 'D']
 const PASS_MARK = 4
 
+const QUIZ_ID = 'git-basics'
+
 export default function QuizMode() {
   useDocumentTitle('Quiz Mode')
+  const { state, recordQuiz, completeConcept } = useProgress()
+  const previous = state.quizzes[QUIZ_ID]
 
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -89,6 +95,14 @@ export default function QuizMode() {
   const question = QUESTIONS[Math.min(index, QUESTIONS.length - 1)]
   const isCorrect = checked && selected === question.correct
   const score = results.filter(Boolean).length
+
+  // Persist the attempt exactly once, as the score screen appears.
+  useEffect(() => {
+    if (!done) return
+    recordQuiz(QUIZ_ID, score, QUESTIONS.length)
+    if (score >= PASS_MARK) completeConcept('git-basics')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done])
 
   const check = () => {
     if (selected === null) return
@@ -378,13 +392,24 @@ export default function QuizMode() {
                   ? 'You have the git mental model down. Branching & Merging is unlocked.'
                   : `Review the snapshot model and staging area, then retry — you only need ${PASS_MARK} of ${QUESTIONS.length}.`}
               </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              {previous && previous.attempts > 1 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: 'var(--color-neutral-700)',
+                    margin: '-14px 0 22px',
+                  }}
+                >
+                  Best so far {previous.best}/{previous.total} across {previous.attempts} attempts.
+                </p>
+              ) : null}
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button type="button" className="btn btn-secondary" onClick={restart}>
                   Retry missed questions
                 </button>
-                <button type="button" className="btn btn-primary">
+                <Link to="/roadmap" className="btn btn-primary">
                   Next concept
-                </button>
+                </Link>
               </div>
             </div>
           )}

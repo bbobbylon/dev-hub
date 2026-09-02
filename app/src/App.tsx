@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { useActivityTracker } from './lib/progress'
+import { Route, Routes, useLocation } from 'react-router-dom'
 
 import PageGallery from './pages/PageGallery'
 import DevHub from './pages/DevHub'
@@ -25,6 +26,7 @@ import Glossary from './pages/Glossary'
 import Roadmap from './pages/Roadmap'
 import ProgressDashboard from './pages/ProgressDashboard'
 import CourseComplete from './pages/CourseComplete'
+import NotFound from './pages/NotFound'
 
 /** Every navigation lands at the top of the new page, as a document would. */
 function ScrollToTop() {
@@ -36,6 +38,9 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  // Counts real time-on-page, which drives the streak and the minutes chart.
+  useActivityTracker()
+
   return (
     <>
       <ScrollToTop />
@@ -64,7 +69,7 @@ export default function App() {
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/progress-dashboard" element={<ProgressDashboard />} />
         <Route path="/course-complete" element={<CourseComplete />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )

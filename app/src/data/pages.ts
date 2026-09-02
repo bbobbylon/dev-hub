@@ -214,4 +214,3 @@ export const PAGES: PageEntry[] = [
   },
 ]
 
-export const PAGES_BY_GROUP = (group: PageGroup) => PAGES.filter((p) => p.group === group)

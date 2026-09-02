@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
-const DONE_COUNT = 8
 const TOTAL_CONCEPTS = 23
+/** The design's starting point, used until the learner completes anything. */
+const BASELINE_DONE = 8
 
 /** A concept chip inside a stage: done, next up, or not started. */
 function Chip({
@@ -171,7 +173,10 @@ const UPCOMING = [
 
 export default function Roadmap() {
   useDocumentTitle('Roadmap')
-  const pct = Math.round((DONE_COUNT / TOTAL_CONCEPTS) * 100)
+  const { state } = useProgress()
+  const completed = Object.keys(state.concepts).length
+  const doneCount = Math.max(BASELINE_DONE, completed)
+  const pct = Math.round((doneCount / TOTAL_CONCEPTS) * 100)
 
   return (
     <div className="page">
@@ -205,12 +210,12 @@ export default function Roadmap() {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '18px 0 6px' }}>
           <div style={{ flex: 1, maxWidth: 320 }}>
-            <Meter value={DONE_COUNT} max={TOTAL_CONCEPTS} tone="accent-2" height={10} />
+            <Meter value={doneCount} max={TOTAL_CONCEPTS} tone="accent-2" height={10} />
           </div>
           <span
             style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-accent-2-700)' }}
           >
-            {DONE_COUNT} of {TOTAL_CONCEPTS} concepts · {pct}%
+            {doneCount} of {TOTAL_CONCEPTS} concepts · {pct}%
           </span>
         </div>
       </header>

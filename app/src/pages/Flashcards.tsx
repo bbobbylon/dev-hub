@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { isDue, useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
@@ -74,17 +75,37 @@ const RATINGS: { kind: Rating; label: string; interval: string; border: string; 
 
 export default function Flashcards() {
   useDocumentTitle('Flashcards')
+  const { state, rateCard } = useProgress()
 
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [rated, setRated] = useState<Rating[]>([])
 
-  const card = CARDS[index]
+  // The session is the cards actually due now, fixed when the page loads so
+  // rating one doesn't reshuffle the deck under you.
+  const session = useMemo(
+    () => {
+      const due = CARDS.filter((c) => isDue(state.cards[c.tag]))
+      return due.length ? due : CARDS
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
+
+  const card = session[Math.min(index, session.length - 1)]
+  const finished = index >= session.length
 
   const rate = (kind: Rating) => {
-    setIndex((i) => Math.min(i + 1, CARDS.length - 1))
+    rateCard(card.tag, kind)
+    setIndex((i) => i + 1)
     setFlipped(false)
     setRated((r) => [...r, kind])
+  }
+
+  const restart = () => {
+    setIndex(0)
+    setFlipped(false)
+    setRated([])
   }
 
   const dotColor = (di: number) => {
@@ -93,13 +114,14 @@ export default function Flashcards() {
     return di === index ? 'var(--color-accent)' : 'var(--color-neutral-300)'
   }
 
-  const due = CARDS.length - Math.min(rated.length, CARDS.length - 1)
+  const dueNow = CARDS.filter((c) => isDue(state.cards[c.tag])).length
+  const mastered = CARDS.filter((c) => (state.cards[c.tag]?.intervalDays ?? 0) >= 5).length
 
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column' }}>
       <TopNav
         note="Page type · Flashcards / spaced repetition"
-        right={<Tag tone="accent-2">{due} due today</Tag>}
+        right={<Tag tone="accent-2">{dueNow} due today</Tag>}
       />
 
       <div
@@ -125,10 +147,48 @@ export default function Flashcards() {
               HTTP Essentials deck
             </h1>
             <span style={{ fontSize: 13, color: 'var(--color-neutral-700)' }}>
-              Card {index + 1} of {CARDS.length}
+              Card {Math.min(index + 1, session.length)} of {session.length}
             </span>
           </div>
 
+          {finished ? (
+            <div
+              className="card elev-lg"
+              style={{
+                borderRadius: 'var(--radius-lg)',
+                minHeight: 300,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 14,
+                padding: 40,
+                textAlign: 'center',
+                animation: 'pop 0.25s ease',
+              }}
+            >
+              <Tag tone="accent-2">SESSION COMPLETE</Tag>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 30, lineHeight: 1.2 }}>
+                {rated.length} card{rated.length === 1 ? '' : 's'} reviewed
+              </div>
+              <p
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  color: 'var(--color-neutral-700)',
+                  margin: 0,
+                  maxWidth: 380,
+                }}
+              >
+                {dueNow === 0
+                  ? 'Nothing else is due right now — the deck will resurface these as their intervals come round.'
+                  : `${dueNow} card${dueNow === 1 ? '' : 's'} still due.`}
+              </p>
+              <button type="button" className="btn btn-secondary" onClick={restart}>
+                Study again
+              </button>
+            </div>
+          ) : (
           <button
             type="button"
             onClick={() => setFlipped((f) => !f)}
@@ -231,8 +291,9 @@ export default function Flashcards() {
               </div>
             )}
           </button>
+          )}
 
-          {flipped ? (
+          {!finished && flipped ? (
             <div
               className="grid grid-3"
               style={{ gap: 10, marginTop: 18, animation: 'pop 0.25s ease' }}
@@ -268,7 +329,7 @@ export default function Flashcards() {
                 </button>
               ))}
             </div>
-          ) : (
+          ) : finished ? null : (
             <div
               style={{
                 textAlign: 'center',
@@ -282,7 +343,7 @@ export default function Flashcards() {
           )}
 
           <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 26 }}>
-            {CARDS.map((c, di) => (
+            {session.map((c, di) => (
               <span
                 key={c.tag}
                 style={{
@@ -310,13 +371,16 @@ export default function Flashcards() {
         }}
       >
         <span>
-          <strong style={{ color: 'var(--color-accent-2-700)' }}>12</strong> mastered
+          <strong style={{ color: 'var(--color-accent-2-700)' }}>{mastered}</strong> mastered
         </span>
         <span>
-          <strong style={{ color: 'var(--color-accent-700)' }}>5</strong> due today
+          <strong style={{ color: 'var(--color-accent-700)' }}>{dueNow}</strong> due today
         </span>
         <span>
-          <strong style={{ color: 'var(--color-neutral-800)' }}>9</strong> new this week
+          <strong style={{ color: 'var(--color-neutral-800)' }}>
+            {CARDS.length - Object.keys(state.cards).filter((k) => CARDS.some((c) => c.tag === k)).length}
+          </strong>{' '}
+          not yet seen
         </span>
       </div>
     </div>

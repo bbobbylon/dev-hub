@@ -3,7 +3,30 @@
 A React implementation of the **Coding Learning App Redesign** handed off from Claude Design
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
-All 23 designed pages are implemented, plus the gallery that indexes them.
+All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
+mockups only depicted is now real.
+
+## Beyond the mockups
+
+The designs showed a learner's progress as fixed numbers: a 4-day streak, 8 of 23 concepts, a
+hardcoded minutes chart. Nothing was recorded, so a refresh erased everything. `src/lib/progress.ts`
+makes it true — a small localStorage store, shared across tabs via the `storage` event, with no
+server and no account.
+
+- **Quiz scores persist**, accumulating a personal best across attempts; passing a checkpoint marks
+  the concept complete.
+- **Flashcards run real spaced repetition** (SM-2, trimmed to the three ratings the deck offers).
+  A session studies only what's actually due and then *ends*, instead of looping on the last card.
+  The "due today" and "mastered" counts are computed, not decorative.
+- **Milestones persist** on the capstone brief.
+- **The Progress Dashboard reads live data** — streak, hours this week, concepts completed, quiz
+  accuracy, the 14-day minutes chart and the completion donut all derive from real activity.
+- **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
+  streak and the chart honest.
+- **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
+  gallery gained a filter across all 23 archetypes. Both have empty states.
+- **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
+- **Progress can be reset** from the dashboard, with a note that data never leaves the device.
 
 ## Running it
 

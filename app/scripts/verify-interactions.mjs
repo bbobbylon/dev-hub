@@ -13,6 +13,15 @@ const check = (name, pass, detail = '') => {
   console.log(`${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`)
 }
 const go = (path) => page.goto(BASE + path, { waitUntil: 'load' })
+
+// Progress persists in localStorage now, so any block whose expectations
+// depend on a fresh learner must say so explicitly — otherwise an earlier
+// block's ratings and scores leak into it.
+const resetProgress = async () => {
+  await page.goto(BASE + '/', { waitUntil: 'load' })
+  await page.evaluate(() => localStorage.clear())
+}
+await resetProgress()
 const body = () => page.evaluate(() => document.body.innerText)
 
 /* ── Quiz Mode: full 5-question run, scoring, restart ─────────────────── */
@@ -206,15 +215,82 @@ check('build edge: all unchecked → 0%', (await body()).includes('0% BUILT'))
 for (let i = 0; i < total; i++) await boxes.nth(i).click()
 check('build edge: all checked → 100%', (await body()).includes('100% BUILT'))
 
-// Flashcards past the final card — the deck clamps rather than overrunning.
+// Flashcards to the end of the deck — the session now completes rather than
+// looping on the last card. Needs a fresh deck: the happy-path check above
+// rated one card, which schedules it out of today's session.
+await resetProgress()
 await go('/flashcards')
-for (let i = 0; i < 7; i++) {
+for (let i = 0; i < 5; i++) {
   await page.getByRole('button', { name: /Show (answer|question)/ }).click()
   await page.getByRole('button', { name: /Easy/ }).click()
 }
-const overrun = await body()
-check('cards edge: clamps at the last card', overrun.includes('Card 5 of 5'))
-check('cards edge: still renders a card', overrun.includes('Why is HTTP called stateless?'))
+const deckEnd = await body()
+check('cards edge: session completes at deck end', deckEnd.includes('SESSION COMPLETE'))
+check('cards edge: reports how many were reviewed', deckEnd.includes('5 cards reviewed'))
+check('cards edge: nothing left due after rating all easy', deckEnd.includes('0 due today'))
+await page.getByRole('button', { name: 'Study again' }).click()
+check('cards edge: study again restarts the deck', (await body()).includes('tap to flip'))
+
+/* ── Persistence, search and 404 — the features behind the mockups ────── */
+
+await resetProgress()
+
+// Quiz scores survive a reload and accumulate into a personal best.
+await go('/quiz-mode')
+for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Skip' }).click()
+await go('/progress-dashboard')
+const dash = await body()
+check('progress: dashboard reads the recorded attempt', dash.includes('0%'))
+check('progress: streak is computed, not hardcoded', !dash.includes('4 days'))
+
+// A second attempt is remembered alongside the first.
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('progress: personal best across attempts shown', (await body()).includes('Best so far 5/5'))
+
+// Milestones persist across a reload.
+await go('/project-build-along')
+await page.getByRole('button', { name: /Add --filter PATTERN/ }).click()
+const afterToggle = await body()
+await go('/project-build-along')
+check(
+  'progress: milestones survive a reload',
+  (await body()).match(/(\d+)% BUILT/)?.[1] === afterToggle.match(/(\d+)% BUILT/)?.[1],
+)
+
+// Dev Hub search was decorative in the mockup.
+await go('/dev-hub')
+await page.getByLabel('Search concepts').fill('hash')
+const searched = await body()
+check('search: Dev Hub filters to matches', searched.includes('Hash Maps'))
+check('search: non-matches are hidden', !searched.includes('Shell Scripting'))
+await page.getByLabel('Search concepts').fill('zzzz')
+check('search: empty state explains itself', (await body()).includes('Nothing matches'))
+
+// Gallery filter across all 23 archetypes.
+await go('/')
+await page.getByLabel('Filter pages').fill('dark')
+const gallery = await body()
+check('search: gallery filters', gallery.includes('Terminal Simulator'))
+check('search: gallery hides non-matches', !gallery.includes('Cheat Sheet'))
+
+// Unknown URLs used to silently redirect to the gallery.
+await go('/does-not-exist')
+const missing = await body()
+check('404: unknown route explains itself', missing.includes('No such page'))
+check('404: offers a way back', missing.includes('Browse the gallery'))
+
+// Reset clears everything.
+await go('/progress-dashboard')
+page.once('dialog', (d) => d.accept())
+await page.getByRole('button', { name: 'Reset progress' }).click()
+await go('/quiz-mode')
+for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Skip' }).click()
+check('progress: reset clears the personal best', !(await body()).includes('Best so far'))
 
 const failed = results.filter((r) => !r.pass)
 console.log(`\n${results.length - failed.length}/${results.length} interaction checks passed`)

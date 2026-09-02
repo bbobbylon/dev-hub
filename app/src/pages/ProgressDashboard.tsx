@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { isDue, recentMinutes, streakOf, useProgress } from '../lib/progress'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
@@ -7,54 +8,17 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 /* ── data ──────────────────────────────────────────────────────────────── */
 
-const MINUTES = [25, 0, 40, 22, 15, 0, 30, 45, 20, 0, 35, 28, 24, 31]
-const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S']
 const DAILY_GOAL = 20
 const CHART_CEILING = 45
+const WEEKLY_GOAL_HOURS = 4
+const TOTAL_CONCEPTS = 23
+const DECK = ['STATUS CODES', 'METHODS', 'HEADERS', 'CACHING', 'STATE']
+const DAY_INITIAL = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-const STATS = [
-  {
-    label: 'Streak',
-    value: '4',
-    unit: 'days',
-    note: 'Best: 11 — keep going',
-    noteColor: 'var(--color-accent-2-700)',
-    valueColor: 'var(--color-accent-700)',
-  },
-  {
-    label: 'This week',
-    value: '3.2',
-    unit: 'hours',
-    note: 'Goal: 4 h · 80% there',
-    valueColor: 'var(--color-accent-700)',
-  },
-  {
-    label: 'Concepts done',
-    value: '8',
-    unit: 'of 23',
-    note: 'Backend path · 34%',
-    valueColor: 'var(--color-accent-700)',
-  },
-  {
-    label: 'Quiz accuracy',
-    value: '86%',
-    note: 'First-try, last 30 days',
-    valueColor: 'var(--color-accent-2-700)',
-  },
-]
-
-const PATH_BREAKDOWN = [
-  { color: 'var(--color-accent-2)', label: '8 mastered' },
-  { color: 'var(--color-accent)', label: '2 in progress' },
-  { color: 'var(--color-neutral-400)', label: '13 locked' },
-]
 
 /* Donut geometry: r=46 → circumference ≈ 289; 34% ≈ 98 of it. */
 const DONUT_R = 46
 const DONUT_CIRCUMFERENCE = Math.round(2 * Math.PI * DONUT_R)
-const PATH_PCT = 34
-const DONUT_FILLED = Math.round((PATH_PCT / 100) * DONUT_CIRCUMFERENCE)
-
 interface Badge {
   name: ReactNode
   icon: ReactNode
@@ -136,7 +100,7 @@ const BADGES: Badge[] = [
   },
 ]
 
-const UP_NEXT = [
+const UP_NEXT_TEMPLATE = [
   {
     to: '/flashcards',
     label: '5 flashcards due (HTTP deck)',
@@ -229,6 +193,68 @@ function PanelLabel({ children }: { children: ReactNode }) {
 
 export default function ProgressDashboard() {
   useDocumentTitle('Progress Dashboard')
+  const { state, reset } = useProgress()
+
+  const days = recentMinutes(state.activity, 14)
+  const streak = streakOf(state.activity)
+  const weekMinutes = days.slice(-7).reduce((n, d) => n + d.minutes, 0)
+  const conceptsDone = Object.keys(state.concepts).length
+  const attempts = Object.values(state.quizzes)
+  const accuracy = attempts.length
+    ? Math.round(
+        (attempts.reduce((n, q) => n + q.best / q.total, 0) / attempts.length) * 100,
+      )
+    : 0
+  const pathPct = Math.round((conceptsDone / TOTAL_CONCEPTS) * 100)
+  const cardsDue = DECK.filter((tag) => isDue(state.cards[tag])).length
+
+  const STATS = [
+    {
+      label: 'Streak',
+      value: String(streak),
+      unit: streak === 1 ? 'day' : 'days',
+      note: streak > 0 ? 'Keep it going' : 'Start today',
+      noteColor: 'var(--color-accent-2-700)',
+      valueColor: 'var(--color-accent-700)',
+    },
+    {
+      label: 'This week',
+      value: (weekMinutes / 60).toFixed(1),
+      unit: 'hours',
+      note: `Goal: ${WEEKLY_GOAL_HOURS} h · ${Math.min(100, Math.round((weekMinutes / 60 / WEEKLY_GOAL_HOURS) * 100))}% there`,
+      valueColor: 'var(--color-accent-700)',
+    },
+    {
+      label: 'Concepts done',
+      value: String(conceptsDone),
+      unit: `of ${TOTAL_CONCEPTS}`,
+      note: `Backend path · ${pathPct}%`,
+      valueColor: 'var(--color-accent-700)',
+    },
+    {
+      label: 'Quiz accuracy',
+      value: `${accuracy}%`,
+      note: attempts.length ? 'Best score, per checkpoint' : 'No checkpoints yet',
+      valueColor: 'var(--color-accent-2-700)',
+    },
+  ]
+
+  const PATH_BREAKDOWN = [
+    { color: 'var(--color-accent-2)', label: `${conceptsDone} mastered` },
+    { color: 'var(--color-accent)', label: `${cardsDue} due for review` },
+    {
+      color: 'var(--color-neutral-400)',
+      label: `${TOTAL_CONCEPTS - conceptsDone} not started`,
+    },
+  ]
+
+  const DONUT_FILLED = Math.round((pathPct / 100) * DONUT_CIRCUMFERENCE)
+
+  const upNext = UP_NEXT_TEMPLATE.map((item) =>
+    item.to === '/flashcards'
+      ? { ...item, label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (HTTP deck)` }
+      : item,
+  )
 
   return (
     <div className="page">
@@ -239,7 +265,7 @@ export default function ProgressDashboard() {
 
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '44px 48px 110px' }}>
         <h1 style={{ fontSize: 38, margin: '0 0 6px', color: 'var(--color-accent-700)' }}>
-          Nice pace, Ada
+          Nice pace
         </h1>
         <p style={{ fontSize: 14.5, color: 'var(--color-neutral-700)', margin: '0 0 30px' }}>
           Your week in learning — streaks, minutes, and what to hit next.
@@ -298,7 +324,7 @@ export default function ProgressDashboard() {
           >
             <PanelLabel>Minutes per day, last two weeks</PanelLabel>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 150 }}>
-              {MINUTES.map((m, i) => (
+              {days.map(({ minutes: m, date }, i) => (
                 <div
                   key={i}
                   style={{
@@ -322,7 +348,7 @@ export default function ProgressDashboard() {
                     }}
                   />
                   <span style={{ fontSize: 10, color: 'var(--color-neutral-700)' }}>
-                    {DAY_LABELS[i]}
+                    {DAY_INITIAL[date.getDay()]}
                   </span>
                 </div>
               ))}
@@ -363,7 +389,7 @@ export default function ProgressDashboard() {
           >
             <PanelLabel>Path completion</PanelLabel>
             <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-              <svg width="110" height="110" viewBox="0 0 110 110" role="img" aria-label={`${PATH_PCT}% of the path complete`}>
+              <svg width="110" height="110" viewBox="0 0 110 110" role="img" aria-label={`${pathPct}% of the path complete`}>
                 <circle
                   cx="55"
                   cy="55"
@@ -391,7 +417,7 @@ export default function ProgressDashboard() {
                   fontSize="22"
                   fill="var(--color-accent-2-700)"
                 >
-                  {PATH_PCT}%
+                  {pathPct}%
                 </text>
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
@@ -492,7 +518,7 @@ export default function ProgressDashboard() {
           >
             <PanelLabel>Up next — 15 minutes total</PanelLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {UP_NEXT.map((item) => (
+              {upNext.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
@@ -535,6 +561,30 @@ export default function ProgressDashboard() {
               ))}
             </div>
           </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginTop: 26,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span style={{ fontSize: 12.5, color: 'var(--color-neutral-700)' }}>
+            Progress is stored in this browser only — nothing leaves the device.
+          </span>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{ fontSize: 12.5 }}
+            onClick={() => {
+              if (confirm('Clear all saved progress? This cannot be undone.')) reset()
+            }}
+          >
+            Reset progress
+          </button>
         </div>
       </main>
     </div>

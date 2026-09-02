@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
@@ -60,12 +60,28 @@ function Mono({ children }: { children: string }) {
   )
 }
 
+const PAGE = 'project-build-along'
+
 export default function ProjectBuildAlong() {
   useDocumentTitle('Project Build-Along')
-  const [done, setDone] = useState<boolean[]>(INITIAL_DONE)
+  const { state, toggleMilestone } = useProgress()
 
-  const toggle = (i: number) =>
-    setDone((d) => d.map((value, index) => (index === i ? !value : value)))
+  // Falls back to the design's starting state until the learner touches a box,
+  // so a first visit still looks like the mockup rather than an empty list.
+  const touched = MILESTONES.some((_, i) => `${PAGE}:${i}` in state.milestones)
+  const done = MILESTONES.map((_, i) =>
+    touched ? !!state.milestones[`${PAGE}:${i}`] : INITIAL_DONE[i],
+  )
+
+  const toggle = (i: number) => {
+    if (!touched) {
+      // Seed every box from the design defaults so the first click doesn't
+      // silently clear the others.
+      MILESTONES.forEach((_, j) => toggleMilestone(`${PAGE}:${j}`, j === i ? !INITIAL_DONE[j] : INITIAL_DONE[j]))
+      return
+    }
+    toggleMilestone(`${PAGE}:${i}`)
+  }
 
   const pct = Math.round((done.filter(Boolean).length / done.length) * 100)
 

@@ -1,4 +1,6 @@
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { streakOf, useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
@@ -156,6 +158,23 @@ function ConceptCard({ concept }: { concept: Concept }) {
 
 export default function DevHub() {
   useDocumentTitle('Dev Hub')
+  const { state } = useProgress()
+  const [query, setQuery] = useState('')
+
+  const streak = streakOf(state.activity)
+
+  // The search box was decorative in the mockup; it now filters the catalog on
+  // title and blurb, and hides topics that end up empty.
+  const topics = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return TOPICS
+    return TOPICS.map((t) => ({
+      ...t,
+      concepts: t.concepts.filter(
+        (c) => c.title.toLowerCase().includes(q) || c.blurb.toLowerCase().includes(q),
+      ),
+    })).filter((t) => t.concepts.length > 0)
+  }, [query])
 
   return (
     <div className="page">
@@ -171,7 +190,8 @@ export default function DevHub() {
         }
         right={
           <span className="chip">
-            <Icon name="flame" size={13} color="var(--color-accent-700)" /> 4 day streak
+            <Icon name="flame" size={13} color="var(--color-accent-700)" />{' '}
+            {streak} day streak
           </span>
         }
       />
@@ -205,11 +225,13 @@ export default function DevHub() {
           placeholder="Search concepts… e.g. pipes, recursion, git rebase"
           style={{ maxWidth: 480 }}
           aria-label="Search concepts"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
       </header>
 
       <main className="wrap" style={{ padding: '0 56px 100px' }}>
-        {TOPICS.map((topic) => {
+        {topics.map((topic) => {
           const done = topic.concepts.filter((c) => c.status === 'done').length
           return (
             <section key={topic.title} style={{ marginBottom: 44 }}>
@@ -234,6 +256,13 @@ export default function DevHub() {
             </section>
           )
         })}
+
+        {topics.length === 0 ? (
+          <p style={{ fontSize: 15, color: 'var(--color-neutral-700)' }}>
+            Nothing matches “{query}”. Try a shorter word, or browse the{' '}
+            <Link to="/">full gallery</Link>.
+          </p>
+        ) : null}
       </main>
     </div>
   )
