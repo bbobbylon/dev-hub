@@ -168,10 +168,17 @@ await page.getByRole('button', { name: 'Clear output' }).click()
 check('playground: clear resets', (await body()).includes('Output appears here'))
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
+// Client-side routing changes the URL before React commits the new DOM, so
+// each step waits for the render — not just the address — before asserting.
+// "Dev Hub" also matches two links on the gallery (brand + catalog card), so
+// the brand is addressed by its class.
 await go('/')
 await page.getByRole('link', { name: /Quiz Mode/ }).click()
+await page.waitForURL('**/quiz-mode')
+await page.getByRole('heading', { level: 1 }).waitFor()
 check('nav: gallery card routes to the page', page.url().endsWith('/quiz-mode'))
-await page.getByRole('link', { name: 'Dev Hub' }).click()
+await page.locator('.topnav-brand').click()
+await page.waitForURL((u) => new URL(u).pathname === '/')
 check('nav: brand mark returns to the gallery', new URL(page.url()).pathname === '/')
 
 /* ── Boundaries: the paths the happy-path checks never reach ─────────── */
@@ -250,6 +257,7 @@ for (const letter of ['B', 'B', 'B', 'A', 'A']) {
   await page.getByRole('button', { name: 'Check answer' }).click()
   await page.getByRole('button', { name: /Next question|See results/ }).click()
 }
+await page.getByText(/Best so far/).waitFor({ timeout: 10_000 }).catch(() => {})
 check('progress: personal best across attempts shown', (await body()).includes('Best so far 5/5'))
 
 // Milestones persist across a reload.

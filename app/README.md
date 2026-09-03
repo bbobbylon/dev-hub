@@ -39,11 +39,11 @@ npm run preview    # serve the build on :4173
 
 ## Verifying it
 
-There are now two Playwright suites, both run against `npm run preview` on port 4173:
+Three Playwright suites, all run against `npm run preview` on port 4173:
 
 ```bash
 npm run preview &        # must be up first
-npm run verify           # routes + interactions
+npm run verify           # routes + responsive + interactions
 ```
 
 - `verify:routes` — loads all 24 routes, asserting each renders real content, has an `<h1>`,
@@ -56,7 +56,7 @@ npm run verify           # routes + interactions
   decorator cost arithmetic, walkthrough gating, milestone checklist, test runner) and asserts the
   ported behaviour matches.
 
-Both block outbound requests, so the Google Fonts link is not fetched during verification. The
+They block outbound requests, so the Google Fonts link is not fetched during verification. The
 running app still loads Caprasimo and Figtree normally.
 
 There's also a content-fidelity audit — a reviewing aid rather than a test, so it isn't part of
