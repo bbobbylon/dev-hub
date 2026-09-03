@@ -16,7 +16,7 @@ npm run preview    # serve the build on :4173
 
 ## Verifying it
 
-Two Playwright suites, both run against `npm run preview` on port 4173:
+There are now two Playwright suites, both run against `npm run preview` on port 4173:
 
 ```bash
 npm run preview &        # must be up first
