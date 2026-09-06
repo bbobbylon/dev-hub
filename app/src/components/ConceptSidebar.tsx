@@ -98,6 +98,7 @@ function SidebarLink({ item }: { item: SidebarItem }) {
     <>
       {mark}
       {item.label}
+      {item.state === 'locked' ? <span className="sr-only"> (locked)</span> : null}
     </>
   )
 

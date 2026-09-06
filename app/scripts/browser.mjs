@@ -1,7 +1,11 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { chromium } from 'playwright'
 
-export const BASE = process.env.VERIFY_BASE_URL ?? 'http://localhost:4173'
+// `npm run build` (no BASE_PATH override) always emits the GitHub Pages
+// sub-path build — see vite.config.ts's default — and `npm run preview` now
+// serves that same sub-path, so this must match it or every route 404s.
+// Override with VERIFY_BASE_URL if you built with a different BASE_PATH.
+export const BASE = process.env.VERIFY_BASE_URL ?? 'http://localhost:4173/dev-hub'
 
 /**
  * Prefer the Chromium this environment ships (PLAYWRIGHT_BROWSERS_PATH) over

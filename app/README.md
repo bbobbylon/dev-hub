@@ -109,12 +109,13 @@ Measured against the two light grounds, the ramp splits cleanly at step 700:
 | `accent-2-600` | 3.53:1 | 3.14:1 | fails |
 | `accent-2-700` | 5.43:1 | 4.82:1 | passes |
 
-**What remains, and why it wasn't changed:** all 18 surviving pairs are the accent fill itself —
-cream-on-terracotta primary buttons, `.btn-ghost` accent text, accent-tinted labels on accent
-panels, and the terminal's accent-on-dark. They measure 2.7–3.9:1, which is precisely the ~3:1 the
-Organic guide says the accent pair is tuned to ("enough for icons, large text and interface chrome,
-not for body copy"). Clearing them means changing the accent colour itself — a brand decision, not
-a porting one.
+**What remains, and why it wasn't changed:** the surviving pairs (19 now — the Roadmap page's
+"Continue" button was later wired up from a dead `<button>` into a real `.btn-primary` link, adding
+one more instance of the same tradeoff) are the accent fill itself — cream-on-terracotta primary
+buttons, `.btn-ghost` accent text, accent-tinted labels on accent panels, and the terminal's
+accent-on-dark. They measure 2.7–3.9:1, which is precisely the ~3:1 the Organic guide says the
+accent pair is tuned to ("enough for icons, large text and interface chrome, not for body copy").
+Clearing them means changing the accent colour itself — a brand decision, not a porting one.
 
 ## How it's organised
 

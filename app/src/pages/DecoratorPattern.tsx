@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { streakOf, useProgress } from '../lib/progress'
 
 /* ── content ───────────────────────────────────────────────────────────── */
 
@@ -468,6 +469,8 @@ function PredictThenRun() {
 
 export default function DecoratorPattern() {
   useDocumentTitle('Decorator Pattern')
+  const { state } = useProgress()
+  const streak = streakOf(state.activity)
 
   return (
     <div className="page">
@@ -484,7 +487,7 @@ export default function DecoratorPattern() {
         }
         right={
           <span className="chip">
-            <Icon name="flame" size={13} color="var(--color-accent-700)" /> 4 day streak
+            <Icon name="flame" size={13} color="var(--color-accent-700)" /> {streak} day streak
           </span>
         }
       />

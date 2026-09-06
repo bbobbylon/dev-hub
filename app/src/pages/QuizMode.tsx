@@ -405,7 +405,7 @@ export default function QuizMode() {
               ) : null}
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button type="button" className="btn btn-secondary" onClick={restart}>
-                  Retry missed questions
+                  Retry the quiz
                 </button>
                 <Link to="/roadmap" className="btn btn-primary">
                   Next concept

@@ -12,7 +12,13 @@ const check = (name, pass, detail = '') => {
   results.push({ name, pass, detail })
   console.log(`${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`)
 }
-const go = (path) => page.goto(BASE + path, { waitUntil: 'load' })
+// Pages are code-split (React.lazy) — 'load' fires once the shell script has
+// loaded, before the route's own chunk has been fetched and mounted. Waiting
+// for real content is what makes every body() read right after go() reliable.
+const go = async (path) => {
+  await page.goto(BASE + path, { waitUntil: 'load' })
+  await page.waitForSelector('main, h1', { timeout: 10_000 }).catch(() => {})
+}
 
 // Progress persists in localStorage now, so any block whose expectations
 // depend on a fresh learner must say so explicitly — otherwise an earlier
@@ -43,7 +49,7 @@ check(
   'quiz: verdict names the pass mark',
   quizEnd.includes('you only need 4 of 5'),
 )
-await page.getByRole('button', { name: 'Retry missed questions' }).click()
+await page.getByRole('button', { name: 'Retry the quiz' }).click()
 check('quiz: restart returns to Q1', (await body()).includes('Question 1 of 5'))
 
 /* ── Flashcards: flip + rate advances the deck ────────────────────────── */
@@ -178,8 +184,11 @@ await page.waitForURL('**/quiz-mode')
 await page.getByRole('heading', { level: 1 }).waitFor()
 check('nav: gallery card routes to the page', page.url().endsWith('/quiz-mode'))
 await page.locator('.topnav-brand').click()
-await page.waitForURL((u) => new URL(u).pathname === '/')
-check('nav: brand mark returns to the gallery', new URL(page.url()).pathname === '/')
+// The router basename (GitHub Pages' sub-path) means the gallery's real
+// pathname is BASE's own path plus a trailing slash, not bare "/".
+const galleryPath = new URL(BASE + '/').pathname
+await page.waitForURL((u) => new URL(u).pathname === galleryPath)
+check('nav: brand mark returns to the gallery', new URL(page.url()).pathname === galleryPath)
 
 /* ── Boundaries: the paths the happy-path checks never reach ─────────── */
 

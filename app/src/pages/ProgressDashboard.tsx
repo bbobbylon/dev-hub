@@ -260,7 +260,7 @@ export default function ProgressDashboard() {
     <div className="page">
       <TopNav
         note="Page type · Personal stats dashboard"
-        right={<Tag tone="accent">4-DAY STREAK</Tag>}
+        right={<Tag tone="accent">{streak}-DAY STREAK</Tag>}
       />
 
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '44px 48px 110px' }}>

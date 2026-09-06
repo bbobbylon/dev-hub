@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { useProgress } from '../lib/progress'
+import { streakOf, useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
@@ -177,10 +177,14 @@ export default function Roadmap() {
   const completed = Object.keys(state.concepts).length
   const doneCount = Math.max(BASELINE_DONE, completed)
   const pct = Math.round((doneCount / TOTAL_CONCEPTS) * 100)
+  const streak = streakOf(state.activity)
 
   return (
     <div className="page">
-      <TopNav note="Page type · Learning roadmap" right={<Tag tone="accent">4-day streak</Tag>} />
+      <TopNav
+        note="Page type · Learning roadmap"
+        right={<Tag tone="accent">{streak}-day streak</Tag>}
+      />
 
       <header style={{ maxWidth: 960, margin: '0 auto', padding: '56px 48px 8px' }}>
         <Tag tone="accent-2" style={{ marginBottom: 14, display: 'inline-flex' }}>
@@ -289,9 +293,9 @@ export default function Roadmap() {
                   <Chip label="Branching & Merging — next up" state="next" block />
                   <Chip label="Rebase & History" state="todo" block />
                 </div>
-                <button type="button" className="btn btn-primary" style={{ marginTop: 16 }}>
+                <Link to="/git-branching" className="btn btn-primary" style={{ marginTop: 16 }}>
                   Continue — Branching &amp; Merging
-                </button>
+                </Link>
               </div>
             </div>
           </div>

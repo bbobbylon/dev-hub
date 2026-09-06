@@ -10,6 +10,7 @@ import { Icon } from '../components/Icon'
 import { Code } from '../components/ui'
 import { useCopy } from '../components/useCopy'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { streakOf, useProgress } from '../lib/progress'
 import {
   ANATOMY,
   ANATOMY_ORDER,
@@ -347,6 +348,8 @@ function Walkthrough() {
 export default function CliBasics() {
   useDocumentTitle('CLI Basics')
   const { copied, copy } = useCopy()
+  const { state } = useProgress()
+  const streak = streakOf(state.activity)
 
   return (
     <div className="page">
@@ -363,7 +366,7 @@ export default function CliBasics() {
         }
         right={
           <span className="chip">
-            <Icon name="flame" size={13} color="var(--color-accent-700)" /> 4 day streak
+            <Icon name="flame" size={13} color="var(--color-accent-700)" /> {streak} day streak
           </span>
         }
       />
