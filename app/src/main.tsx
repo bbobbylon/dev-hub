@@ -7,7 +7,9 @@ import './styles/app.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* BASE_URL mirrors vite.config.ts's `base` (e.g. "/dev-hub/" on GitHub
+        Pages), so routes resolve under the sub-path instead of at the root. */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>
   </StrictMode>,

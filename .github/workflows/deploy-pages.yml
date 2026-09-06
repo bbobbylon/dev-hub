@@ -1,0 +1,80 @@
+# Publishes the app (app/) to GitHub Pages (free, no card, custom domain
+# supported). Runs on every push to master that touches app/, and on demand.
+#
+# NOTE: this repo's default branch is master (not main) — confirm that's still
+# true before changing the trigger below; a stale local `main` branch also
+# exists (11 commits behind, an orphan from repo creation) but is not what's
+# deployed anywhere.
+#
+# One-time setup: push; this workflow tries to enable Pages itself
+# (configure-pages with enablement). If that's refused (needs repo-admin
+# rights the default GITHUB_TOKEN doesn't have on a repo's first deploy):
+# Settings → Pages → Source: "GitHub Actions".
+#
+# Optional repo variable (Settings → Secrets and variables → Actions → Variables):
+#   BASE_PATH = "/" when serving from a custom domain ("/dev-hub/" — the
+#               default, matching vite.config.ts — on bbobbylon.github.io/dev-hub)
+#
+# This is a plain client-rendered Vite + React app (react-router's BrowserRouter,
+# basename wired to Vite's BASE_URL in src/main.tsx) — no backend, no
+# prerendering. The built index.html doubles as the 404.html SPA fallback so
+# deep links and typos load the app instead of GitHub's own 404 page.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths: ['app/**', '.github/workflows/deploy-pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          BASE_PATH: ${{ vars.BASE_PATH }}
+        run: npm run build
+
+      - name: SPA fallback
+        working-directory: app/dist
+        run: cp index.html 404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
