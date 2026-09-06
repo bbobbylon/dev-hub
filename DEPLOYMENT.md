@@ -48,6 +48,42 @@ GitHub Pages serves a project site from `https://bbobbylon.github.io/dev-hub/`
    the live Pages URL, `status` → `LIVE`, then `npm run shots -- --only
    dev-hub` there.
 
+## It went live (2026-09-06) — steps 1–3 done
+
+**`https://bbobbylon.github.io/dev-hub/`** is up.
+
+Step 2 played out exactly as the workflow's own comment warned: run #1
+attempt 1 failed at `actions/configure-pages`, because the default
+`GITHUB_TOKEN` can't enable Pages on a repo's first deploy. Setting
+Settings → Pages → Source: **GitHub Actions** by hand fixed it, and the
+re-run (attempt 2) went green — build and deploy both. Nothing in the
+workflow needed changing; leave `enablement: true` alone, it's a no-op now
+that Pages exists.
+
+Step 3 passed against the live site:
+
+- Gallery renders all 24 cards.
+- A cold navigation to `/dev-hub/quiz-mode` (never served as a real file)
+  loads the app — the `404.html` fallback works. Note it answers with HTTP
+  **404** and the app's HTML body; that's how Pages serves the fallback, and
+  it's not a fault.
+- Ran the Git Basics checkpoint end to end; the Progress Dashboard then read
+  **20 %** quiz accuracy from the 1/5 attempt, and it survived a full reload.
+  (The test attempt was cleared from the browser afterwards.)
+- No console errors on any page visited.
+
+**Caveat for every future Pages project on this account:** they all share the
+`bbobbylon.github.io` origin, so they all share one `localStorage`. That
+browser already carries keys from other projects (`dlh_progress_v1`,
+`ng-bookmarks-v1`, `angular-practice-progress-v1`, a bare `theme`…). Dev Hub
+is safe because it namespaces its key as `dev-hub.progress.v1` — keep new
+keys prefixed, and be wary of the unprefixed `theme` key colliding with
+another project's.
+
+Step 4 (WebsiteHub) is still open: the local `websitehub` checkout at
+`B:\Documents\Coding\websitehub` is a `.git` directory with no working tree,
+so the `InMemoryProjectRepository` entry hasn't been repointed yet.
+
 ## Rollback
 
 Actions → "Deploy to GitHub Pages" → re-run from the previous commit, or
