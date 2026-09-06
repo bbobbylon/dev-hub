@@ -291,7 +291,7 @@ export default function Roadmap() {
                   <Chip label="Git Basics" state="done" block />
                   <Chip label="Staging & Commits" state="done" block />
                   <Chip label="Branching & Merging — next up" state="next" block />
-                  <Chip label="Rebase & History" state="todo" block />
+                  <Chip label="Rebase & History" state="todo" to="/rebase-history" block />
                 </div>
                 <Link to="/git-branching" className="btn btn-primary" style={{ marginTop: 16 }}>
                   Continue — Branching &amp; Merging

@@ -4,7 +4,9 @@ A React implementation of the **Coding Learning App Redesign** handed off from C
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
 All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
-mockups only depicted is now real.
+mockups only depicted is now real. A 24th page, Rebase & History, was added afterward: the Roadmap
+mockup already named it as Version Control's fourth concept, but no design existed for it — it's
+new content in the app's own style, not a ported prototype.
 
 ## Beyond the mockups
 
@@ -24,7 +26,7 @@ server and no account.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 23 archetypes. Both have empty states.
+  gallery gained a filter across all 24 archetypes. Both have empty states.
 - **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
 - **Progress can be reset** from the dashboard, with a note that data never leaves the device.
 
@@ -46,7 +48,7 @@ npm run preview &        # must be up first
 npm run verify           # routes + responsive + interactions
 ```
 
-- `verify:routes` — loads all 24 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 25 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from

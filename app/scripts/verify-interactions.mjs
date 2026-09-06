@@ -74,6 +74,18 @@ check('viz: final counters read 9 / 4', vizEnd.includes('9') && vizEnd.includes(
 await page.getByRole('button', { name: 'Reset' }).click()
 check('viz: reset returns to frame 1', (await body()) === viz0)
 
+/* ── Rebase & History: stepping replays commits, ends linear ──────────── */
+await go('/rebase-history')
+check('rebase: Back disabled at step 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
+const rebase0 = await body()
+for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
+const rebaseEnd = await body()
+check('rebase: reaches the done state', rebaseEnd.includes('Rebase complete'))
+check('rebase: replay count reads 2 of 2', rebaseEnd.includes('2 of 2'))
+check('rebase: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
+await page.getByRole('button', { name: 'Reset' }).click()
+check('rebase: reset returns to step 1', (await body()) === rebase0)
+
 /* ── Regex Lab: real matching, counts change per pattern ──────────────── */
 await go('/regex-lab')
 const digits = await body()

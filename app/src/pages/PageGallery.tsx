@@ -55,7 +55,7 @@ export default function PageGallery() {
       <header className="wrap page-header">
         <h1>Every kind of page your learning app needs</h1>
         <p className="lede">
-          20 archetypes plus the three originals, all on the same design system. Click any card —
+          21 archetypes plus the three originals, all on the same design system. Click any card —
           pages link back here from their top-left logo.
         </p>
         <input

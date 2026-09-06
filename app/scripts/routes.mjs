@@ -7,6 +7,7 @@ export const ROUTES = [
   '/video-lesson',
   '/architecture-deep-dive',
   '/git-branching',
+  '/rebase-history',
   '/big-o-performance',
   '/data-structures-visual',
   '/api-anatomy',

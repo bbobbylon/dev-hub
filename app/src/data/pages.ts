@@ -63,6 +63,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'rebase-history',
+    title: 'Rebase & History',
+    kind: 'STEP-THROUGH VIZ',
+    tone: 'accent',
+    blurb: 'Merge’s companion — replay a branch onto main and watch the SHAs rewrite.',
+    group: 'learn',
+  },
+  {
     slug: 'big-o-performance',
     title: 'Big-O Performance',
     kind: 'CHART-LED',

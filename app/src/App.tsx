@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import PageGallery from './pages/PageGallery'
 import NotFound from './pages/NotFound'
 
-// Lazy: the 22 page-sized lessons/tools. A visit only ever needs a handful of
+// Lazy: the 23 page-sized lessons/tools. A visit only ever needs a handful of
 // these, so there's no reason to ship all of them in the initial bundle.
 const DevHub = lazy(() => import('./pages/DevHub'))
 const CliBasics = lazy(() => import('./pages/CliBasics'))
@@ -15,6 +15,7 @@ const DecoratorPattern = lazy(() => import('./pages/DecoratorPattern'))
 const VideoLesson = lazy(() => import('./pages/VideoLesson'))
 const ArchitectureDeepDive = lazy(() => import('./pages/ArchitectureDeepDive'))
 const GitBranching = lazy(() => import('./pages/GitBranching'))
+const RebaseHistory = lazy(() => import('./pages/RebaseHistory'))
 const BigOPerformance = lazy(() => import('./pages/BigOPerformance'))
 const DataStructuresVisual = lazy(() => import('./pages/DataStructuresVisual'))
 const ApiAnatomy = lazy(() => import('./pages/ApiAnatomy'))
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/video-lesson" element={<VideoLesson />} />
             <Route path="/architecture-deep-dive" element={<ArchitectureDeepDive />} />
             <Route path="/git-branching" element={<GitBranching />} />
+            <Route path="/rebase-history" element={<RebaseHistory />} />
             <Route path="/big-o-performance" element={<BigOPerformance />} />
             <Route path="/data-structures-visual" element={<DataStructuresVisual />} />
             <Route path="/api-anatomy" element={<ApiAnatomy />} />
