@@ -35,7 +35,7 @@ export default function PageGallery() {
   useDocumentTitle('Page Gallery')
   const [query, setQuery] = useState('')
 
-  // 23 archetypes is more than fits on a screen; filtering beats scrolling.
+  // 22 archetypes is more than fits on a screen; filtering beats scrolling.
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return PAGES
@@ -55,7 +55,7 @@ export default function PageGallery() {
       <header className="wrap page-header">
         <h1>Every kind of page your learning app needs</h1>
         <p className="lede">
-          21 archetypes plus the three originals, all on the same design system. Click any card —
+          22 archetypes plus the three originals, all on the same design system. Click any card —
           pages link back here from their top-left logo.
         </p>
         <input

@@ -13,8 +13,8 @@ interface State {
 
 /**
  * Catches a render crash in one page so it doesn't blank the whole app —
- * there's no server here to fall back on, just 24 hand-built interactive
- * pages, and a bug in one shouldn't take out the other 23.
+ * there's no server here to fall back on, just 25 hand-built interactive
+ * pages, and a bug in one shouldn't take out the other 24.
  */
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null }

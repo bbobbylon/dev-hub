@@ -31,6 +31,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'shell-scripting',
+    title: 'Shell Scripting',
+    kind: 'STEP-THROUGH VIZ',
+    tone: 'accent',
+    blurb: 'Turn a chain of commands into backup.sh — step through what each line actually does.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

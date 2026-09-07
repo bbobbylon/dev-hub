@@ -6,7 +6,7 @@ export const SIDEBAR: SidebarGroup[] = [
     title: 'Terminal & Shell',
     items: [
       { label: 'CLI Basics', state: 'current' },
-      { label: 'Shell Scripting', state: 'open' },
+      { label: 'Shell Scripting', state: 'open', to: '/shell-scripting' },
       { label: 'Environment Variables', state: 'locked' },
     ],
   },

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { ImageSlot } from '../components/ImageSlot'
+import recursionPoster from '../assets/recursion-poster.svg'
 import { syn } from '../components/CodeListing'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
@@ -136,7 +137,10 @@ export default function VideoLesson() {
             }}
           >
             <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
-              <ImageSlot placeholder="Drop the lesson still / poster frame here" />
+              <ImageSlot
+                src={recursionPoster}
+                alt="A code editor showing the countdown() function with its base case highlighted, beside a preview of the call-stack diagram covered later in the lesson"
+              />
               <div
                 style={{
                   position: 'absolute',

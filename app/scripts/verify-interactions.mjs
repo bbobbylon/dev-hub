@@ -86,6 +86,18 @@ check('rebase: Step disabled at the end', await page.getByRole('button', { name:
 await page.getByRole('button', { name: 'Reset' }).click()
 check('rebase: reset returns to step 1', (await body()) === rebase0)
 
+/* ── Shell Scripting: stepping through backup.sh reveals terminal + vars ── */
+await go('/shell-scripting')
+check('shell: Back disabled at step 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
+const shell0 = await body()
+check('shell: STAMP unknown before stepping', shell0.includes('STAMP') && !shell0.includes('20260907'))
+for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
+const shellEnd = await body()
+check('shell: final step reveals the echo output', shellEnd.includes('Backed up to backups/devhub-20260907.tar.gz'))
+check('shell: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
+await page.getByRole('button', { name: 'Reset' }).click()
+check('shell: reset returns to step 1', (await body()) === shell0)
+
 /* ── Regex Lab: real matching, counts change per pattern ──────────────── */
 await go('/regex-lab')
 const digits = await body()

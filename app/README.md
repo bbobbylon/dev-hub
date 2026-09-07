@@ -4,9 +4,16 @@ A React implementation of the **Coding Learning App Redesign** handed off from C
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
 All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
-mockups only depicted is now real. A 24th page, Rebase & History, was added afterward: the Roadmap
-mockup already named it as Version Control's fourth concept, but no design existed for it — it's
-new content in the app's own style, not a ported prototype.
+mockups only depicted is now real. Two pages were added afterward, in the app's own style rather
+than ported from a prototype:
+
+- **Rebase & History** — the Roadmap mockup already named it as Version Control's fourth concept,
+  but no design existed for it.
+- **Shell Scripting** — CLI Basics' own concept sidebar listed it as `state: 'open'` (the state the
+  component's doc comment defines as "reachable") but with no `to`, which the sidebar renders as a
+  plain, unclickable label regardless of that state. It's now a real step-through lesson (walking
+  `backup.sh` line by line, terminal output and variable values updating as you go), wired up from
+  every place that named it: that sidebar, and the Roadmap's Stage 1 chip.
 
 ## Beyond the mockups
 
@@ -69,7 +76,7 @@ npm run audit:content    # needs no server
 ```
 
 It pulls every substantial run of prose out of each `.dc.html` prototype and checks it survived
-into the corresponding React source. It currently reports **3 phrases to review, all known
+into the corresponding React source. It currently reports **4 phrases to review, all known
 extractor artifacts**, not omissions:
 
 - Two CLI Basics entries are the prototype's flat clipboard payload strings. Here those are derived
@@ -77,8 +84,13 @@ extractor artifacts**, not omissions:
   blob. The payloads are asserted byte-for-byte against the prototype in `verify:interactions`.
 - One Quiz Mode entry is a sentence that's now a template literal (`you only need ${PASS_MARK} of
   ${QUESTIONS.length}`). The rendered wording is asserted in `verify:interactions`.
+- One Page Gallery entry is the prototype's original archetype count. The prototype is a frozen
+  snapshot that will always say "20"; the gallery's own lede is deliberately kept current as
+  archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 now that
+  Shell Scripting has too) — see `PAGES.length` in `data/pages.ts` for the number that's actually
+  true.
 
-If that count rises, something was dropped — go read what it flags.
+If that count rises *beyond* this, something was dropped — go read what it flags.
 
 ### Accessibility
 

@@ -256,7 +256,7 @@ export default function Roadmap() {
               </div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <Chip label="CLI Basics" state="done" to="/cli-basics" />
-                <Chip label="Shell Scripting" state="done" />
+                <Chip label="Shell Scripting" state="done" to="/shell-scripting" />
                 <Chip label="Environment Variables" state="done" />
               </div>
             </div>
