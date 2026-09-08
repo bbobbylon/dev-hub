@@ -1,3 +1,10 @@
+/**
+ * Route `/architecture-deep-dive` — "SYSTEM DIAGRAM" page tracing one payment request through a
+ * typical web backend (browser → load balancer → API server → cache/database → replica) as a
+ * numbered inline SVG map, with matching explanatory cards below (`LAYER_CARDS`) for the three
+ * non-obvious stops. The diagram is hand-built with the local `Node` helper rather than any
+ * shared diagram component, and its content is self-contained — not shared with any other page.
+ */
 import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
@@ -77,6 +84,7 @@ function Node({
   )
 }
 
+// The explanatory cards rendered below the SVG diagram, one per non-trivial numbered stop.
 const LAYER_CARDS = [
   {
     n: 2,
@@ -104,6 +112,7 @@ const LAYER_CARDS = [
   },
 ]
 
+/** The Architecture Deep Dive page — the request-journey SVG diagram plus its layer cards. */
 export default function ArchitectureDeepDive() {
   useDocumentTitle('Architecture Deep Dive')
 

@@ -1,3 +1,9 @@
+/**
+ * Route `*` (catch-all) — the 404 page rendered for any URL that doesn't match a defined route,
+ * instead of silently redirecting to the gallery. Depends only on the shared `TopNav` chrome and
+ * `useDocumentTitle`; its two actions link back to the gallery (`/`) and the Dev Hub concepts
+ * page (`/dev-hub`).
+ */
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { useDocumentTitle } from '../components/useDocumentTitle'

@@ -1,3 +1,11 @@
+/**
+ * Route `/rebase-history` — a step-through visualizer replaying a feature
+ * branch being rebased onto main, showing its commits get new SHAs as they're
+ * reapplied. Companion to the Git Branching page's merge-flow visualization
+ * (same repo, same commit graph, same colour roles) but was added later, with
+ * no prototype of its own — built to match that page's style. Linked from the
+ * Roadmap's stage 2 chip list.
+ */
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Code, Tag } from '../components/ui'
@@ -56,12 +64,13 @@ function RefPill({
    faded), so drawing it that way is what keeps them from drifting apart. ── */
 
 const M = [40, 120, 200, 280] // main commits, pre-existing through "you are here"
-const RAIL_Y = 44
-const F1 = { x: 240, y: 68 }
-const F2 = { x: 280, y: 90 }
-const F1_PRIME = 340
-const F2_PRIME = 400
+const RAIL_Y = 44 // the y-coordinate of main's horizontal rail
+const F1 = { x: 240, y: 68 } // original position of the first feature commit
+const F2 = { x: 280, y: 90 } // original position of the second feature commit
+const F1_PRIME = 340 // x-coordinate where the replayed F1 lands on main's rail
+const F2_PRIME = 400 // x-coordinate where the replayed F2 lands on main's rail
 
+/** Draws the commit graph for the given `step`, layering queued/replayed/orphaned commits onto one base picture rather than swapping five separate SVGs. */
 function RebaseGraph({ step }: { step: number }) {
   const queued = step >= 1
   const gotF1Prime = step >= 2
@@ -178,12 +187,14 @@ function RebaseGraph({ step }: { step: number }) {
 
 /* ── steps ─────────────────────────────────────────────────────────────── */
 
+/** One frame of the rebase replay: the caption shown and the "live state" panel's values at that point. */
 interface Step {
   title: string
   note: string
   live: { head: string; mainTip: string; featureTip: string; replayed: string }
 }
 
+// drives the graph, caption, terminal, and live-state panel as the learner steps through
 const STEPS: Step[] = [
   {
     title: 'Where we left off',
@@ -212,6 +223,7 @@ const STEPS: Step[] = [
   },
 ]
 
+// the mock terminal pane; lines are revealed up to the current step
 const TERMINAL_LINES = [
   '$ git log --oneline --graph --all',
   '$ git rebase main',
@@ -220,6 +232,7 @@ const TERMINAL_LINES = [
   'Successfully rebased and updated refs/heads/feature.',
 ]
 
+// rows of the "merge vs. rebase" comparison table
 const COMPARISON = [
   {
     axis: 'History shape',
@@ -248,8 +261,10 @@ const COMPARISON = [
   },
 ]
 
+/** The Rebase & History step-through visualizer mounted at `/rebase-history` (see file header). */
 export default function RebaseHistory() {
   useDocumentTitle('Rebase & History')
+  // index into STEPS for the frame currently shown
   const [step, setStep] = useState(0)
 
   const frame = STEPS[step]

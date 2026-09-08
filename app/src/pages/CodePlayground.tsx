@@ -1,3 +1,12 @@
+/**
+ * Code Playground — route `/code-playground`, a code-challenge page
+ * (FizzBuzz, challenge 4 of 12): a brief, a read-only `CodeListing` showing
+ * the finished solution, and a test checklist. "Run tests" is simulated —
+ * `setPassed(true)` just flips every checklist item and prints a
+ * pre-written `EXPECTED_OUTPUT` block; there is no real code execution or
+ * editing here (the editor chrome is cosmetic, per the "editable in the real
+ * app" note passed to `CodeListing`).
+ */
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { CodeListing, syn } from '../components/CodeListing'
@@ -7,6 +16,7 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+// Syntax-highlighted lines rendered in the read-only solution CodeListing
 const SOLUTION = [
   {
     content: (
@@ -82,6 +92,7 @@ const SOLUTION = [
   },
 ]
 
+// Test-checklist labels shown in the sidebar; all flip to "passed" together on Run
 const TESTS = [
   'Prints 15 lines',
   '3, 6, 9, 12 → Fizz',
@@ -89,9 +100,11 @@ const TESTS = [
   '15 → FizzBuzz',
 ]
 
+// Simulated stdout printed to the output pane after "Run tests"
 const EXPECTED_OUTPUT =
   '1  2  Fizz  4  Buzz  Fizz  7  8  Fizz  Buzz  11  Fizz  13  14  FizzBuzz'
 
+/** Inline monospace snippet used in the challenge brief. */
 function BriefCode({ children }: { children: string }) {
   return (
     <code style={{ background: 'var(--color-neutral-100)', padding: '1px 6px', borderRadius: 6 }}>
@@ -100,9 +113,10 @@ function BriefCode({ children }: { children: string }) {
   )
 }
 
+/** Code-challenge page: a brief, a solution listing, and a simulated run-tests loop. */
 export default function CodePlayground() {
   useDocumentTitle('Code Playground')
-  const [passed, setPassed] = useState(false)
+  const [passed, setPassed] = useState(false) // whether "Run tests" has been clicked since the last "Clear output"
 
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column' }}>

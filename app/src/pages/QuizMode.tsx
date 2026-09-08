@@ -1,3 +1,11 @@
+/**
+ * Route `/quiz-mode` — the "CHECKPOINT" exam flow for the Git Basics concept: a question
+ * palette that doubles as a progress bar, per-question answer feedback, and a final score
+ * screen. Answers live entirely in local component state; only the finished attempt is
+ * persisted, via `useProgress().recordQuiz` keyed by `QUIZ_ID`, and a passing score unlocks
+ * the next concept through `completeConcept`. The question bank (`QUESTIONS`) is local to
+ * this page and not shared with any other quiz.
+ */
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useProgress } from '../lib/progress'
@@ -5,6 +13,7 @@ import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+/** One multiple-choice quiz question, its options, and the explanation shown after checking. */
 interface Question {
   topic: string
   text: string
@@ -13,6 +22,7 @@ interface Question {
   why: string
 }
 
+// The Git Basics question bank, rendered one at a time in the question card.
 const QUESTIONS: Question[] = [
   {
     topic: 'MENTAL MODEL',
@@ -76,20 +86,24 @@ const QUESTIONS: Question[] = [
   },
 ]
 
+// Option-badge letters, indexed by option position.
 const LETTERS = ['A', 'B', 'C', 'D']
+// Minimum correct answers (out of QUESTIONS.length) to pass the checkpoint.
 const PASS_MARK = 4
 
+// Key this attempt is recorded and looked up under in progress state.
 const QUIZ_ID = 'git-basics'
 
+/** The Quiz Mode checkpoint page — steps through `QUESTIONS`, then shows the score screen. */
 export default function QuizMode() {
   useDocumentTitle('Quiz Mode')
   const { state, recordQuiz, completeConcept } = useProgress()
   const previous = state.quizzes[QUIZ_ID]
 
-  const [index, setIndex] = useState(0)
-  const [selected, setSelected] = useState<number | null>(null)
-  const [checked, setChecked] = useState(false)
-  const [results, setResults] = useState<boolean[]>([])
+  const [index, setIndex] = useState(0) // current question index
+  const [selected, setSelected] = useState<number | null>(null) // option picked for the current question
+  const [checked, setChecked] = useState(false) // whether the current answer has been checked
+  const [results, setResults] = useState<boolean[]>([]) // correct/incorrect per answered question
 
   const done = index >= QUESTIONS.length
   const question = QUESTIONS[Math.min(index, QUESTIONS.length - 1)]
@@ -104,12 +118,14 @@ export default function QuizMode() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done])
 
+  /** Locks in the selected option and records whether it was correct. */
   const check = () => {
     if (selected === null) return
     setChecked(true)
     setResults((r) => [...r, selected === question.correct])
   }
 
+  /** Moves to the next question; `recordSkip` logs a skipped question as incorrect. */
   const advance = (recordSkip: boolean) => {
     if (recordSkip) setResults((r) => [...r, false])
     setIndex((i) => i + 1)
@@ -117,6 +133,7 @@ export default function QuizMode() {
     setChecked(false)
   }
 
+  /** Resets the quiz back to the first question with no answers recorded. */
   const restart = () => {
     setIndex(0)
     setSelected(null)
@@ -168,6 +185,7 @@ export default function QuizMode() {
     return { box, badge }
   }
 
+  /** Colour for one dot in the question palette/progress bar: answered (right/wrong), current, or upcoming. */
   const paletteColor = (pi: number) => {
     if (pi < results.length) return results[pi] ? 'var(--color-accent-2)' : 'var(--color-accent-600)'
     return pi === index ? 'var(--color-accent-300)' : 'var(--color-neutral-300)'

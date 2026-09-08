@@ -1,3 +1,10 @@
+/**
+ * Route `/framework-comparison` — the same click-counter widget implemented
+ * three ways (React/Vue/Svelte-style syntax highlighted with `syn` from
+ * `CodeListing`), followed by a dimension-by-dimension comparison table and a
+ * "pick X if…" verdict row. Fully static: no shared data file, no interactive
+ * state beyond the page itself.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { syn } from '../components/CodeListing'
@@ -6,6 +13,7 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+/** One framework's code sample card: name, tagline, and the highlighted source lines. */
 interface Sample {
   name: string
   tagline: string
@@ -15,6 +23,7 @@ interface Sample {
   lines: ReactNode[]
 }
 
+// the three code sample cards rendered side by side
 const SAMPLES: Sample[] = [
   {
     name: 'React',
@@ -116,6 +125,7 @@ const SAMPLES: Sample[] = [
   },
 ]
 
+// rows of the "what actually differs" comparison table
 const DIMENSIONS: { label: string; react: ReactNode; vue: ReactNode; svelte: ReactNode }[] = [
   {
     label: 'How updates happen',
@@ -151,6 +161,7 @@ const DIMENSIONS: { label: string; react: ReactNode; vue: ReactNode; svelte: Rea
   { label: 'Job-market demand', react: 'Highest', vue: 'Strong', svelte: 'Growing' },
 ]
 
+// the three "pick X if…" verdict cards
 const VERDICTS: { tone: TagTone; label: string; body: string }[] = [
   {
     tone: 'accent',
@@ -169,6 +180,7 @@ const VERDICTS: { tone: TagTone; label: string; body: string }[] = [
   },
 ]
 
+/** The Framework Comparison page mounted at `/framework-comparison` (see file header). */
 export default function FrameworkComparison() {
   useDocumentTitle('Framework Comparison')
 

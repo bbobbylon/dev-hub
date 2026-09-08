@@ -1,3 +1,11 @@
+/**
+ * Route `/roadmap` — the five-stage backend-developer learning path, showing
+ * "you are here" and locked-stage states and progress toward `TOTAL_CONCEPTS`
+ * via `useProgress()`. Stage 2's chip grid links out to individual lesson
+ * pages, including `/shell-scripting` and `/rebase-history` — this page is
+ * one of the places those two link from. Stages 3-5 (`UPCOMING`) are locked
+ * placeholders with no pages behind them yet.
+ */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { streakOf, useProgress } from '../lib/progress'
@@ -6,6 +14,7 @@ import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+// total concepts across all five stages; drives the progress meter's denominator
 const TOTAL_CONCEPTS = 23
 /** The design's starting point, used until the learner completes anything. */
 const BASELINE_DONE = 8
@@ -114,6 +123,7 @@ function StageRail({
   )
 }
 
+/** A neutral `Tag` with a lock icon, used for the "LOCKED" / "UNLOCKS AT STAGE 2" labels. */
 function LockedTag({ children }: { children: string }) {
   return (
     <Tag tone="neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -123,6 +133,7 @@ function LockedTag({ children }: { children: string }) {
   )
 }
 
+/** The circular numbered node on the stage rail; filled when `state` is 'current', dimmed when 'locked'. */
 function NumberNode({ n, state }: { n: number; state: 'current' | 'locked' }) {
   return (
     <div
@@ -171,11 +182,12 @@ const UPCOMING = [
   },
 ]
 
+/** The Roadmap page mounted at `/roadmap` (see file header). */
 export default function Roadmap() {
   useDocumentTitle('Roadmap')
   const { state } = useProgress()
-  const completed = Object.keys(state.concepts).length
-  const doneCount = Math.max(BASELINE_DONE, completed)
+  const completed = Object.keys(state.concepts).length // concepts actually recorded as done
+  const doneCount = Math.max(BASELINE_DONE, completed) // never regress below the design's baseline
   const pct = Math.round((doneCount / TOTAL_CONCEPTS) * 100)
   const streak = streakOf(state.activity)
 

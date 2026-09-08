@@ -1,3 +1,9 @@
+/**
+ * Vite's entry point (wired via `index.html`'s `<script type="module" src="/src/main.tsx">`).
+ * Mounts `App` into `#root`, imports the two global stylesheets once for the
+ * whole app (design tokens, then app-layer rules that read them), and
+ * establishes the router basename all `<Link>`/`<Route>` paths resolve under.
+ */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'

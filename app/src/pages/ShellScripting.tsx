@@ -1,3 +1,12 @@
+/**
+ * Route `/shell-scripting` — "STEP-THROUGH VIZ" that walks through a fixed `backup.sh` bash
+ * script line by line, pairing the highlighted `SCRIPT` lines with a terminal transcript and a
+ * live variable-state panel driven by `STEPS`. It was added later to fix a dead sidebar link
+ * from CLI Basics; its `SIDEBAR` constant hand-duplicates `src/data/cliBasics.ts`'s `SIDEBAR`
+ * rather than importing it (see the comment above `SIDEBAR` below), so the two lists must be
+ * kept in sync by hand. Also renders a `CopyPanel` cheat sheet (`CHEAT_LEFT`/`CHEAT_RIGHT`) and
+ * a closing `Aside` discussion prompt.
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { streakOf, useProgress } from '../lib/progress'
@@ -37,6 +46,7 @@ const SIDEBAR: SidebarGroup[] = [
 
 /* ── the script, walked through five times as it "runs" ──────────────────── */
 
+// The backup.sh source, rendered in the CodeListing pane with the current step's lines highlighted.
 const SCRIPT: ListingLine[] = [
   { content: <><span style={syn.cm}>#!/usr/bin/env bash</span></> },
   { content: <><span style={syn.kw}>set</span> -e</> },
@@ -53,6 +63,7 @@ const SCRIPT: ListingLine[] = [
   { content: <><span style={syn.fn}>echo</span> <span style={syn.str}>"Backed up to $DEST"</span></> },
 ]
 
+/** One walkthrough frame: which SCRIPT lines it highlights, its explanation, and the resulting variable/terminal state. */
 interface Step {
   title: string
   note: string
@@ -61,6 +72,7 @@ interface Step {
   state: { name: string; stamp: string; dest: string; backupsDir: string }
 }
 
+// The five-step walkthrough driving the highlighted lines, terminal output, and variables panel.
 const STEPS: Step[] = [
   {
     title: 'Name the interpreter, then bail out on the first error',
@@ -96,12 +108,14 @@ const STEPS: Step[] = [
   },
 ]
 
+// Left CopyPanel: commands to make a script executable and run it.
 const CHEAT_LEFT: CodeLine[] = [
   { text: 'chmod +x backup.sh', comment: '# make it runnable' },
   { text: './backup.sh' },
   { comment: '# not "backup.sh" — bash won\'t search . by default' },
 ]
 
+// Right CopyPanel: common `[ ]` test conditions.
 const CHEAT_RIGHT: CodeLine[] = [
   { text: '[ -f "$FILE" ]', comment: '# file exists?' },
   { text: '[ -d "$DIR" ]', comment: '# directory exists?' },
@@ -109,13 +123,14 @@ const CHEAT_RIGHT: CodeLine[] = [
   { text: '[ "$A" = "$B" ]', comment: '# strings equal — spaces required' },
 ]
 
+/** The Shell Scripting step-through page — walks `SCRIPT` via `STEPS`, plus a reference cheat sheet. */
 export default function ShellScripting() {
   useDocumentTitle('Shell Scripting')
   const { state } = useProgress()
   const streak = streakOf(state.activity)
-  const { copied, copy } = useCopy()
+  const { copied, copy } = useCopy() // shared copy-to-clipboard state for both CopyPanels below
 
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(0) // index into STEPS for the current walkthrough frame
   const frame = STEPS[step]
   const atEnd = step >= STEPS.length - 1
   const highlighted = new Set(frame.lines)

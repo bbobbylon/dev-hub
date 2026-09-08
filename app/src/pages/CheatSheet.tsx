@@ -1,3 +1,13 @@
+/**
+ * Cheat Sheet — route `/cheat-sheet`, a dense Git reference laid out as four
+ * printable columns (`START`, `DAILY`, `BRANCHES`, `OH_NO`). Column order
+ * mirrors a real working session — set up, daily loop, branches, fixing
+ * mistakes — rather than alphabetical order. This page defines its own local
+ * `Aside` callout component rather than importing the shared
+ * `src/components/Aside`, so its look is independent of pages that do use the
+ * shared one (e.g. `GitBranching`, `BigOPerformance`). The "Print / PDF"
+ * button just calls `window.print()`.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
@@ -5,17 +15,20 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+/** One command row: the command itself and a short gloss of what it does. */
 interface Entry {
   cmd: string
   what: string
 }
 
+// Column 1 — one-time / repo setup commands
 const START: Entry[] = [
   { cmd: 'git init', what: 'new repo in this folder' },
   { cmd: 'git clone URL', what: 'copy an existing repo' },
   { cmd: 'git remote -v', what: 'where push/pull go' },
 ]
 
+// Column 2 — the everyday add/commit/push loop
 const DAILY: Entry[] = [
   { cmd: 'git status', what: "what changed, what's staged" },
   { cmd: 'git add -p', what: 'stage hunk by hunk — review as you go' },
@@ -24,6 +37,7 @@ const DAILY: Entry[] = [
   { cmd: 'git push', what: 'publish your commits' },
 ]
 
+// Column 3 — branch create/switch/merge/cleanup commands
 const BRANCHES: Entry[] = [
   { cmd: 'git switch -c feat/x', what: 'create + move to a branch' },
   { cmd: 'git switch main', what: 'jump back' },
@@ -32,6 +46,7 @@ const BRANCHES: Entry[] = [
   { cmd: 'git log --oneline --graph', what: 'see the shape of history' },
 ]
 
+// Column 4 — recovery commands for undoing mistakes
 const OH_NO: Entry[] = [
   { cmd: 'git restore file', what: 'discard unstaged edits' },
   { cmd: 'git restore --staged file', what: 'un-stage, keep edits' },
@@ -73,6 +88,7 @@ function ColumnHead({ n, title, inverted = false }: { n: number; title: string; 
   )
 }
 
+/** Renders a column's list of command/gloss rows. */
 function Entries({ entries, inverted = false }: { entries: Entry[]; inverted?: boolean }) {
   return (
     <>
@@ -103,6 +119,7 @@ function Entries({ entries, inverted = false }: { entries: Entry[]; inverted?: b
   )
 }
 
+/** A tinted callout box (mnemonic or danger-zone note); local to this page, not the shared `components/Aside`. */
 function Aside({
   tone,
   label,
@@ -139,6 +156,7 @@ function Aside({
   )
 }
 
+/** Inline monospace snippet used in the "Danger zone" callout. */
 function DangerCode({ children }: { children: string }) {
   return (
     <code
@@ -154,6 +172,7 @@ function DangerCode({ children }: { children: string }) {
   )
 }
 
+/** Dense reference page: Git commands in four printable columns ordered like a real work session. */
 export default function CheatSheet() {
   useDocumentTitle('Cheat Sheet')
 

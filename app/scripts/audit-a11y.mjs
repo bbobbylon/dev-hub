@@ -5,7 +5,10 @@
  * ~3:1 — fine for icons and large text, not for body copy — so paragraph text
  * in the accent must use a deep ramp step. This checks that held.
  *
- * Run against `npm run preview`.
+ * Run via `npm run audit:a11y` — not part of `npm run verify`, and (unlike
+ * audit-content.mjs) does drive a real browser, so it needs `npm run preview`
+ * up. Depends on browser.mjs (BASE, openPage) and routes.mjs (ROUTES), and
+ * loops over every route like verify-routes.mjs/verify-responsive.mjs do.
  */
 import { BASE, openPage } from './browser.mjs'
 import { ROUTES } from './routes.mjs'
@@ -14,23 +17,27 @@ const { browser, page } = await openPage({ width: 1280, height: 900 })
 
 const IN_PAGE = () => {
   /* ── colour maths (WCAG 2.1 relative luminance) ────────────────────── */
+  // Parse a computed rgb()/rgba() string into {r,g,b,a} components.
   const parse = (c) => {
     const m = c.match(/rgba?\(([^)]+)\)/)
     if (!m) return null
     const [r, g, b, a = 1] = m[1].split(/[,\s/]+/).filter(Boolean).map(Number)
     return { r, g, b, a }
   }
+  // WCAG 2.1 relative luminance of an opaque {r,g,b} colour.
   const lum = ({ r, g, b }) =>
     [r, g, b]
       .map((v) => v / 255)
       .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
       .reduce((acc, v, i) => acc + v * [0.2126, 0.7152, 0.0722][i], 0)
+  // Alpha-composite a (possibly translucent) foreground over an opaque background.
   const over = (fg, bg) => ({
     r: fg.r * fg.a + bg.r * (1 - fg.a),
     g: fg.g * fg.a + bg.g * (1 - fg.a),
     b: fg.b * fg.a + bg.b * (1 - fg.a),
     a: 1,
   })
+  // WCAG contrast ratio between two opaque colours (always >= 1).
   const ratio = (a, b) => {
     const [l1, l2] = [lum(a), lum(b)].sort((x, y) => y - x)
     return (l1 + 0.05) / (l2 + 0.05)
@@ -48,13 +55,14 @@ const IN_PAGE = () => {
     return acc ?? { r: 255, g: 255, b: 255, a: 1 }
   }
 
+  // Short "tag.first-class" label for identifying an element in a report line.
   const label = (el) => {
     const cls = String(el.className || '').split(' ')[0]
     return `${el.tagName.toLowerCase()}${cls ? '.' + cls : ''}`
   }
 
   /* ── 1. text contrast ──────────────────────────────────────────────── */
-  const contrast = []
+  const contrast = [] // failing { el, text, ratio, required, size } entries for this page
   for (const el of document.querySelectorAll('*')) {
     // Only elements that directly render text.
     const text = [...el.childNodes]
@@ -94,7 +102,7 @@ const IN_PAGE = () => {
   }
 
   /* ── 2. interactive elements without an accessible name ────────────── */
-  const nameless = []
+  const nameless = [] // labels of controls this page failed to name
   for (const el of document.querySelectorAll('a, button, input, select, textarea')) {
     const rect = el.getBoundingClientRect()
     if (rect.width === 0 && rect.height === 0) continue
@@ -111,9 +119,9 @@ const IN_PAGE = () => {
   return { contrast, nameless }
 }
 
-let contrastTotal = 0
-let namelessTotal = 0
-const seen = new Map()
+let contrastTotal = 0 // sum of contrast failures across all routes (duplicates included)
+let namelessTotal = 0 // sum of unnamed-control failures across all routes
+const seen = new Map() // distinct failing (element, ratio, size) triples → which routes hit them
 
 for (const route of ROUTES) {
   await page.goto(BASE + route, { waitUntil: 'load' })

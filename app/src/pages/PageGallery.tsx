@@ -1,3 +1,11 @@
+/**
+ * Route `/` — the app's actual root/homepage: a searchable gallery indexing
+ * every page in the app, one card per `PageEntry` from `../data/pages`,
+ * grouped by `GROUP_TITLES`. Unlike every other page here, it's eagerly
+ * loaded rather than lazy (see `App.tsx`), since it's the most common landing
+ * point. Not to be confused with `DevHub` (`/dev-hub`), an in-universe
+ * "home screen" mockup with its own unrelated hardcoded topic list.
+ */
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
@@ -5,6 +13,7 @@ import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { GROUP_TITLES, PAGES, type PageEntry, type PageGroup } from '../data/pages'
 
+/** One page-archetype card, linking to `/${page.slug}`. */
 function GalleryCard({ page }: { page: PageEntry }) {
   return (
     <Link to={`/${page.slug}`} className="card elev-sm link-card">
@@ -17,6 +26,7 @@ function GalleryCard({ page }: { page: PageEntry }) {
   )
 }
 
+/** One gallery section for a `PageGroup`; renders nothing if `pages` is empty (e.g. an active search filters it out). */
 function GroupSection({ group, pages }: { group: PageGroup; pages: PageEntry[] }) {
   if (pages.length === 0) return null
   return (
@@ -31,11 +41,14 @@ function GroupSection({ group, pages }: { group: PageGroup; pages: PageEntry[] }
   )
 }
 
+/** The Page Gallery — the app's root page (see file header). */
 export default function PageGallery() {
   useDocumentTitle('Page Gallery')
+  // current text in the filter box
   const [query, setQuery] = useState('')
 
   // 22 archetypes is more than fits on a screen; filtering beats scrolling.
+  // pages matching the current query, recomputed only when it changes
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return PAGES
@@ -43,6 +56,7 @@ export default function PageGallery() {
       [p.title, p.kind, p.blurb].some((f) => f.toLowerCase().includes(q)),
     )
   }, [query])
+  /** Filters `matches` down to one group, for rendering each `GroupSection`. */
   const inGroup = (g: PageGroup) => matches.filter((p) => p.group === g)
 
   return (

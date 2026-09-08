@@ -1,3 +1,12 @@
+/**
+ * The app's route table. Every path here has three siblings that must be
+ * kept in sync when a page is added or removed: the corresponding entry in
+ * `data/pages.ts` (drives the gallery card and its slug), the `ROUTES` array
+ * in `scripts/routes.mjs` (drives the Playwright verification suites), and
+ * the page's own `ConceptSidebar`/`Roadmap` links (which point at a route by
+ * string, so a typo there silently renders an unclickable label instead of a
+ * broken link — see `ConceptSidebar`'s `SidebarLink`).
+ */
 import { Suspense, lazy, useEffect } from 'react'
 import { useActivityTracker } from './lib/progress'
 import { Route, Routes, useLocation } from 'react-router-dom'
@@ -44,6 +53,13 @@ function ScrollToTop() {
   return null
 }
 
+/**
+ * The app root: mounted once by `main.tsx` inside a `BrowserRouter`. Wires
+ * the global activity tracker, resets scroll on navigation, wraps the whole
+ * route tree in one `ErrorBoundary` (keyed on `pathname` so a crash on one
+ * page clears itself when you navigate away), and lazy-loads every page
+ * except the two most commonly hit first (`PageGallery`, `NotFound`).
+ */
 export default function App() {
   // Counts real time-on-page, which drives the streak and the minutes chart.
   useActivityTracker()

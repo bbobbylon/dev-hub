@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+// Shared monospace stack for every code-styled surface in this file.
 const mono = 'ui-monospace, Menlo, monospace'
 
 /** Syntax roles shared by the code listings — keyword, call, string, comment. */

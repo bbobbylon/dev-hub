@@ -1,3 +1,11 @@
+/**
+ * Route `/dev-hub` — "Dev Hub Landing," an in-universe concept catalog
+ * (grouped by topic, with done/current/locked states and a filter box) that
+ * mocks up the home screen of the product this app teaches about. This is
+ * NOT the app's actual homepage — that's `PageGallery` at `/`, which indexes
+ * every page in the app for browsing. `DevHub` has its own hardcoded `TOPICS`
+ * list, unrelated to `PAGES` in `../data/pages`.
+ */
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { streakOf, useProgress } from '../lib/progress'
@@ -5,8 +13,10 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+/** A concept card's lock state: finished, in progress, or not yet reachable. */
 type Status = 'done' | 'current' | 'locked'
 
+/** One concept card in the catalog. */
 interface Concept {
   title: string
   blurb: string
@@ -14,11 +24,13 @@ interface Concept {
   to?: string
 }
 
+/** A topic section grouping several concept cards. */
 interface Topic {
   title: string
   concepts: Concept[]
 }
 
+// the catalog's topic sections and their concept cards, rendered top to bottom
 const TOPICS: Topic[] = [
   {
     title: 'Terminal & Shell',
@@ -73,18 +85,21 @@ const TOPICS: Topic[] = [
   },
 ]
 
+// pill text shown on a concept card for each status
 const STATUS_LABEL: Record<Status, string> = {
   done: 'BEGINNER',
   current: 'IN PROGRESS',
   locked: 'LOCKED',
 }
 
+// pill colors shown on a concept card for each status
 const STATUS_TAG: Record<Status, { background: string; color: string }> = {
   done: { background: 'var(--color-accent-2-100)', color: 'var(--color-accent-2-700)' },
   current: { background: 'var(--color-accent-100)', color: 'var(--color-accent-700)' },
   locked: { background: 'var(--color-neutral-100)', color: 'var(--color-neutral-700)' },
 }
 
+/** The check/dot/lock glyph in a concept card's corner, matching its status. */
 function StatusMark({ status }: { status: Status }) {
   if (status === 'done') return <Icon name="check" size={18} color="var(--color-accent-2-600)" />
   if (status === 'current')
@@ -96,6 +111,7 @@ function StatusMark({ status }: { status: Status }) {
   return <Icon name="lock" size={16} color="var(--color-neutral-600)" />
 }
 
+/** One catalog card; links to `concept.to` when set and not locked, otherwise renders as an inert div. */
 function ConceptCard({ concept }: { concept: Concept }) {
   const body = (
     <>
@@ -156,15 +172,18 @@ function ConceptCard({ concept }: { concept: Concept }) {
   )
 }
 
+/** The Dev Hub Landing page mounted at `/dev-hub` (see file header). */
 export default function DevHub() {
   useDocumentTitle('Dev Hub')
   const { state } = useProgress()
+  // current text in the concept search box
   const [query, setQuery] = useState('')
 
   const streak = streakOf(state.activity)
 
   // The search box was decorative in the mockup; it now filters the catalog on
   // title and blurb, and hides topics that end up empty.
+  // topics filtered by `query`, recomputed only when the query changes
   const topics = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return TOPICS

@@ -1,6 +1,8 @@
 /** Lucide icon paths, drawn at stroke-width 2.75 per the Organic system. */
 import type { CSSProperties } from 'react'
 
+// Raw SVG path/shape children per icon name, traced from Lucide (or, where
+// noted, from the prototype's own art) rather than pulled in as a dependency.
 const PATHS = {
   terminal: <><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></>,
   check: <path d="M20 6 9 17l-5-5" />,
@@ -32,6 +34,7 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS
 
+/** Renders one named icon as an inline SVG at a given pixel size and stroke color. */
 export function Icon({
   name,
   size = 18,

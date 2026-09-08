@@ -1,3 +1,12 @@
+/**
+ * Route `/decorator-pattern` — "PATTERN DEEP-DIVE" teaching the Decorator design pattern
+ * through the classic Starbuzz Coffee example: a terracotta hero, a build-your-own-order
+ * sandbox (`OrderBuilder`) that lets the reader wrap a drink in condiment objects and watch
+ * the constructor call and running total build together, and a predict-then-run Java code
+ * listing (`PredictThenRun`). All content — the worked receipt, the "same shape elsewhere"
+ * comparisons, and the Java source lines — is local to this file; nothing here is shared
+ * with or linked from another page.
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -8,14 +17,17 @@ import { streakOf, useProgress } from '../lib/progress'
 
 /* ── content ───────────────────────────────────────────────────────────── */
 
+// The condiments offered in the order-builder sandbox, with their price delta.
 const CONDIMENTS = {
   soy: { label: 'Soy', delta: 0.1 },
   whip: { label: 'Whip', delta: 0.1 },
   mocha: { label: 'Mocha', delta: 0.2 },
 } as const
 
+/** One of the condiment keys in `CONDIMENTS`. */
 type CondimentKey = keyof typeof CONDIMENTS
 
+// Price of the undecorated House Blend the sandbox starts from.
 const BASE_COST = 0.89
 
 /** The receipt shown in the "core idea" panel — a fixed worked example. */
@@ -26,6 +38,7 @@ const WORKED_RECEIPT = [
   { label: '+ Mocha', running: '1.29', last: true },
 ]
 
+// The "same shape, three places you already use it" comparison cards.
 const FAMILIAR_STACKS = [
   {
     title: "Java's I/O stack",
@@ -84,6 +97,7 @@ const JAVA_SOURCE: { text: string; comment?: string }[] = [
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+/** Small inline `<code>` chip; `on` picks its background to match the surface it sits on. */
 function InlineCode({ children, on = 'bg' }: { children: string; on?: 'bg' | 'surface' | 'dark' }) {
   const background =
     on === 'dark'
@@ -106,6 +120,7 @@ function InlineCode({ children, on = 'bg' }: { children: string; on?: 'bg' | 'su
   )
 }
 
+/** One label/amount line in a receipt-style list (used by the core-idea panel and the sandbox). */
 function ReceiptRow({
   label,
   amount,
@@ -135,8 +150,9 @@ function ReceiptRow({
 
 /* ── the live "build your own order" sandbox ───────────────────────────── */
 
+/** The "build your own order" sandbox: click condiments to wrap a House Blend, one at a time. */
 function OrderBuilder() {
-  const [stack, setStack] = useState<CondimentKey[]>([])
+  const [stack, setStack] = useState<CondimentKey[]>([]) // condiments applied, in wrap order
 
   let running = BASE_COST
   const rows = stack.map((key, i) => {
@@ -150,6 +166,7 @@ function OrderBuilder() {
   )
   const description = `House Blend${stack.map((key) => `, ${CONDIMENTS[key].label}`).join('')}`
 
+  // Renders one "+ Condiment · $delta" button that pushes `key` onto the stack.
   const addButton = (key: CondimentKey) => (
     <button
       key={key}
@@ -170,6 +187,7 @@ function OrderBuilder() {
     </button>
   )
 
+  // Renders the outlined Undo/Reset buttons.
   const secondaryButton = (label: string, onClick: () => void) => (
     <button
       type="button"
@@ -319,8 +337,9 @@ function OrderBuilder() {
 
 /* ── predict-then-run code runner ──────────────────────────────────────── */
 
+/** Predict-then-run panel: shows the Java source, reveals fixed output only once "Run" is clicked. */
 function PredictThenRun() {
-  const [showOutput, setShowOutput] = useState(false)
+  const [showOutput, setShowOutput] = useState(false) // whether the fixed console output is revealed
 
   return (
     <section style={{ marginBottom: 24 }}>
@@ -467,6 +486,7 @@ function PredictThenRun() {
 
 /* ── page ──────────────────────────────────────────────────────────────── */
 
+/** The Decorator Pattern deep-dive page — hero, core-idea panel, order-builder sandbox, predict-then-run runner. */
 export default function DecoratorPattern() {
   useDocumentTitle('Decorator Pattern')
   const { state } = useProgress()

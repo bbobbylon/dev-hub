@@ -1,9 +1,21 @@
+/**
+ * Flashcards — route `/flashcards`, a spaced-repetition deck ("HTTP
+ * Essentials"). Flip a card, rate yourself again/good/easy, and the rating
+ * feeds `useProgress().rateCard`, which runs the real SM-2 `schedule()` from
+ * `src/lib/progress.ts` to set the card's next due date. A session studies
+ * only the cards `isDue` right now (falling back to the full deck if nothing
+ * is due yet), fixes that set for the session so rating one card doesn't
+ * reshuffle it, and ends with a summary screen instead of looping the last
+ * card. The Progress Dashboard reads this same `state.cards` data to show a
+ * due count and links here from its "up next" queue.
+ */
 import { useMemo, useState } from 'react'
 import { isDue, useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+/** One flashcard: `tag` doubles as its id in `useProgress()`'s `state.cards`. */
 interface Card {
   tag: string
   front: string
@@ -11,6 +23,7 @@ interface Card {
   example: string
 }
 
+// The HTTP Essentials deck's cards, front/back/example
 const CARDS: Card[] = [
   {
     tag: 'STATUS CODES',
@@ -44,8 +57,10 @@ const CARDS: Card[] = [
   },
 ]
 
+/** Self-rating a learner can give a card after flipping it. */
 type Rating = 'again' | 'good' | 'easy'
 
+// The three rating buttons shown under a flipped card, with their display intervals
 const RATINGS: { kind: Rating; label: string; interval: string; border: string; background: string; color: string }[] = [
   {
     kind: 'again',
@@ -73,13 +88,14 @@ const RATINGS: { kind: Rating; label: string; interval: string; border: string; 
   },
 ]
 
+/** Spaced-repetition flashcard session: flip, rate, and repeat through the cards due today. */
 export default function Flashcards() {
   useDocumentTitle('Flashcards')
   const { state, rateCard } = useProgress()
 
-  const [index, setIndex] = useState(0)
-  const [flipped, setFlipped] = useState(false)
-  const [rated, setRated] = useState<Rating[]>([])
+  const [index, setIndex] = useState(0) // position of the current card within `session`
+  const [flipped, setFlipped] = useState(false) // whether the current card is showing its back
+  const [rated, setRated] = useState<Rating[]>([]) // ratings given so far this session, in order
 
   // The session is the cards actually due now, fixed when the page loads so
   // rating one doesn't reshuffle the deck under you.
@@ -95,6 +111,7 @@ export default function Flashcards() {
   const card = session[Math.min(index, session.length - 1)]
   const finished = index >= session.length
 
+  /** Records a rating for the current card, persists it via `rateCard`, and advances to the next. */
   const rate = (kind: Rating) => {
     rateCard(card.tag, kind)
     setIndex((i) => i + 1)
@@ -102,12 +119,14 @@ export default function Flashcards() {
     setRated((r) => [...r, kind])
   }
 
+  /** Resets the session back to the first card with no ratings, for "Study again". */
   const restart = () => {
     setIndex(0)
     setFlipped(false)
     setRated([])
   }
 
+  /** Color for the progress dot at session index `di` — rated, current, or upcoming. */
   const dotColor = (di: number) => {
     if (di < rated.length)
       return rated[di] === 'again' ? 'var(--color-accent-600)' : 'var(--color-accent-2)'

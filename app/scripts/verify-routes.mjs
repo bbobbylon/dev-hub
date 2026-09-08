@@ -1,6 +1,9 @@
 /**
  * Smoke test: every route renders real content, with no console errors and no
- * horizontal overflow. Run against `npm run preview`.
+ * horizontal overflow. Run via `npm run verify:routes` (also the first leg of
+ * `npm run verify`, alongside verify-responsive.mjs and
+ * verify-interactions.mjs). Run against `npm run preview`. Depends on
+ * browser.mjs (BASE, openPage) and routes.mjs (ROUTES).
  */
 import { BASE, openPage } from './browser.mjs'
 import { ROUTES } from './routes.mjs'
@@ -8,10 +11,10 @@ import { ROUTES } from './routes.mjs'
 
 const { browser, page } = await openPage()
 
-let failures = 0
+let failures = 0 // count of routes that failed at least one check
 for (const route of ROUTES) {
-  const errors = []
-  const onError = (e) => errors.push(String(e))
+  const errors = [] // console/page errors collected for the current route
+  const onError = (e) => errors.push(String(e)) // uncaught page exception handler
   // The blocked Google Fonts request above logs ERR_FAILED; that's this
   // harness's doing, not the page's.
   const onConsole = (m) => {
@@ -24,6 +27,7 @@ for (const route of ROUTES) {
   // agent proxy and may never settle, which would hang the run.
   await page.goto(BASE + route, { waitUntil: 'load' })
   await page.waitForSelector('main, h1', { timeout: 10000 }).catch(() => {})
+  // Per-route render facts collected in-page, checked against below.
   const info = await page.evaluate(() => ({
     title: document.title,
     h1: document.querySelector('h1')?.textContent?.trim() ?? null,
@@ -34,7 +38,7 @@ for (const route of ROUTES) {
   page.off('pageerror', onError)
   page.off('console', onConsole)
 
-  const problems = []
+  const problems = [] // human-readable failure descriptions for this route
   if (errors.length) problems.push(`console: ${errors.join(' | ').slice(0, 200)}`)
   if (info.textLen < 200) problems.push(`thin render (${info.textLen} chars)`)
   if (!info.h1) problems.push('no <h1>')

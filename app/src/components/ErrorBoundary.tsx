@@ -19,16 +19,19 @@ interface State {
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null }
 
+  /** React's hook for catching a render error thrown anywhere below this boundary. */
   static getDerivedStateFromError(error: Error) {
     return { error }
   }
 
+  /** Clears a caught error once `resetKey` changes (App.tsx passes the route pathname). */
   componentDidUpdate(prevProps: Props) {
     if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
       this.setState({ error: null })
     }
   }
 
+  /** Renders the fallback screen while an error is caught, otherwise the real children. */
   render() {
     if (this.state.error) {
       return (

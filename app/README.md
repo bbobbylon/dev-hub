@@ -194,5 +194,6 @@ was verified this way: 24/24 pixel-identical.
   Simulator carries a visually hidden one. Neither changes the rendered design.
 - `CLI Basics` keeps the labelled mount point for the user's existing step-by-step playthrough
   component, as the design intends.
-- `Video Lesson`'s poster frame is still an empty slot — pass `src` to `ImageSlot` once there's a
-  real still, as flagged in the design session.
+- `Video Lesson`'s poster frame now has a real `src` (`src/assets/recursion-poster.svg`, drawn from
+  the app's own design tokens) — it's no longer the empty `ImageSlot` placeholder flagged in the
+  design session.

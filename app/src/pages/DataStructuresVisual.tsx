@@ -1,3 +1,10 @@
+/**
+ * Route `/data-structures-visual` — a diagram-first field guide to four data
+ * shapes (array, linked list, hash map, binary search tree), each drawn as an
+ * inline SVG with a one-line "fast" and "slow" verdict. Purely presentational:
+ * all four diagrams and the `STRUCTURES` copy are hand-authored in this file,
+ * with no shared data source and no interactive state.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
@@ -7,6 +14,7 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 const INK = 'var(--color-neutral-700)'
 const MUTED = 'var(--color-neutral-700)'
 
+/** Small inline `<code>` chip used inside the "fast"/"slow" verdict copy. */
 function Mono({ children }: { children: string }) {
   return (
     <code style={{ background: 'var(--color-neutral-100)', padding: '1px 5px', borderRadius: 5 }}>
@@ -17,6 +25,7 @@ function Mono({ children }: { children: string }) {
 
 /* ── the four diagrams ─────────────────────────────────────────────────── */
 
+// cells rendered by ArrayDiagram; index 2 is highlighted to illustrate O(1) access
 const ARRAY_CELLS = [
   { value: '12', index: '[0]', highlighted: false },
   { value: '7', index: '[1]', highlighted: false },
@@ -25,6 +34,7 @@ const ARRAY_CELLS = [
   { value: '24', index: '[4]', highlighted: false },
 ]
 
+/** SVG of five numbered boxes with one index highlighted — illustrates array access by position. */
 function ArrayDiagram() {
   return (
     <svg viewBox="0 0 380 92" style={{ width: '100%', height: 'auto', marginBottom: 14 }} role="img" aria-label="Five numbered array cells; index 2 is highlighted">
@@ -67,12 +77,14 @@ function ArrayDiagram() {
   )
 }
 
+// nodes rendered by LinkedListDiagram, left to right
 const LIST_NODES = [
   { value: '12', x: 16 },
   { value: '7', x: 136 },
   { value: '31', x: 256 },
 ]
 
+/** SVG of three linked nodes with arrows to the next, ending in null — illustrates pointer-chasing. */
 function LinkedListDiagram() {
   return (
     <svg viewBox="0 0 380 92" style={{ width: '100%', height: 'auto', marginBottom: 14 }} role="img" aria-label="Three linked nodes, each pointing to the next, ending in null">
@@ -119,6 +131,7 @@ function LinkedListDiagram() {
   )
 }
 
+// bucket slots rendered by HashMapDiagram; bucket 3 is filled to match the "ada" example
 const BUCKETS = [
   { label: '0 ·', y: 6, filled: false },
   { label: '1 ·', y: 34, filled: false },
@@ -126,6 +139,7 @@ const BUCKETS = [
   { label: '4 ·', y: 90, filled: false },
 ]
 
+/** SVG showing a key hashed to a bucket number, which addresses a slot in the table. */
 function HashMapDiagram() {
   return (
     <svg viewBox="0 0 380 120" style={{ width: '100%', height: 'auto', marginBottom: 14 }} role="img" aria-label="A key is hashed to a bucket number, which addresses a slot in the table">
@@ -176,6 +190,7 @@ function HashMapDiagram() {
   )
 }
 
+/** SVG of a three-level binary search tree rooted at 50 — illustrates "smaller left, bigger right". */
 function BstDiagram() {
   return (
     <svg viewBox="0 0 380 130" style={{ width: '100%', height: 'auto', marginBottom: 14 }} role="img" aria-label="A binary search tree rooted at 50, with 30 and 70 below it">
@@ -245,6 +260,7 @@ function BstDiagram() {
 
 /* ── cards ─────────────────────────────────────────────────────────────── */
 
+/** One field-guide card: a structure's name, its diagram, and its fast/slow operation. */
 interface Structure {
   name: string
   tagline: string
@@ -253,6 +269,7 @@ interface Structure {
   slow: ReactNode
 }
 
+// the four field-guide cards rendered in the grid
 const STRUCTURES: Structure[] = [
   {
     name: 'Array',
@@ -292,6 +309,7 @@ const STRUCTURES: Structure[] = [
   },
 ]
 
+/** One "FAST"/"SLOW" line in a structure card: a colored `Tag` label plus the verdict text. */
 function Verdict({ tone, label, children }: { tone: 'accent' | 'accent-2'; label: string; children: ReactNode }) {
   return (
     <div style={{ display: 'flex', gap: 8 }}>
@@ -303,6 +321,7 @@ function Verdict({ tone, label, children }: { tone: 'accent' | 'accent-2'; label
   )
 }
 
+/** The Data Structures Visual field guide mounted at `/data-structures-visual` (see file header). */
 export default function DataStructuresVisual() {
   useDocumentTitle('Data Structures Visual')
 

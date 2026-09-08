@@ -1,4 +1,12 @@
-/** Every route the app serves — shared by the verification scripts. */
+/**
+ * Every route the app serves. Not an npm script itself — a data module
+ * imported by verify-routes.mjs, verify-responsive.mjs, snapshot.mjs and
+ * audit-a11y.mjs, each of which loops over ROUTES to check or capture every
+ * page. (verify-interactions.mjs navigates its own hardcoded subset of paths
+ * directly and doesn't import this; audit-content.mjs works from prototype
+ * filenames instead of routes.) Keep in sync with the router's route table
+ * whenever a page is added, renamed, or removed.
+ */
 export const ROUTES = [
   '/',
   '/dev-hub',

@@ -1,3 +1,13 @@
+/**
+ * Route `/cli-basics` — the flagship interactive lesson: a clickable anatomy
+ * of a CLI command, a self-checking quiz, and a step-by-step terminal
+ * walkthrough that builds up to finding oversized log files. All lesson
+ * content (sidebar groups, anatomy parts, command groups, cheat-sheet lines,
+ * quiz questions, walkthrough steps) lives in `../data/cliBasics`, which is
+ * already fully commented — this file only lays that data out. The three
+ * cheat-sheet `CopyPanel`s below share a single `useCopy()` call keyed by
+ * string ('bash' | 'ps' | 'pipes'); that's intentional, not a bug.
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -27,7 +37,9 @@ import {
 
 /* ── the clickable command anatomy ─────────────────────────────────────── */
 
+/** Lets the learner click through each token of an example command to see what role it plays. */
 function CommandAnatomy() {
+  // which anatomy token (command/flag/argument/etc.) is currently selected
   const [selected, setSelected] = useState<AnatomyKey>('command')
   const def = ANATOMY[selected]
 
@@ -101,9 +113,12 @@ function CommandAnatomy() {
 
 /* ── the quiz: answer once, then the row locks and explains itself ─────── */
 
+/** Renders each quiz question as a row of option buttons; answering locks the row and reveals its explanation. */
 function QuickQuiz() {
+  // question index -> chosen option index, once answered
   const [answers, setAnswers] = useState<Record<number, number>>({})
 
+  /** Records the chosen option for question `qi`; a second click on an already-answered question is a no-op. */
   const answer = (qi: number, oi: number) => {
     if (answers[qi] !== undefined) return
     setAnswers((prev) => ({ ...prev, [qi]: oi }))
@@ -196,8 +211,11 @@ function QuickQuiz() {
 
 /* ── the terminal walkthrough: reveal output, then advance ─────────────── */
 
+/** Steps through `WALKTHROUGH` one command at a time; each step's output stays hidden until "Run it" is clicked. */
 function Walkthrough() {
+  // index of the walkthrough step currently in focus
   const [step, setStep] = useState(0)
+  // step index -> whether its output has been revealed
   const [revealed, setRevealed] = useState<Record<number, boolean>>({})
 
   return (
@@ -345,8 +363,10 @@ function Walkthrough() {
 
 /* ── page ──────────────────────────────────────────────────────────────── */
 
+/** The CLI Basics lesson page mounted at `/cli-basics` (see file header for what it renders). */
 export default function CliBasics() {
   useDocumentTitle('CLI Basics')
+  // which cheat-sheet panel ('bash' | 'ps' | 'pipes') last had its copy button clicked, shared by all three CopyPanels
   const { copied, copy } = useCopy()
   const { state } = useProgress()
   const streak = streakOf(state.activity)

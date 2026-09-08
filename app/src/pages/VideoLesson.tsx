@@ -1,3 +1,13 @@
+/**
+ * Video Lesson — route `/video-lesson`, a video-plus-transcript page on
+ * recursion. The player is a static mock (fixed 04:12/12:38 readout, no real
+ * <video>), but its poster frame uses `ImageSlot` with a real `src` —
+ * `src/assets/recursion-poster.svg`, an SVG built from the app's own design
+ * tokens rather than an empty placeholder. The transcript is synced to a
+ * fixed timestamp (the 04:12 paragraph is pre-highlighted) and includes an
+ * inline code snippet built from `CodeListing`'s `syn` syntax-color roles.
+ * "After the video" links out to Quiz Mode and Code Playground.
+ */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
@@ -10,6 +20,7 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+// Chapter list rendered in the sidebar's "Chapters" panel
 const CHAPTERS = [
   { at: '00:00', title: "Why loops aren't always enough", state: 'done' as const },
   { at: '03:58', title: 'Base case & recursive case', state: 'current' as const },
@@ -20,8 +31,10 @@ const CHAPTERS = [
 
 /** Chapter marks along the scrubber, as a percentage of the runtime. */
 const CHAPTER_MARKS = [12, 46, 74]
+// Scrubber fill, as a percentage of the runtime — fixed at the mock's 04:12 position
 const PROGRESS_PCT = 33
 
+// Syntax-highlighted countdown() snippet shown inside the 04:12 transcript paragraph
 const COUNTDOWN_SOURCE: ReactNode[] = [
   <>
     <span style={syn.kw}>def</span> <span style={syn.fn}>countdown</span>(n):
@@ -43,6 +56,7 @@ const COUNTDOWN_SOURCE: ReactNode[] = [
   </>,
 ]
 
+// Links rendered in the "After the video" panel
 const AFTER_VIDEO = [
   {
     to: '/quiz-mode',
@@ -86,6 +100,7 @@ const AFTER_VIDEO = [
   },
 ]
 
+/** Small uppercase label heading a sidebar panel; `tone` swaps the neutral color for the accent-2 note color. */
 function PanelLabel({ children, tone = 'neutral' }: { children: string; tone?: 'neutral' | 'accent-2' }) {
   return (
     <div
@@ -103,6 +118,7 @@ function PanelLabel({ children, tone = 'neutral' }: { children: string; tone?: '
   )
 }
 
+/** Video-plus-transcript lesson page on recursion, with a chapter list, timestamped notes, and follow-up links. */
 export default function VideoLesson() {
   useDocumentTitle('Video Lesson')
 

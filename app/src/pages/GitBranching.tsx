@@ -1,3 +1,12 @@
+/**
+ * Git Branching — route `/git-branching`, a storyboard walkthrough (not an
+ * interactive simulator): the same repository shown as four static SVG
+ * commit-graph "frames" — one line of history, branching, divergence, and
+ * merge — each paired with a caption. Every frame is hand-drawn inline SVG
+ * built from the constants below, not generated from real git data. Ends
+ * with an `Aside` FAQ callout. The Progress Dashboard's "up next" queue links
+ * here as "Continue: Branching & Merging".
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
@@ -19,6 +28,7 @@ const BRANCH_PILL = 'var(--color-accent-2-100)'
 const BRANCH_PILL_INK = 'var(--color-accent-2-700)'
 const CAPTION = 'var(--color-neutral-700)'
 
+/** Inline monospace snippet used for git commands within a frame's caption. */
 function Code({ children }: { children: string }) {
   return (
     <code
@@ -69,6 +79,7 @@ function RefPill({
   )
 }
 
+/** One storyboard frame: a numbered moment in the repo's history, its caption, and its hand-drawn SVG graph. */
 interface Frame {
   n: number
   title: string
@@ -78,6 +89,7 @@ interface Frame {
   emphasised?: boolean
 }
 
+// The four storyboard frames, in chronological order
 const FRAMES: Frame[] = [
   {
     n: 1,
@@ -196,6 +208,7 @@ const FRAMES: Frame[] = [
   },
 ]
 
+/** Storyboard page: four static commit-graph frames walking a feature branch from creation to merge. */
 export default function GitBranching() {
   useDocumentTitle('Git Branching')
 

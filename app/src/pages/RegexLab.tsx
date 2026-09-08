@@ -1,3 +1,9 @@
+/**
+ * Route `/regex-lab` — a live pattern lab: pick one of `PATTERNS`, and its
+ * real `RegExp` is run against `LOG_LINES` to highlight matches as you switch
+ * patterns. Self-contained — no shared data file or other page depends on its
+ * content, and the matching itself is real (not a canned animation).
+ */
 import { useMemo, useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
@@ -27,6 +33,7 @@ const PATTERNS = [
   },
 ]
 
+// sample log lines every pattern is matched against
 const LOG_LINES = [
   '10:42:07 WARN  user ada@shop.dev retried 3 times',
   '10:42:11 ERROR payment 8127 declined for bob@pay.dev',
@@ -34,6 +41,7 @@ const LOG_LINES = [
   '10:44:56 ERROR timeout after 3000 ms',
 ]
 
+// the "pocket decoder" reference grid of regex symbols
 const DECODER = [
   { symbol: '\\d', meaning: 'any digit 0–9' },
   { symbol: '\\w', meaning: 'letter, digit, or _' },
@@ -45,6 +53,7 @@ const DECODER = [
   { symbol: '( )', meaning: 'capture a group' },
 ]
 
+/** A run of text from a log line, tagged as inside or outside a regex match. */
 interface Segment {
   text: string
   match: boolean
@@ -66,12 +75,15 @@ function segment(text: string, regex: RegExp): Segment[] {
   return parts
 }
 
+/** The Regex Lab page mounted at `/regex-lab` (see file header). */
 export default function RegexLab() {
   useDocumentTitle('Regex Lab')
+  // index into PATTERNS for the pattern currently selected
   const [active, setActive] = useState(0)
 
   const pattern = PATTERNS[active]
 
+  // segmented log lines and total match count for the active pattern, recomputed only when it changes
   const { lines, matchCount } = useMemo(() => {
     const segmented = LOG_LINES.map((text) => segment(text, pattern.regex))
     return {

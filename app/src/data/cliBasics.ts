@@ -1,6 +1,16 @@
+/**
+ * Content data for `pages/CliBasics.tsx` only — the flagship lesson page,
+ * extracted out of the component so the JSX stays about layout. Nothing
+ * here is shared with other pages; `ShellScripting.tsx` (which sits in the
+ * same sidebar group) keeps its own local copies of similarly-shaped data
+ * instead of importing from here.
+ */
 import type { CodeLine } from '../components/CopyPanel'
 import type { SidebarGroup } from '../components/ConceptSidebar'
 
+// This page's lesson rail. Shell Scripting renders the same three groups (it
+// sits in "Terminal & Shell" too) from its own local copy rather than this
+// one, so the two must be kept in sync by hand if a group/item changes.
 export const SIDEBAR: SidebarGroup[] = [
   {
     title: 'Terminal & Shell',
@@ -26,8 +36,10 @@ export const SIDEBAR: SidebarGroup[] = [
   },
 ]
 
+/** The three parts of `ls -la /var/log` the anatomy clicker lets you inspect. */
 export type AnatomyKey = 'command' | 'flags' | 'args'
 
+/** Explanation shown when a given token of the sample command is clicked. */
 export const ANATOMY: Record<AnatomyKey, { token: string; label: string; text: string }> = {
   command: {
     token: 'ls',
@@ -46,8 +58,10 @@ export const ANATOMY: Record<AnatomyKey, { token: string; label: string; text: s
   },
 }
 
+/** Left-to-right click order the anatomy clicker steps through. */
 export const ANATOMY_ORDER: AnatomyKey[] = ['command', 'flags', 'args']
 
+/** The four numbered "why bother with a CLI" cards. */
 export const WHY_CLI = [
   {
     n: '01',
@@ -71,6 +85,7 @@ export const WHY_CLI = [
   },
 ]
 
+/** The "essential commands" reference table, grouped by category. */
 export const COMMAND_GROUPS: { title: string; commands: { name: string; blurb: string }[] }[] = [
   {
     title: 'Navigation',
@@ -100,6 +115,7 @@ export const COMMAND_GROUPS: { title: string; commands: { name: string; blurb: s
   },
 ]
 
+/** First cheat-sheet `CopyPanel`: Bash commands. */
 export const BASH_LINES: CodeLine[] = [
   { text: 'pwd', comment: '# print working directory' },
   { text: 'ls -la', comment: '# -l=long, -a=all (hidden too)' },
@@ -118,6 +134,7 @@ export const BASH_LINES: CodeLine[] = [
   { text: 'head -20 file.txt', comment: '# first 20 lines' },
 ]
 
+/** Second cheat-sheet `CopyPanel`: the same operations in PowerShell. */
 export const PS_LINES: CodeLine[] = [
   { text: 'Get-Location', comment: '# = pwd' },
   { text: 'Get-ChildItem -la', comment: '# = ls -la' },
@@ -138,6 +155,7 @@ export const PS_LINES: CodeLine[] = [
   { text: 'Select-String "spring" app.log', comment: '# grep' },
 ]
 
+/** Third cheat-sheet `CopyPanel`: pipes, redirection, and exit codes in both shells. */
 export const PIPES_LINES: CodeLine[] = [
   { comment: "# pipes: one command's output → next's input" },
   { text: 'ls -l | grep ".java"', comment: '# only .java files' },
@@ -158,10 +176,13 @@ export const PIPES_LINES: CodeLine[] = [
 export interface QuizQuestion {
   question: string
   options: string[]
+  /** Index into `options` of the right answer. */
   correct: number
+  /** Shown after answering, right or wrong. */
   explanation: string
 }
 
+/** The three-question checkpoint quiz at the end of CLI Basics. */
 export const QUIZ: QuizQuestion[] = [
   {
     question: 'Which command shows your current directory?',
@@ -196,12 +217,16 @@ export const QUIZ: QuizQuestion[] = [
 ]
 
 export interface WalkStep {
+  /** The task the learner is asked to accomplish before revealing the command. */
   instruction: string
   command: string
+  /** The terminal output shown once the step is revealed. */
   output: string
+  /** One-line explanation of why the command works. */
   explain: string
 }
 
+/** The four-step guided walkthrough that closes out the concept section. */
 export const WALKTHROUGH: WalkStep[] = [
   {
     instruction: 'Where am I?',

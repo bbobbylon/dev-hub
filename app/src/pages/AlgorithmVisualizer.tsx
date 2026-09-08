@@ -1,3 +1,10 @@
+/**
+ * Route `/algorithm-visualizer` — a step-through visualization of bubble sort:
+ * bars re-color to show which two elements are being compared, pseudocode
+ * highlights the line that just ran, and comparison/swap counters update live.
+ * `FRAMES` is a hand-authored, pre-computed trace of the whole sort so that
+ * stepping backward is just an array index change, not a re-simulation.
+ */
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
@@ -20,6 +27,7 @@ interface Frame {
   pass: number
 }
 
+// pre-computed bubble-sort trace; each entry is one frame of the step-through
 const FRAMES: Frame[] = [
   { a: [5, 2, 8, 3, 6], cmp: [0, 1], sorted: [], note: 'Compare 5 and 2 — 5 > 2, so swap.', line: 2, comparisons: 1, swaps: 0, pass: 1 },
   { a: [2, 5, 8, 3, 6], cmp: [1, 2], sorted: [], note: 'Compare 5 and 8 — already in order, no swap.', line: 2, comparisons: 2, swaps: 1, pass: 1 },
@@ -33,6 +41,7 @@ const FRAMES: Frame[] = [
   { a: [2, 3, 5, 6, 8], cmp: [], sorted: [0, 1, 2, 3, 4], note: 'Pass 3 makes zero swaps — the array is sorted, so bubble sort stops early.', line: 4, comparisons: 9, swaps: 4, pass: 3 },
 ]
 
+// lines rendered in the dark pseudocode panel; indices are 1-based against Frame.line
 const PSEUDOCODE = [
   'for i in 0 .. n-1:',
   '  for j in 0 .. n-i-2:',
@@ -43,12 +52,15 @@ const PSEUDOCODE = [
 
 const TOTAL_PASSES = 3
 
+/** The Algorithm Visualizer page mounted at `/algorithm-visualizer` (see file header). */
 export default function AlgorithmVisualizer() {
   useDocumentTitle('Algorithm Visualizer')
+  // index into FRAMES for the step currently shown
   const [f, setF] = useState(0)
 
   const frame = FRAMES[f]
   const atEnd = f >= FRAMES.length - 1
+  /** Whether pseudocode line `i` (0-based) should be highlighted for the current frame. */
   const isActiveLine = (i: number) => i + 1 === frame.line || (frame.line === 0 && i === 0)
 
   return (

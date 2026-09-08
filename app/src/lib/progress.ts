@@ -69,6 +69,7 @@ function read(): ProgressState {
   }
 }
 
+/** Persists `state`, silently giving up if storage is unavailable or full. */
 function write(state: ProgressState) {
   try {
     localStorage.setItem(KEY, JSON.stringify(state))
@@ -80,6 +81,7 @@ function write(state: ProgressState) {
 /** Subscribers in this tab; the storage event covers other tabs. */
 const listeners = new Set<(s: ProgressState) => void>()
 
+/** Applies `fn` to the current state, persists the result, and notifies every `useProgress` instance in this tab. */
 function update(fn: (s: ProgressState) => ProgressState) {
   const next = fn(read())
   write(next)
@@ -88,9 +90,11 @@ function update(fn: (s: ProgressState) => ProgressState) {
 
 /* ── dates ─────────────────────────────────────────────────────────────── */
 
+/** The `activity` record key for a given day, local time, as `YYYY-MM-DD`. */
 export const dayKey = (d: Date = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
+/** `d` shifted by `n` days (negative to go backward). */
 const addDays = (d: Date, n: number) => new Date(d.getTime() + n * 86_400_000)
 
 /**
@@ -147,12 +151,20 @@ export function schedule(prev: CardRecord | undefined, rating: Rating, now = new
   }
 }
 
+/** A card with no schedule yet is always due; otherwise due once `dueAt` has passed. */
 export const isDue = (card: CardRecord | undefined, now = new Date()) =>
   !card || new Date(card.dueAt) <= now
 
 /* ── the hook ──────────────────────────────────────────────────────────── */
 
+/**
+ * The main entry point every page uses to read and mutate progress. Returns
+ * the current `state` plus one mutator per kind of progress event; each
+ * mutator persists immediately and re-renders every component using this
+ * hook (in this tab via `listeners`, in other tabs via the `storage` event).
+ */
 export function useProgress() {
+  // Re-rendered whenever this tab's or another tab's progress changes.
   const [state, setState] = useState<ProgressState>(read)
 
   useEffect(() => {
@@ -167,12 +179,14 @@ export function useProgress() {
     }
   }, [])
 
+  /** Marks a concept complete (first time only — later calls are no-ops). */
   const completeConcept = useCallback((slug: string) => {
     update((s) =>
       s.concepts[slug] ? s : { ...s, concepts: { ...s.concepts, [slug]: new Date().toISOString() } },
     )
   }, [])
 
+  /** Records one quiz attempt, keeping the personal-best score. */
   const recordQuiz = useCallback((id: string, score: number, total: number) => {
     update((s) => {
       const prev = s.quizzes[id]
@@ -191,14 +205,17 @@ export function useProgress() {
     })
   }, [])
 
+  /** Rates a flashcard and reschedules it via SM-2 (see `schedule`). */
   const rateCard = useCallback((id: string, rating: Rating) => {
     update((s) => ({ ...s, cards: { ...s.cards, [id]: schedule(s.cards[id], rating) } }))
   }, [])
 
+  /** Sets a milestone's checked state, or toggles it if `value` is omitted. */
   const toggleMilestone = useCallback((id: string, value?: boolean) => {
     update((s) => ({ ...s, milestones: { ...s.milestones, [id]: value ?? !s.milestones[id] } }))
   }, [])
 
+  /** Adds `seconds` to today's activity total — called by `useActivityTracker`'s tick. */
   const addActivity = useCallback((seconds: number) => {
     update((s) => {
       const k = dayKey()
@@ -206,6 +223,7 @@ export function useProgress() {
     })
   }, [])
 
+  /** Wipes all progress back to `EMPTY` — used by the Progress Dashboard's reset control. */
   const reset = useCallback(() => update(() => EMPTY), [])
 
   return { state, completeConcept, recordQuiz, rateCard, toggleMilestone, addActivity, reset }
