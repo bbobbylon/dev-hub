@@ -1,5 +1,7 @@
 # UI/UX Design Documentation — Dev Hub
 
+_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+
 Dev Hub's visual language is "Organic" — the design system handed off from the original Claude
 Design prototypes (`../project/`) and ported verbatim into `app/src/styles/organic.css`. This
 document describes that system as it exists in code today; for the narrative of *how* it got

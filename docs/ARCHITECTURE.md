@@ -1,5 +1,7 @@
 # Architecture — Dev Hub
 
+_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+
 This is the file-by-file map of the app: what each file is, what it depends on, what depends
 on it, and where it sits in the whole system. For the *narrative* of what was built and why
 (the port from the design handoff, the progress system, the verification suites, the a11y
@@ -39,7 +41,9 @@ repo/
 ├── README.md              Handoff-bundle instructions for a coding agent (read first, historically)
 ├── DEPLOYMENT.md           How this got onto GitHub Pages, and how to redeploy/roll back
 ├── docs/
-│   └── ARCHITECTURE.md     This file
+│   ├── SRS.md              What the app must do and why (requirements, success criteria)
+│   ├── ARCHITECTURE.md     This file
+│   └── UI-DESIGN.md        The "Organic" design system, components, layouts, a11y
 ├── chats/                  Design-session transcripts behind the original prototypes
 ├── project/                The 23 original `.dc.html` Claude Design prototypes + assets
 └── app/                    The actual React app (everything below is under here)

@@ -1,5 +1,7 @@
 # Software Requirements Specification — Dev Hub
 
+_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+
 ## 1. Executive Summary
 
 - **Project:** Dev Hub (repo: `devhub`), v1.0 — live since 2026-09-06.
