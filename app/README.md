@@ -37,15 +37,21 @@ no backend at all.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
   gallery gained a filter across all 24 archetypes. Both have empty states.
 - **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
-- **Progress can be reset** from the dashboard, with a note that data never leaves the device.
+- **Progress can be exported, restored, or reset** from the dashboard's "Your data" panel. Export
+  hands you a dated `dev-hub-progress-YYYY-MM-DD.json`; import reads one back, validating it field
+  by field (`src/lib/progressFile.ts`) and refusing anything malformed by name rather than crashing
+  the page. That's a backup/restore path that needs no account and no backend — the same blob
+  `progressSync.ts` would move for you, moved by hand.
 
 ## Optional account sync
 
 `/sign-in` and `/sign-up` talk to a separate Spring Boot backend (`../server/`) if — and only if —
 the app was built with `VITE_API_BASE_URL` set. With no backend configured (the normal case for the
-GitHub Pages deploy), those pages still render but `useAuth()`'s `login`/`register` reject
-immediately with an inline "Sign-in isn't available in this deployment" message; every other page is
-unaffected.
+GitHub Pages deploy), **those routes don't exist**: `App.tsx` doesn't register them, so they fall
+through to the 404 page, and `TopNav` hides its "Sign in" link. A build with no backend behind it
+never offers a form that could only fail on submit. `scripts/routes.mjs` reads the same variable, so
+the verification suites expect the two routes only when a build would have them; export
+`VITE_API_BASE_URL` for both the build and the verify run, or for neither.
 
 Signed in, `src/lib/progressSync.ts` pulls the account's saved progress once (server's copy wins,
 overwriting local — there's no per-field merge) and pushes local changes back, debounced, on every
@@ -124,7 +130,10 @@ design system's 2px accent ring on all of them, and tab order follows the visual
 the design system's own rule — *"for paragraph-size text in the accent use a deep ramp step rather
 than the accent itself"* — to the neutral ramp, which the prototypes had not done. That took the
 audit from 137 failures across 51 colour pairs down to **31 across 18**, with zero new failures
-introduced (verified by diffing the failure sets before and after). Tokens on dark grounds — the
+introduced (verified by diffing the failure sets before and after). It reads **39 across 20** today:
+the pages added since that pass brought their own inherited pairs with them (Shell Scripting alone
+accounts for 7 of the reported lines), and none of them have been through the same treatment.
+Tokens on dark grounds — the
 terminal, code panes, gutters — were deliberately left alone, since darkening them would *reduce*
 contrast.
 

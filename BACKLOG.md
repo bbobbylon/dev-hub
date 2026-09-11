@@ -1,8 +1,13 @@
 # Backlog — Dev Hub
 
-_Last updated: 2026-09-09._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
+_Last updated: 2026-09-11._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
+
+**Shipped since the last update (2026-09-11):** the account UI is now gated on `apiEnabled`, so a
+backend-free build has no `/sign-in` route and no "Sign in" link rather than a form that fails on
+submit; and item 14, export/import progress as a JSON file (`app/src/lib/progressFile.ts`), which
+was the cheap answer to "I want my progress on another browser" that doesn't need item 1 first.
 
 ## Backend / account
 
@@ -10,7 +15,9 @@ layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
    only works when `VITE_API_BASE_URL` points at a running instance. Needs a host (Railway/Render/
    Fly.io free tier, or paid) plus a real MySQL instance — the first place this stops being
    $0/month — and `VITE_API_BASE_URL` wired into `.github/workflows/deploy-pages.yml` as a build-time
-   variable. See `DEPLOYMENT.md`'s new "optional backend is not deployed" section.
+   variable. See `DEPLOYMENT.md`'s "optional backend is not deployed" section. Note that setting
+   that variable also switches the account routes back on (and `scripts/routes.mjs` with them), so
+   the sign-in/sign-up pages need a real smoke test the first time a deploy carries it.
 2. **Real merge on sign-in, not "server wins."** `lib/progressSync.ts` currently overwrites local
    progress wholesale with whatever the server has on sign-in. Fine for one device, lossy for two —
    studying on a phone, then signing into the same account on a laptop with different local
@@ -53,6 +60,9 @@ layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 13. **Unit tests for the pure logic** — `lib/progress.ts`'s `schedule()` (SM-2) and `streakOf()` are
     both pure functions with real edge cases (ease floor, day boundaries) and no test coverage;
     today's verification is all Playwright e2e, nothing at the function level.
-14. **Export/import progress as a downloadable JSON file** — a manual, no-account backup/restore
-    path. Cheaper than signing in for someone who just wants a safety net before clearing browser
-    data, and doesn't require the backend at all.
+14. ~~**Export/import progress as a downloadable JSON file**~~ — **done 2026-09-11.** The Progress
+    Dashboard's "Your data" panel exports a dated `dev-hub-progress-YYYY-MM-DD.json` and reads one
+    back; `lib/progressFile.ts` validates a restore field by field. Ten checks in
+    `verify-interactions.mjs` cover the round trip and the refusals. What's still missing is a
+    *merge* on import (it replaces, exactly like item 2's server-wins sync) and any way to import
+    from the pages themselves rather than the dashboard.

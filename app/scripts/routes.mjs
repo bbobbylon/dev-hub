@@ -6,7 +6,15 @@
  * directly and doesn't import this; audit-content.mjs works from prototype
  * filenames instead of routes.) Keep in sync with the router's route table
  * whenever a page is added, renamed, or removed.
+ *
+ * The two account routes are the one conditional pair: `App.tsx` registers
+ * `/sign-in` and `/sign-up` only when the build had `VITE_API_BASE_URL` set,
+ * so they are only real routes here under the same variable. Export it before
+ * both `npm run build` and the verify run, or neither sees them — a build with
+ * the variable verified without it would report those two routes as 404s.
  */
+const ACCOUNT_ROUTES = process.env.VITE_API_BASE_URL ? ['/sign-in', '/sign-up'] : []
+
 export const ROUTES = [
   '/',
   '/dev-hub',
@@ -34,6 +42,5 @@ export const ROUTES = [
   '/roadmap',
   '/progress-dashboard',
   '/course-complete',
-  '/sign-in',
-  '/sign-up',
+  ...ACCOUNT_ROUTES,
 ]

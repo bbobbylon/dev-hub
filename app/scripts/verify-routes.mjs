@@ -8,6 +8,14 @@
 import { BASE, openPage } from './browser.mjs'
 import { ROUTES } from './routes.mjs'
 
+// Floor for "did this route actually render?", in characters of body text. Every
+// lesson page clears it several times over; a blank or crashed one is ~30 (the
+// nav alone). The two account forms are the honest exception — a heading, two
+// fields and a button is all they are, ~144 and ~177 chars, so they get a lower
+// floor that a broken render still can't reach rather than a blanket exemption.
+const MIN_TEXT = 200
+const SPARSE = { '/sign-in': 100, '/sign-up': 100 }
+const minTextFor = (route) => SPARSE[route] ?? MIN_TEXT
 
 const { browser, page } = await openPage()
 
@@ -40,7 +48,7 @@ for (const route of ROUTES) {
 
   const problems = [] // human-readable failure descriptions for this route
   if (errors.length) problems.push(`console: ${errors.join(' | ').slice(0, 200)}`)
-  if (info.textLen < 200) problems.push(`thin render (${info.textLen} chars)`)
+  if (info.textLen < minTextFor(route)) problems.push(`thin render (${info.textLen} chars)`)
   if (!info.h1) problems.push('no <h1>')
   if (info.hOverflow) problems.push('horizontal overflow')
 

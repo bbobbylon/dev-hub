@@ -7,6 +7,9 @@
  * are hardcoded per check below rather than sourced from routes.mjs, since
  * each block targets one specific page and interaction, not every route.
  */
+import { readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { BASE, openPage } from './browser.mjs'
 
 const { browser, page } = await openPage({ width: 1440, height: 1000 })
@@ -332,6 +335,70 @@ await go('/does-not-exist')
 const missing = await body()
 check('404: unknown route explains itself', missing.includes('No such page'))
 check('404: offers a way back', missing.includes('Browse the gallery'))
+
+/* ── Backup file: export, restore, and the files that get refused ────── */
+
+// Something worth backing up: a perfect quiz run, which the dashboard's
+// "Quiz accuracy" tile reports on and an empty state demonstrably doesn't.
+await resetProgress()
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+
+await go('/progress-dashboard')
+// The click and the listener are started together: the download event can
+// fire before an awaited click resolves.
+const [download] = await Promise.all([
+  page.waitForEvent('download', { timeout: 15_000 }),
+  page.getByRole('button', { name: 'Export backup' }).click(),
+])
+const backupPath = await download.path()
+const suggested = download.suggestedFilename()
+check(
+  'backup: export offers a dated filename',
+  /^dev-hub-progress-\d{4}-\d{2}-\d{2}\.json$/.test(suggested),
+  suggested,
+)
+check('backup: export says so on screen', (await body()).includes('Saved dev-hub-progress-'))
+const exported = JSON.parse(readFileSync(backupPath, 'utf8'))
+check('backup: file is a version-1 state', exported.version === 1)
+check(
+  'backup: file carries the quiz that was just aced',
+  Object.values(exported.quizzes ?? {}).some((q) => q.best === 5),
+)
+
+// Wipe, then restore from that same file.
+await resetProgress()
+await go('/progress-dashboard')
+check('backup: dashboard is empty before the restore', (await body()).includes('No checkpoints yet'))
+page.once('dialog', (d) => d.accept())
+await page.locator('input[type=file]').setInputFiles(backupPath)
+await page.getByText(/^Restored /).waitFor({ timeout: 10_000 }).catch(() => {})
+const restored = await body()
+check('backup: import reports what it restored', /Restored .*quiz/.test(restored))
+check('backup: the restored quiz is live again', restored.includes('Best score, per checkpoint'))
+
+// A file from some other app, and a file that isn't JSON at all. Both are
+// refused by name rather than crashing the page — and neither one prompts,
+// since parsing fails before there's anything to confirm.
+const foreignPath = join(tmpdir(), 'dev-hub-foreign-backup.json')
+writeFileSync(foreignPath, JSON.stringify({ version: 99, concepts: {} }))
+await page.locator('input[type=file]').setInputFiles(foreignPath)
+await page.getByText(/version 99/).waitFor({ timeout: 10_000 }).catch(() => {})
+check('backup: a foreign version is refused', (await body()).includes('version 99'))
+
+const junkPath = join(tmpdir(), 'dev-hub-junk-backup.json')
+writeFileSync(junkPath, 'this is not json')
+await page.locator('input[type=file]').setInputFiles(junkPath)
+await page.getByText(/valid JSON/).waitFor({ timeout: 10_000 }).catch(() => {})
+check('backup: a non-JSON file is refused', (await body()).includes('valid JSON'))
+check(
+  'backup: a refused import leaves progress alone',
+  (await body()).includes('Best score, per checkpoint'),
+)
 
 // Reset clears everything.
 await go('/progress-dashboard')

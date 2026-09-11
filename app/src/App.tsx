@@ -10,6 +10,7 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { useActivityTracker } from './lib/progress'
 import { useProgressSync } from './lib/progressSync'
+import { apiEnabled } from './lib/api'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -102,8 +103,12 @@ export default function App() {
             <Route path="/roadmap" element={<Roadmap />} />
             <Route path="/progress-dashboard" element={<ProgressDashboard />} />
             <Route path="/course-complete" element={<CourseComplete />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
+            {/* Account routes exist only in a build that has a backend to talk to. Without
+                VITE_API_BASE_URL — the GitHub Pages deploy — they fall through to NotFound
+                rather than rendering a form that can only ever fail on submit. TopNav hides
+                its "Sign in" link on the same condition; keep the two in step. */}
+            {apiEnabled ? <Route path="/sign-in" element={<SignIn />} /> : null}
+            {apiEnabled ? <Route path="/sign-up" element={<SignUp />} /> : null}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
