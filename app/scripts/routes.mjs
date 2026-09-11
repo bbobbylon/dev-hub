@@ -34,4 +34,6 @@ export const ROUTES = [
   '/roadmap',
   '/progress-dashboard',
   '/course-complete',
+  '/sign-in',
+  '/sign-up',
 ]

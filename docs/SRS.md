@@ -1,13 +1,15 @@
 # Software Requirements Specification — Dev Hub
 
-_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+_Last updated: 2026-09-09 — describes the 25-page app plus the optional account/sync layer, on the
+`implement-design-handoff` branch._
 
 ## 1. Executive Summary
 
 - **Project:** Dev Hub (repo: `devhub`), v1.0 — live since 2026-09-06.
 - **Purpose:** a free, self-contained coding-fundamentals learning app — lessons, quizzes,
-  spaced-repetition flashcards, and hands-on tools — with real progress tracked entirely in the
-  learner's own browser, no account or server required.
+  spaced-repetition flashcards, and hands-on tools — with real progress tracked in the learner's own
+  browser by default, no account or server required. An optional account layer lets that same
+  progress follow a learner across devices when they choose to sign in.
 - **Stakeholder:** built and maintained by a single developer (Bobby) as a portfolio piece,
   ported from a Claude Design HTML/CSS/JS handoff into a production React app.
 
@@ -18,9 +20,10 @@ _Last updated: 2026-09-08 — describes the 25-page app on the `implement-design
 those mockups into a real, working learning tool where progress persists and reflects actual
 use, while costing nothing to run or host.
 
-**Users:** anyone learning developer fundamentals — the app assumes no account and no backend,
-so it's equally usable by one person across sessions on one device, or by many people trying it
-anonymously (progress is per-browser, not shared).
+**Users:** anyone learning developer fundamentals. The app requires no account and no backend by
+default, so it's equally usable by one person across sessions on one device, or by many people
+trying it anonymously (progress is per-browser, not shared). A learner who wants their progress to
+follow them across devices can optionally create an account.
 
 **Main features:**
 - 25 standalone interactive lesson/tool pages spanning CLI/shell, Git, algorithms, data
@@ -32,6 +35,8 @@ anonymously (progress is per-browser, not shared).
   donut, and an "up next" queue.
 - A five-stage Roadmap and a Dev Hub landing catalog, both reflecting lock/done/current state.
 - A 404 page and end-to-end search, replacing decorative/absent behavior in the original mockups.
+- An optional account (sign in/sign up) that syncs the same progress blob to a small backend, so it
+  follows a learner across devices — opt-in, and never required for any other feature.
 
 ## 3. Functional Requirements
 
@@ -63,6 +68,12 @@ anonymously (progress is per-browser, not shared).
 - **Copy-to-clipboard** — cheat-sheet code panels (CLI Basics, Shell Scripting) let a learner
   copy the exact runnable command sequence, excluding any display-only comparison lines, with a
   transient "Copied!" acknowledgement.
+- **Account sign-in/sign-up (`pages/SignIn.tsx`, `pages/SignUp.tsx`, `lib/auth.tsx`)** — a learner
+  can register and sign in against the optional backend (`server/`); signed in, `lib/progressSync.ts`
+  pulls their previously-synced progress once (overwriting local — server wins, no field-level merge
+  yet) and pushes local changes back afterward, debounced. With no backend configured at build time,
+  these pages still render but sign-in/sign-up fail with a clear inline message instead of a broken
+  request — every other feature keeps working exactly as it does with no account at all.
 
 ## 4. Non-Functional Requirements
 
@@ -72,8 +83,10 @@ anonymously (progress is per-browser, not shared).
   A render crash on one page is caught by `ErrorBoundary` and doesn't take down the rest of the
   app.
 - **Data durability & privacy:** all progress lives in `localStorage` under one namespaced key
-  (`dev-hub.progress.v1`); nothing is transmitted anywhere. This is a deliberate trade-off —
-  progress does not sync across devices or browsers, and clearing site data erases it.
+  (`dev-hub.progress.v1`) by default; nothing is transmitted anywhere unless a learner explicitly
+  signs in. Signed out, this is unchanged from before: progress does not sync across devices or
+  browsers, and clearing site data erases it. Signed in, the same blob is also stored server-side,
+  keyed to that account, so it survives a device change or cleared local storage.
 - **Accessibility:** every interactive control has an accessible name; keyboard focus is visible
   via the design system's 2px accent ring; tab order follows visual order. Text contrast targets
   WCAG AA (4.5:1) for body-size text on light grounds — see `docs/UI-DESIGN.md` §5 for the
@@ -101,6 +114,8 @@ anonymously (progress is per-browser, not shared).
   local-only) so I can start over without surprise data loss elsewhere.
 - As a returning learner, I want a broken or old link to land me on a helpful 404 page rather
   than silently redirecting somewhere I didn't ask for.
+- As a learner who studies on more than one device, I want to optionally sign in so my progress
+  follows me, without being forced to create an account just to use the app.
 
 ## 6. Success Criteria
 
@@ -118,9 +133,12 @@ anonymously (progress is per-browser, not shared).
 
 ## 7. Constraints
 
-- **No backend, no account, no database** — this is a hard design constraint, not a phase-1
-  simplification; multi-device progress sync is explicitly out of scope.
-- **Static hosting only** — GitHub Pages serves the app from a sub-path
+- **No backend, no account, no database required** — this was originally a hard constraint; it's
+  now a default, not a ceiling. The app must still work fully, including every progress feature,
+  with zero backend involvement (this is what the free static GitHub Pages deploy actually ships).
+  The optional `server/` backend exists solely to sync that same local progress across devices for
+  learners who choose to sign in — it must never become load-bearing for any other feature.
+- **Static hosting only, for the frontend** — GitHub Pages serves the app from a sub-path
   (`/dev-hub/`), which constrains routing (`BrowserRouter`'s `basename`) and asset URLs
   (`vite.config.ts`'s `base`) — see `DEPLOYMENT.md`.
 - **Content fidelity to the design handoff** — pages ported from a `.dc.html` prototype must

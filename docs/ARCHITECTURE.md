@@ -1,6 +1,7 @@
 # Architecture — Dev Hub
 
-_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+_Last updated: 2026-09-09 — describes the 25-page app plus the optional `server/` backend, on the
+`implement-design-handoff` branch._
 
 This is the file-by-file map of the app: what each file is, what it depends on, what depends
 on it, and where it sits in the whole system. For the *narrative* of what was built and why
@@ -17,9 +18,13 @@ see that root `README.md`). It ships ~25 standalone interactive lesson/tool page
 router, plus a gallery that indexes them, plus a real localStorage-backed progress system the
 original design mockups only depicted with hardcoded numbers.
 
-There is no backend and no build-time content pipeline: every page's copy, code samples, and
-quiz questions are TypeScript literals compiled straight into the page component (or a sibling
-`data/*.ts` file), and the only persistence is the browser's own `localStorage`.
+There is no build-time content pipeline: every page's copy, code samples, and quiz questions are
+TypeScript literals compiled straight into the page component (or a sibling `data/*.ts` file). The
+only persistence *required* to use the app is the browser's own `localStorage` — no backend, no
+account, no database. A separate, optional Spring Boot backend (`server/`, §11) exists purely to
+sync that same `localStorage` blob across devices for a learner who signs in; the frontend build
+this repo ships to GitHub Pages has no backend configured at all, and every feature except
+sign-in/cross-device sync works identically with or without one.
 
 ## 2. Technology stack
 
@@ -30,9 +35,10 @@ quiz questions are TypeScript literals compiled straight into the page component
 | Build tool | Vite 8 (`@vitejs/plugin-react`) |
 | Routing | React Router 7, client-side only, one `basename` for the GitHub Pages sub-path |
 | Styling | Plain CSS, no framework — a two-layer system (see §5) |
-| Persistence | Browser `localStorage`, no server, no account |
+| Persistence | Browser `localStorage`, required for nothing but the app to work; optionally mirrored server-side per account (see below) |
 | Verification | A custom Playwright toolchain in `scripts/` (no Jest/Vitest/Playwright-test runner — hand-rolled `.mjs` scripts driven by `npm run verify`) |
 | Hosting | GitHub Pages (static), deployed via `.github/workflows/deploy-pages.yml` — see `DEPLOYMENT.md` |
+| Backend (optional, §11) | Spring Boot 4 / Java 21 / Maven, `server/` — stateless JWT auth + a one-row-per-user progress sync endpoint. Not deployed anywhere; the GitHub Pages build has none configured. |
 
 ## 3. Directory structure
 
@@ -46,6 +52,7 @@ repo/
 │   └── UI-DESIGN.md        The "Organic" design system, components, layouts, a11y
 ├── chats/                  Design-session transcripts behind the original prototypes
 ├── project/                The 23 original `.dc.html` Claude Design prototypes + assets
+├── server/                 Optional Spring Boot backend — sync only, never required (see §11)
 └── app/                    The actual React app (everything below is under here)
     ├── index.html          Vite's HTML entry point — mounts #root, loads fonts, sets favicon
     ├── vite.config.ts      Build config — GitHub Pages sub-path handling (see file comments)
@@ -75,7 +82,7 @@ was tried and dropped (see `app/README.md`'s "How it's organised" section for wh
 
 | File | Exports | What it is | Used by |
 | --- | --- | --- | --- |
-| `components/TopNav.tsx` | `TopNav` | The sticky top bar every page carries; brand mark links back to the gallery (`/`). | Every page |
+| `components/TopNav.tsx` | `TopNav` | The sticky top bar every page carries; brand mark links back to the gallery (`/`). Also reads `useAuth()` directly (not a prop threaded through ~27 call sites) to render "Sign in" or the signed-in user's name + "Sign out" after the `right` slot. | Every page |
 | `components/Aside.tsx` | `Aside` | The Head First-style tinted callout: icon + kicker + heading + body. | ~6 pages |
 | `components/ConceptSidebar.tsx` | `ConceptSidebar`, `SidebarGroup`, `SidebarItem` | The left-hand lesson rail with done/current/locked states; a `SidebarItem` with `state: 'open'` but no `to` silently renders as an unclickable label (the exact bug Shell Scripting's page was built to fix). | CLI Basics, Shell Scripting |
 | `components/SectionHead.tsx` | `SectionHead` | The kicker + heading pair that opens most sections. | Most lesson pages |
@@ -89,7 +96,10 @@ was tried and dropped (see `app/README.md`'s "How it's organised" section for wh
 | `components/ErrorBoundary.tsx` | `ErrorBoundary` | Class component catching a render crash in one page so it doesn't blank the whole app; resets when `resetKey` (the route pathname) changes. | Wraps the whole `<Routes>` tree in `App.tsx` |
 | `data/pages.ts` | `PAGES`, `PageEntry`, `PageGroup`, `GROUP_TITLES` | The page registry — one entry per route (slug/title/kind/tone/blurb/group). Drives `PageGallery`'s cards and search, and (by convention, not by import) must stay in sync with `App.tsx`'s routes and `scripts/routes.mjs`'s `ROUTES`. | `PageGallery` |
 | `data/cliBasics.ts` | `SIDEBAR`, `ANATOMY`(+`AnatomyKey`, `ANATOMY_ORDER`), `WHY_CLI`, `COMMAND_GROUPS`, `BASH_LINES`, `PS_LINES`, `PIPES_LINES`, `QUIZ`(+`QuizQuestion`), `WALKTHROUGH`(+`WalkStep`) | All content for `pages/CliBasics.tsx`, pulled out of the component so its JSX stays about layout. Not shared with `ShellScripting.tsx`, which keeps its own local copies of similarly-shaped data (including its own `SIDEBAR`) rather than importing from here. | `CliBasics.tsx` only |
-| `lib/progress.ts` | `useProgress`, `useActivityTracker`, `streakOf`, `recentMinutes`, `schedule`, `isDue`, `dayKey`, `EMPTY`, plus the `ProgressState`/`QuizRecord`/`CardRecord`/`Rating` types | The entire persistence layer: a single JSON blob in `localStorage` (key `dev-hub.progress.v1`) holding completed concepts, quiz scores, SM-2 flashcard schedules, milestones, and per-day activity seconds. Synced across tabs via the `storage` event. | `App.tsx` (activity tracker), every page that records progress, `ProgressDashboard` (reads several helpers directly) |
+| `lib/progress.ts` | `useProgress`, `useActivityTracker`, `streakOf`, `recentMinutes`, `schedule`, `isDue`, `dayKey`, `EMPTY`, plus the `ProgressState`/`QuizRecord`/`CardRecord`/`Rating` types | The entire local persistence layer: a single JSON blob in `localStorage` (key `dev-hub.progress.v1`) holding completed concepts, quiz scores, SM-2 flashcard schedules, milestones, and per-day activity seconds. Synced across tabs via the `storage` event. Knows nothing about the network or accounts — `importState` (a `reset`-shaped replace-all mutator) is the only hook `progressSync.ts` needs to apply a synced copy. | `App.tsx` (activity tracker), every page that records progress, `ProgressDashboard` (reads several helpers directly), `lib/progressSync.ts` |
+| `lib/api.ts` | `API_BASE`, `apiEnabled`, `register`, `login`, `fetchProgress`, `saveProgress`, `ApiError` | Thin fetch wrapper for the optional backend (§11); parses its `HttpResponse` envelope and throws `ApiError` (carrying the HTTP status) on failure. `apiEnabled` is `false` whenever `VITE_API_BASE_URL` wasn't set at build time — the GitHub Pages build's normal state. | `lib/auth.tsx`, `lib/progressSync.ts` |
+| `lib/auth.tsx` | `AuthProvider`, `useAuth`, `isUnauthorized` | Account state: `{ user, token }` persisted to `localStorage` (`dev-hub.auth.v1`, separate from the progress key), trusted optimistically until a request 401s. `login`/`register` reject immediately with a clear message when `apiEnabled` is `false`, so callers never branch on that flag themselves. Wraps `<App>` in `main.tsx`, not `App.tsx` — same reasoning as `BrowserRouter` living there (no route-tree dependency). | `main.tsx`, `TopNav`, `SignIn`/`SignUp`, `lib/progressSync.ts` |
+| `lib/progressSync.ts` | `useProgressSync` | Bridges `lib/auth.tsx` and `lib/progress.ts` without either knowing about the other: on sign-in, pulls the server's saved progress once and overwrites local via `importState` (server wins — no field-level merge); after that, pushes every local change back, debounced ~2s. Every network call is fire-and-forget. A no-op whenever `apiEnabled` is `false` or no one's signed in. | `App.tsx` (mounted once, next to `useActivityTracker`) |
 
 ## 5. Styling system (`src/styles/`)
 
@@ -158,6 +168,8 @@ in-file header comment now; this table is the cross-file summary.
 | `BigOPerformance.tsx` | `/big-o-performance` | A growth-curve SVG chart plus complexity cards and a lookup-cost comparison table. | Fully static — no hooks beyond `useDocumentTitle`. | `TopNav`, `useDocumentTitle` | Self-contained. |
 | `CodePlayground.tsx` | `/code-playground` | A FizzBuzz code challenge: brief, read-only solution listing, test checklist. | One `useState` (`passed`) flips the checklist and prints a canned output string — "running tests" is fully simulated, not real execution. | `TopNav`, `CodeListing`, `useDocumentTitle` | Self-contained. |
 | `CheatSheet.tsx` | `/cheat-sheet` | Git commands in four columns, ordered to mirror a real work session rather than alphabetically. | "Print / PDF" calls `window.print()`; no hooks beyond `useDocumentTitle`. | `TopNav`, `useDocumentTitle` | **Defines its own local `Aside`-like callout instead of importing the shared `components/Aside`** — styled independently of `GitBranching`/`BigOPerformance`'s asides. |
+| `SignIn.tsx` | `/sign-in` | Email/password form against the optional backend's `/api/auth/login`. | `email`/`password`/`error`/`busy` state; calls `useAuth().login`, redirects to `/` on success. | `TopNav`, `useDocumentTitle`, `lib/auth.tsx` | Not a lesson — deliberately excluded from `data/pages.ts`'s gallery registry (same reasoning as `DevHub.tsx`/`NotFound.tsx`). Links to `/sign-up`. |
+| `SignUp.tsx` | `/sign-up` | Registration form; on success, calls `login` itself and redirects to `/`. | Same shape as `SignIn.tsx` plus `firstName`/`lastName`. | `TopNav`, `useDocumentTitle`, `lib/auth.tsx` | Also excluded from the gallery registry. Links to `/sign-in`. |
 
 ## 8. Verification & audit scripts (`scripts/`)
 
@@ -211,3 +223,35 @@ This app is also listed as a portfolio card in a separate, unrelated repo
 (`websitehub` — Angular + Spring Boot), which links to the live GitHub Pages URL and shows a
 screenshot of the gallery page. That repo has no code dependency on this one; the link is
 purely presentational and kept up to date by hand.
+
+## 11. Optional backend (`server/`)
+
+A separate Spring Boot app, built from this machine's `scaffold-spring-backend` skill template and
+adapted for Dev Hub. It exists for exactly one reason: letting `lib/progressSync.ts` carry the same
+`ProgressState` blob across devices for a learner who signs in. Nothing else in the app depends on
+it, and the deployed GitHub Pages build doesn't have one configured at all.
+
+- **Stack:** Spring Boot 4 / Java 21 / Maven, `NamedParameterJdbcTemplate` (no JPA/Flyway — an
+  idempotent `schema.sql`, run by hand), stateless JWT auth, package `com.devhub.backend`.
+- **`/api/auth/register`, `/api/auth/login`, `/api/auth/profile`** — the template's stock user
+  aggregate (`UserQuery`→`UserRowMapper`→`UserRepo`/`Impl`→`UserService`/`Impl`→`AuthController`),
+  unmodified beyond the package rename.
+- **`/api/progress`** (`GET`/`PUT`, both requiring a Bearer token) — the one addition. A `Progress`
+  aggregate following the same layering, storing the frontend's whole `ProgressState` object as an
+  opaque JSON column (`user_progress.data`) keyed by `user_id`, rather than modeling quizzes/cards/
+  milestones/activity as their own relational tables — a deliberate simplification, since the
+  frontend already treats the blob as one versioned unit (`lib/progress.ts`'s `ProgressState`).
+  Each request is scoped to the caller's own id via `@AuthenticationPrincipal`, never a client-
+  supplied one, so no extra authority rule is needed beyond `SecurityConfig`'s existing
+  `anyRequest().authenticated()` catch-all.
+- **CORS** is opened for `http://localhost:5173` (dev) and `https://bbobbylon.github.io` (prod),
+  alongside the template's other default dev-port origins.
+- **Not deployed anywhere.** It builds (`mvn package`) and that's as far as this pass took it — see
+  `DEPLOYMENT.md` and `BACKLOG.md` for what standing up a real, hosted instance would require.
+- **A shared-template bug fixed along the way:** the `scaffold-spring-backend` skill's template
+  didn't compile as-is against Spring Boot 4.0.6, because Boot 4 pulls Jackson 3, which moved
+  `ObjectMapper`/`JsonNode` out of `com.fasterxml.jackson.databind` into `tools.jackson.databind`
+  (annotations like `@JsonInclude` stayed put). `CustomAuthFilter`, `CustomAccessDeniedHandler`, and
+  `CustomAuthenticationEntryPoint` all needed that one import fixed. Both this copy and the shared
+  template at `~/.claude/skills/scaffold-spring-backend/template/` were corrected, so future
+  scaffolds off that skill won't hit the same failure.

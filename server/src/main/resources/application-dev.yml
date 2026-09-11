@@ -1,0 +1,6 @@
+# Dev-profile overrides. Safe local fallbacks already live in application.yml.
+logging:
+  level:
+    com.devhub.backend: DEBUG
+    # Uncomment to debug auth issues:
+    # org.springframework.security: DEBUG

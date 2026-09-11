@@ -19,8 +19,10 @@ than ported from a prototype:
 
 The designs showed a learner's progress as fixed numbers: a 4-day streak, 8 of 23 concepts, a
 hardcoded minutes chart. Nothing was recorded, so a refresh erased everything. `src/lib/progress.ts`
-makes it true — a small localStorage store, shared across tabs via the `storage` event, with no
-server and no account.
+makes it true — a small localStorage store, shared across tabs via the `storage` event. It has no
+notion of a server or an account itself; an *optional* cross-device sync layer sits outside it (see
+"Optional account sync" below), so the app is still fully usable, and still a $0 static deploy, with
+no backend at all.
 
 - **Quiz scores persist**, accumulating a personal best across attempts; passing a checkpoint marks
   the concept complete.
@@ -36,6 +38,21 @@ server and no account.
   gallery gained a filter across all 24 archetypes. Both have empty states.
 - **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
 - **Progress can be reset** from the dashboard, with a note that data never leaves the device.
+
+## Optional account sync
+
+`/sign-in` and `/sign-up` talk to a separate Spring Boot backend (`../server/`) if — and only if —
+the app was built with `VITE_API_BASE_URL` set. With no backend configured (the normal case for the
+GitHub Pages deploy), those pages still render but `useAuth()`'s `login`/`register` reject
+immediately with an inline "Sign-in isn't available in this deployment" message; every other page is
+unaffected.
+
+Signed in, `src/lib/progressSync.ts` pulls the account's saved progress once (server's copy wins,
+overwriting local — there's no per-field merge) and pushes local changes back, debounced, on every
+change after that. `src/lib/auth.tsx` holds the account/token in `localStorage`
+(`dev-hub.auth.v1`, separate from the progress key), and `src/lib/api.ts` is the thin fetch layer
+both use. See `../server/README.md` for the backend's endpoints, and `../BACKLOG.md` for what's
+still open (conflict-free merge on sign-in, actual hosting for the backend, etc.).
 
 ## Running it
 

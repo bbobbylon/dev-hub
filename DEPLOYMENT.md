@@ -84,6 +84,26 @@ Step 4 (WebsiteHub) is still open: the local `websitehub` checkout at
 `B:\Documents\Coding\websitehub` is a `.git` directory with no working tree,
 so the `InMemoryProjectRepository` entry hasn't been repointed yet.
 
+## The optional backend (`server/`) is not deployed
+
+`server/` (Spring Boot, `docs/ARCHITECTURE.md` §11) exists only to sync progress across devices for
+signed-in learners. It's untouched by everything above — the GitHub Pages deploy is still the same
+$0/month static build it always was, with no backend configured, and every feature except sign-in
+keeps working exactly as before. `npm run build` doesn't fail or change behavior because of it.
+
+Hosting it for real is a separate, not-yet-made decision — it would mean:
+
+- Picking somewhere to actually run it (a free-tier host like Railway/Render/Fly.io, or a paid one)
+  plus a real MySQL instance, which is the first place this stops being $0/month.
+- Setting `VITE_API_BASE_URL` as a build-time variable in `.github/workflows/deploy-pages.yml`
+  (Vite env vars are baked in at build time, not read at runtime) pointing at that host's URL.
+- Confirming `SecurityConfig`'s CORS origin list already covers `https://bbobbylon.github.io` (it
+  does, as of this pass) and that the host's own `JWT_SECRET`/DB credentials are set as real secrets,
+  never committed.
+
+Until that happens, `/sign-in` and `/sign-up` render but show "Sign-in isn't available in this
+deployment" on the live site — by design, not a bug. See `BACKLOG.md`.
+
 ## Rollback
 
 Actions → "Deploy to GitHub Pages" → re-run from the previous commit, or

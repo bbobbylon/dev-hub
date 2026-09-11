@@ -9,6 +9,7 @@
  */
 import { Suspense, lazy, useEffect } from 'react'
 import { useActivityTracker } from './lib/progress'
+import { useProgressSync } from './lib/progressSync'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -43,6 +44,8 @@ const Glossary = lazy(() => import('./pages/Glossary'))
 const Roadmap = lazy(() => import('./pages/Roadmap'))
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'))
 const CourseComplete = lazy(() => import('./pages/CourseComplete'))
+const SignIn = lazy(() => import('./pages/SignIn'))
+const SignUp = lazy(() => import('./pages/SignUp'))
 
 /** Every navigation lands at the top of the new page, as a document would. */
 function ScrollToTop() {
@@ -63,6 +66,8 @@ function ScrollToTop() {
 export default function App() {
   // Counts real time-on-page, which drives the streak and the minutes chart.
   useActivityTracker()
+  // Syncs progress with the optional backend when signed in; a no-op otherwise (see `lib/progressSync.ts`).
+  useProgressSync()
   const { pathname } = useLocation()
 
   return (
@@ -97,6 +102,8 @@ export default function App() {
             <Route path="/roadmap" element={<Roadmap />} />
             <Route path="/progress-dashboard" element={<ProgressDashboard />} />
             <Route path="/course-complete" element={<CourseComplete />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

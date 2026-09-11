@@ -6,8 +6,11 @@
  * true: quiz scores, flashcard scheduling, milestones and per-day activity,
  * kept in localStorage and shared across tabs.
  *
- * Deliberately dependency-free and synchronous. It is a single small JSON blob
- * per browser; there is no server and no account.
+ * Deliberately dependency-free and synchronous. It is a single small JSON blob per browser, with
+ * no notion of a server or an account itself — an *optional* cross-device sync layer for signed-in
+ * users lives entirely outside this file, in `lib/progressSync.ts`, which reads `state` from
+ * `useProgress()` and writes it back via `importState` below rather than this file importing any
+ * networking or auth code.
  */
 import { useCallback, useEffect, useState } from 'react'
 
@@ -226,7 +229,10 @@ export function useProgress() {
   /** Wipes all progress back to `EMPTY` — used by the Progress Dashboard's reset control. */
   const reset = useCallback(() => update(() => EMPTY), [])
 
-  return { state, completeConcept, recordQuiz, rateCard, toggleMilestone, addActivity, reset }
+  /** Replaces the whole state — used by `lib/progressSync.ts` to apply a synced server copy. */
+  const importState = useCallback((next: ProgressState) => update(() => ({ ...EMPTY, ...next })), [])
+
+  return { state, completeConcept, recordQuiz, rateCard, toggleMilestone, addActivity, reset, importState }
 }
 
 /**
