@@ -5,12 +5,18 @@
  * `streakOf`, `recentMinutes`, and `isDue` directly to derive a streak
  * counter, a 14-day minutes bar chart, a path-completion donut, quiz
  * accuracy, badges, and an "up next" queue that links out to Flashcards,
- * Quiz Mode, and Git Branching. The reset button at the bottom calls
- * `useProgress().reset()`, which wipes the localStorage progress every other
- * page in the app reads from.
+ * Quiz Mode, and Git Branching.
+ *
+ * It also owns the only controls that touch the whole progress blob at once — the "Your data"
+ * panel at the bottom: export a backup (`lib/progressFile.ts`), import one back over the top of
+ * the current state, and reset, which calls `useProgress().reset()` and wipes the localStorage
+ * progress every other page in the app reads from.
  */
-import type { ReactNode } from 'react'
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { isDue, recentMinutes, streakOf, useProgress } from '../lib/progress'
+import { downloadProgress, parseProgressFile, summarize } from '../lib/progressFile'
+import { apiEnabled } from '../lib/api'
+import { useAuth } from '../lib/auth'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
@@ -216,7 +222,39 @@ function PanelLabel({ children }: { children: ReactNode }) {
 /** Stats dashboard: streak, weekly minutes, path completion, badges, and next actions, all derived from real `useProgress()` state. */
 export default function ProgressDashboard() {
   useDocumentTitle('Progress Dashboard')
-  const { state, reset } = useProgress()
+  const { state, reset, importState } = useProgress()
+  const { user } = useAuth()
+
+  // The file picker behind the "Import backup" button, and the one-line result shown under it.
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [note, setNote] = useState<{ text: string; ok: boolean } | null>(null)
+
+  /** Reads the chosen file, validates it, and — once confirmed — replaces all progress with it. */
+  const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    // Cleared immediately so picking the same file twice in a row still fires a change event.
+    e.target.value = ''
+    if (!file) return
+    try {
+      const next = parseProgressFile(await file.text())
+      const summary = summarize(next)
+      if (!confirm(`Replace your current progress with ${summary} from ${file.name}?`)) {
+        setNote(null)
+        return
+      }
+      importState(next)
+      setNote({ text: `Restored ${summary}.`, ok: true })
+    } catch (err) {
+      setNote({ text: err instanceof Error ? err.message : 'That file could not be read.', ok: false })
+    }
+  }
+
+  // Where progress actually lives right now, which depends on both the build and the account.
+  const storageNote = !apiEnabled
+    ? 'Progress is stored in this browser only — nothing leaves the device. Export a backup before clearing site data or switching browsers.'
+    : user
+      ? 'Progress is saved in this browser and synced to your account. A file backup still works if you ever sign out for good.'
+      : 'Progress is stored in this browser. Sign in to sync it across devices, or keep a file backup.'
 
   const days = recentMinutes(state.activity, 14) // last 14 days' minutes, oldest first
   const streak = streakOf(state.activity) // consecutive active days counting back from today
@@ -588,29 +626,88 @@ export default function ProgressDashboard() {
             </div>
           </div>
         </div>
+        {/* backup, restore, reset — everything that acts on the whole progress blob at once */}
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            marginTop: 26,
-            flexWrap: 'wrap',
-          }}
+          className="card elev-sm"
+          style={{ borderRadius: 'var(--radius-lg)', padding: '22px 24px', marginTop: 22 }}
         >
-          <span style={{ fontSize: 12.5, color: 'var(--color-neutral-700)' }}>
-            Progress is stored in this browser only — nothing leaves the device.
-          </span>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{ fontSize: 12.5 }}
-            onClick={() => {
-              if (confirm('Clear all saved progress? This cannot be undone.')) reset()
+          <PanelLabel>Your data</PanelLabel>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              flexWrap: 'wrap',
             }}
           >
-            Reset progress
-          </button>
+            <p
+              style={{
+                fontSize: 12.5,
+                color: 'var(--color-neutral-700)',
+                margin: 0,
+                maxWidth: 480,
+                lineHeight: 1.5,
+              }}
+            >
+              {storageNote}
+            </p>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: 12.5 }}
+                onClick={() =>
+                  setNote({ text: `Saved ${downloadProgress(state)}.`, ok: true })
+                }
+              >
+                Export backup
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: 12.5 }}
+                onClick={() => fileRef.current?.click()}
+              >
+                Import backup
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: 12.5 }}
+                onClick={() => {
+                  if (confirm('Clear all saved progress? This cannot be undone.')) {
+                    reset()
+                    setNote({ text: 'Progress cleared.', ok: true })
+                  }
+                }}
+              >
+                Reset progress
+              </button>
+            </div>
+          </div>
+          {/* Driven by the button above rather than shown directly, so the row keeps its
+              three matching buttons; named for the a11y audit, which checks every input. */}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            aria-label="Progress backup file"
+            onChange={onFile}
+            style={{ display: 'none' }}
+          />
+          {note ? (
+            <p
+              role="status"
+              style={{
+                fontSize: 12.5,
+                margin: '14px 0 0',
+                color: note.ok ? 'var(--color-accent-2-700)' : 'var(--color-accent-700)',
+              }}
+            >
+              {note.text}
+            </p>
+          ) : null}
         </div>
       </main>
     </div>

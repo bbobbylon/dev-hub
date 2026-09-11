@@ -101,8 +101,16 @@ Hosting it for real is a separate, not-yet-made decision — it would mean:
   does, as of this pass) and that the host's own `JWT_SECRET`/DB credentials are set as real secrets,
   never committed.
 
-Until that happens, `/sign-in` and `/sign-up` render but show "Sign-in isn't available in this
-deployment" on the live site — by design, not a bug. See `BACKLOG.md`.
+Until that happens the live site simply has no account layer: `apiEnabled` is `false`, so `App.tsx`
+never registers `/sign-in` or `/sign-up` (both fall through to the 404 page) and `TopNav` renders no
+"Sign in" link. That's the fix for what shipped on 2026-09-11, where the link appeared on all ~27
+pages and the form only revealed "Sign-in isn't available in this deployment" after you'd typed an
+email and a password into it. Learners who want their progress on a second browser use the Progress
+Dashboard's export/import instead, which needs no backend. See `BACKLOG.md`.
+
+One coupling to remember when the backend *does* go up: setting `VITE_API_BASE_URL` in the workflow
+changes the route table, so `app/scripts/routes.mjs` needs the same variable exported for a verify
+run to expect those two routes. Build and verify with it set, or with it unset — never one of each.
 
 ## Rollback
 

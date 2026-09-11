@@ -61,8 +61,15 @@ follow them across devices can optionally create an account.
   checked/unchecked, and the checked state survives a reload.
 - **Progress Dashboard** — reads and displays, without any hardcoded numbers: current streak,
   hours studied this week, concepts completed, quiz accuracy, a 14-day minutes-per-day chart, a
-  completion donut, and cards due for review; includes a reset control that wipes all progress
-  after the learner is told it never leaves the device.
+  completion donut, and cards due for review; includes a "Your data" panel that tells the learner
+  where their progress actually lives (this browser / this browser plus their account) and lets
+  them act on all of it at once — see backup/restore below, plus a reset control that wipes it.
+- **Progress backup and restore (`lib/progressFile.ts`)** — a learner can download their whole
+  progress state as a dated JSON file and later load that file back, from any browser, with no
+  account and no backend involved. A restore states what it found before replacing anything, and
+  a file that isn't a valid Dev Hub backup is refused with a specific reason rather than partially
+  applied: malformed entries are dropped rather than coerced, so a hand-edited or foreign file can
+  never leave the dashboard rendering bad numbers or crashing.
 - **Search** — both the Dev Hub landing catalog and the Page Gallery filter their contents live
   against a query string, with an empty state when nothing matches.
 - **Copy-to-clipboard** — cheat-sheet code panels (CLI Basics, Shell Scripting) let a learner
@@ -72,8 +79,10 @@ follow them across devices can optionally create an account.
   can register and sign in against the optional backend (`server/`); signed in, `lib/progressSync.ts`
   pulls their previously-synced progress once (overwriting local — server wins, no field-level merge
   yet) and pushes local changes back afterward, debounced. With no backend configured at build time,
-  these pages still render but sign-in/sign-up fail with a clear inline message instead of a broken
-  request — every other feature keeps working exactly as it does with no account at all.
+  the account layer is absent rather than broken: the routes aren't registered, the "Sign in" link
+  isn't rendered, and the learner is never shown a form that could only fail on submit. Every other
+  feature keeps working exactly as it does with no account at all, and backup/restore above covers
+  moving progress between browsers without one.
 
 ## 4. Non-Functional Requirements
 
@@ -116,14 +125,18 @@ follow them across devices can optionally create an account.
   than silently redirecting somewhere I didn't ask for.
 - As a learner who studies on more than one device, I want to optionally sign in so my progress
   follows me, without being forced to create an account just to use the app.
+- As a learner about to clear my browser data or switch browsers, I want to save my progress to a
+  file and load it back afterwards, so I don't have to create an account just to keep a safety net.
 
 ## 6. Success Criteria
 
 - All 26 routes (25 lesson/tool pages + the gallery) render without console errors, at all three
-  verified breakpoints — enforced by `npm run verify` before any deploy.
-- All 85 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
+  verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
+  a backend has 28: the two account routes exist only then, and `scripts/routes.mjs` reads the same
+  `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
+- All 95 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
   page's actual behavior (quiz flow, flashcard scheduling, milestone persistence, step-through
-  gating, search, and more).
+  gating, search, the backup round trip and the files it refuses, and more).
 - The content-fidelity audit (`npm run audit:content`) reports only known, explained extractor
   artifacts — never a genuinely dropped phrase from the original design.
 - The accessibility audit (`npm run audit:a11y`) reports zero unnamed interactive controls and a
