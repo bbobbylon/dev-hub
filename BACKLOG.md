@@ -66,3 +66,42 @@ was the cheap answer to "I want my progress on another browser" that doesn't nee
     `verify-interactions.mjs` cover the round trip and the refusals. What's still missing is a
     *merge* on import (it replaces, exactly like item 2's server-wins sync) and any way to import
     from the pages themselves rather than the dashboard.
+
+## Found while working (2026-09-11)
+
+Noticed in passing while gating the account UI and adding the backup file — none of it blocked that
+work, all of it is real. Numbered from 15 so the references above stay valid.
+
+15. **Half the Progress Dashboard is still hardcoded**, which is item 7's problem on a bigger page.
+    `BADGES` always shows "Terminal Tamer" and "7-Day Flame" as earned and "Bug Hunter · 2 of 5
+    cases" / "First Path · 34%" as fixed text; "Weakest topic by quiz score" is pinned to "Exit
+    codes" regardless of the actual scores in `state.quizzes`; and `UP_NEXT_TEMPLATE`'s labels and
+    "4 min"/"5 min"/"6 min" estimates are fixed, with only the flashcard due count swapped in live.
+    The stat tiles, chart and donut around them are all real, which makes the fake parts *more*
+    conspicuous, not less.
+16. **`TOTAL_CONCEPTS = 23` is a hardcoded denominator** in `ProgressDashboard.tsx`, driving both
+    "Concepts done · of 23" and the completion donut, while the app now ships 25 pages. Worth
+    deciding whether 23 is a deliberate count of *concepts* (distinct from pages) or just drift —
+    and if the former, saying so in a comment, because nothing in the file explains the number.
+17. **`DECK` duplicates the Flashcards deck's tags** as a literal array in the dashboard, purely to
+    compute "cards due". Change the deck in `Flashcards.tsx` and the dashboard's due count silently
+    goes wrong. The deck should be one exported list both pages read.
+18. **The a11y audit has no regression guard.** `audit:a11y` prints its count and always exits 0, so
+    new pages quietly add contrast failures — it went 31→39 across 20 pairs between passes, entirely
+    from pages added since the ramp fix, and nobody noticed until this session. A `--max` threshold
+    or a checked-in baseline file would make `docs/SRS.md`'s "documented, non-regressing set of
+    contrast exceptions" actually enforced instead of aspirational. The related content fix is to
+    put the newer pages (Shell Scripting is the worst at 7 lines) through the same `-700` ramp
+    treatment the original pass applied.
+19. **The workflow's actions all target deprecated Node 20.** Every deploy now logs a warning that
+    `actions/checkout@v4`, `configure-pages@v5`, `setup-node@v4`, `upload-artifact@v4` and
+    `deploy-pages@v4` are being force-run on Node 24. They still work; bump them before a runner
+    change makes it a failure instead of an annotation.
+20. **`SignIn`/`SignUp` chunks still ship in a backend-free build.** They're `lazy()`-declared in
+    `App.tsx` whether or not the routes are registered, so Rollup emits both chunks and nothing ever
+    fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy — a conditional dynamic import
+    would drop them.
+21. **The sign-in and sign-up pages barely say anything.** They're the two routes that trip
+    `verify-routes.mjs`'s render floor (144 and 177 chars) — a heading, two fields, a button, and no
+    explanation of what an account actually gets you, which is the one question someone on that page
+    has. Fixing the copy would also remove the need for their special-cased floor.
