@@ -5,6 +5,12 @@ export interface SidebarItem {
   label: string
   /** 'current' is the page you're on, 'open' is reachable, 'locked' is greyed. */
   state: 'current' | 'open' | 'locked'
+  /**
+   * The route this item links to. `SidebarLink` only renders a real `<Link>`
+   * when both this is set and `state !== 'locked'` — an `'open'` item with no
+   * `to` silently renders as an unclickable label, which is exactly the bug
+   * Shell Scripting's entry in `data/cliBasics.ts` had before it was wired up.
+   */
   to?: string
 }
 
@@ -52,6 +58,7 @@ export function ConceptSidebar({ groups, top = 57 }: { groups: SidebarGroup[]; t
   )
 }
 
+/** One row in the rail: picks the dot/lock mark and styling for `item.state`, and renders a real `<Link>` only when the item is reachable and has a target route. */
 function SidebarLink({ item }: { item: SidebarItem }) {
   const base = {
     display: 'flex',

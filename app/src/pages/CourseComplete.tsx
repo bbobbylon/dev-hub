@@ -1,9 +1,17 @@
+/**
+ * Route `/course-complete` — "CELEBRATION" screen shown after finishing a learning path: a
+ * confetti-framed headline, a certificate card, and "where to next" recommendation cards. All
+ * of `CERT`, `NEXT_PATHS`, and `CONFETTI` below are static placeholder content — this page does
+ * not currently call `useProgress()`, so the stats and name on the certificate are not yet
+ * pulled from real progress state. The "where to next" cards both link to `/roadmap`.
+ */
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+// Placeholder certificate data (name, path, date, stats) shown on the completion card.
 const CERT = {
   name: 'Ada Moreno',
   path: 'Terminal & Shell',
@@ -12,6 +20,7 @@ const CERT = {
   stats: ['23 concepts', '14 checkpoints', '1 capstone shipped'],
 }
 
+// The "where to next" recommendation cards below the certificate.
 const NEXT_PATHS: { tone: TagTone; label: string; title: string; body: string }[] = [
   {
     tone: 'accent',
@@ -34,6 +43,7 @@ const CONFETTI = [
   { bottom: -6, left: -20, size: 12, background: 'var(--color-accent-300)', opacity: 1, duration: '7s', reverse: false },
 ]
 
+/** The Course Complete celebration page — certificate recap plus "where to next" cards. */
 export default function CourseComplete() {
   useDocumentTitle('Course Complete')
 

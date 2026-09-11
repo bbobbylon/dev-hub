@@ -7,11 +7,15 @@
  * copy lives in data the DOM never shows at once.
  *
  * Not a test — a reviewing aid. Report what it flags, then read those by eye.
+ * Run via `npm run audit:content` — not part of `npm run verify` and not
+ * dependent on `npm run preview` being up, since it reads files directly
+ * rather than driving a browser (so it doesn't use browser.mjs or routes.mjs;
+ * see audit-a11y.mjs for the sibling audit that does).
  */
 import { readFileSync, readdirSync } from 'node:fs'
 
-const PROTO_DIR = '../project'
-const SRC = 'src'
+const PROTO_DIR = '../project' // design-handoff .dc.html prototypes, outside app/
+const SRC = 'src' // ported React source root, resolved relative to app/
 
 /** Prototype file → the source files its copy should land in. */
 const MAP = {
@@ -41,6 +45,7 @@ const MAP = {
   'Course Complete': ['pages/CourseComplete.tsx'],
 }
 
+/** Decode the small set of HTML entities the prototypes actually use. */
 const entities = (s) =>
   s
     .replace(/&nbsp;/g, ' ')
@@ -125,20 +130,20 @@ function phrases(text) {
   ]
 }
 
-const files = readdirSync(PROTO_DIR).filter((f) => f.endsWith('.dc.html'))
-let missingTotal = 0
-const report = []
+const files = readdirSync(PROTO_DIR).filter((f) => f.endsWith('.dc.html')) // every design prototype
+let missingTotal = 0 // running count of phrases flagged as dropped, across all prototypes
+const report = [] // human-readable output lines, printed together at the end
 
 for (const file of files) {
-  const name = file.replace('.dc.html', '')
-  const targets = MAP[name]
+  const name = file.replace('.dc.html', '') // prototype name, doubles as the MAP key
+  const targets = MAP[name] // source files this prototype's copy should appear in
   if (!targets) {
     report.push(`?    ${name} — no mapping`)
     continue
   }
-  const proto = phrases(prototypeText(`${PROTO_DIR}/${file}`))
-  const src = sourceText(targets)
-  const missing = proto.filter((p) => !src.includes(p))
+  const proto = phrases(prototypeText(`${PROTO_DIR}/${file}`)) // prototype's prose, chunked into phrases
+  const src = sourceText(targets) // ported React source, flattened to plain text
+  const missing = proto.filter((p) => !src.includes(p)) // prototype phrases not found in the source
   missingTotal += missing.length
   if (missing.length) {
     report.push(`MISS ${name} — ${missing.length}/${proto.length} phrases not found:`)

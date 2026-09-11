@@ -1,14 +1,23 @@
+/**
+ * Route `/terminal-simulator` — "DARK MISSION" incident-debugging exercise ("Mission 2 · The
+ * Lost Log") played out in a fake dark terminal. Clicking "Type it for me" advances through a
+ * fixed transcript (`SCRIPT`) one command at a time; the sidebar's `OBJECTIVES` unlock in step
+ * with it, ending in a scripted "mission complete" reveal. All content is local to this page —
+ * it does not read or write `useProgress()` and is not linked from any other page's sidebar.
+ */
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 
+/** One executed command in the scripted terminal transcript. */
 interface ScriptLine {
   cwd: string
   cmd: string
   out: string
 }
 
+// The fixed command-by-command transcript the terminal replays as `n` increases.
 const SCRIPT: ScriptLine[] = [
   { cwd: '~', cmd: 'cd /var/log/payments', out: '' },
   {
@@ -29,7 +38,7 @@ const SCRIPT: ScriptLine[] = [
   },
 ]
 
-/** `at` is the command count at which the objective is satisfied. */
+/** Sidebar checklist items; `at` is the command count at which the objective is satisfied. */
 const OBJECTIVES = [
   { title: 'Get to the log directory', hint: 'cd /var/log/payments', at: 1 },
   { title: 'See what is in it (and how big)', hint: 'ls -la', at: 2 },
@@ -40,6 +49,7 @@ const OBJECTIVES = [
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+/** Renders the coloured `dev@prod:<cwd>$` shell prompt segment. */
 function Prompt({ cwd }: { cwd: string }) {
   return (
     <>
@@ -51,9 +61,10 @@ function Prompt({ cwd }: { cwd: string }) {
   )
 }
 
+/** The Terminal Simulator mission page — replays `SCRIPT` and tracks `OBJECTIVES` as it plays. */
 export default function TerminalSimulator() {
   useDocumentTitle('Terminal Simulator')
-  const [n, setN] = useState(0)
+  const [n, setN] = useState(0) // number of SCRIPT commands executed so far
 
   const executed = SCRIPT.slice(0, n)
   const complete = n >= SCRIPT.length

@@ -1,3 +1,14 @@
+/**
+ * Progress Dashboard — route `/progress-dashboard`, a personal stats
+ * dashboard. It is the single biggest consumer of `src/lib/progress.ts`:
+ * besides the `useProgress()` hook it imports the standalone helpers
+ * `streakOf`, `recentMinutes`, and `isDue` directly to derive a streak
+ * counter, a 14-day minutes bar chart, a path-completion donut, quiz
+ * accuracy, badges, and an "up next" queue that links out to Flashcards,
+ * Quiz Mode, and Git Branching. The reset button at the bottom calls
+ * `useProgress().reset()`, which wipes the localStorage progress every other
+ * page in the app reads from.
+ */
 import type { ReactNode } from 'react'
 import { isDue, recentMinutes, streakOf, useProgress } from '../lib/progress'
 import { Link } from 'react-router-dom'
@@ -8,17 +19,25 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 /* ── data ──────────────────────────────────────────────────────────────── */
 
+// Minutes/day threshold that colors a chart bar as "hit goal"
 const DAILY_GOAL = 20
+// Bar-chart y-axis ceiling, in minutes
 const CHART_CEILING = 45
+// Target weekly hours shown in the "This week" stat's note
 const WEEKLY_GOAL_HOURS = 4
+// Denominator for the path-completion percentage
 const TOTAL_CONCEPTS = 23
+// Flashcard tags checked against state.cards to compute the due count
 const DECK = ['STATUS CODES', 'METHODS', 'HEADERS', 'CACHING', 'STATE']
+// Single-letter weekday labels under the minutes bar chart
 const DAY_INITIAL = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 
 /* Donut geometry: r=46 → circumference ≈ 289; 34% ≈ 98 of it. */
 const DONUT_R = 46
 const DONUT_CIRCUMFERENCE = Math.round(2 * Math.PI * DONUT_R)
+
+/** One badge tile in the "Badges" panel; `earned` swaps a dashed ring for a solid one. */
 interface Badge {
   name: ReactNode
   icon: ReactNode
@@ -26,6 +45,7 @@ interface Badge {
   tone: 'accent' | 'accent-2' | 'neutral'
 }
 
+// Badge tiles rendered in the "Badges" panel
 const BADGES: Badge[] = [
   {
     name: 'Terminal Tamer',
@@ -100,6 +120,7 @@ const BADGES: Badge[] = [
   },
 ]
 
+// "Up next" queue links; the flashcards entry's label is rewritten with the live due count before render
 const UP_NEXT_TEMPLATE = [
   {
     to: '/flashcards',
@@ -172,6 +193,7 @@ const UP_NEXT_TEMPLATE = [
 
 /* ── small pieces ──────────────────────────────────────────────────────── */
 
+/** Small uppercase label heading a dashboard panel. */
 function PanelLabel({ children }: { children: ReactNode }) {
   return (
     <div
@@ -191,13 +213,14 @@ function PanelLabel({ children }: { children: ReactNode }) {
 
 /* ── page ──────────────────────────────────────────────────────────────── */
 
+/** Stats dashboard: streak, weekly minutes, path completion, badges, and next actions, all derived from real `useProgress()` state. */
 export default function ProgressDashboard() {
   useDocumentTitle('Progress Dashboard')
   const { state, reset } = useProgress()
 
-  const days = recentMinutes(state.activity, 14)
-  const streak = streakOf(state.activity)
-  const weekMinutes = days.slice(-7).reduce((n, d) => n + d.minutes, 0)
+  const days = recentMinutes(state.activity, 14) // last 14 days' minutes, oldest first
+  const streak = streakOf(state.activity) // consecutive active days counting back from today
+  const weekMinutes = days.slice(-7).reduce((n, d) => n + d.minutes, 0) // minutes across the last 7 of those days
   const conceptsDone = Object.keys(state.concepts).length
   const attempts = Object.values(state.quizzes)
   const accuracy = attempts.length
@@ -208,6 +231,7 @@ export default function ProgressDashboard() {
   const pathPct = Math.round((conceptsDone / TOTAL_CONCEPTS) * 100)
   const cardsDue = DECK.filter((tag) => isDue(state.cards[tag])).length
 
+  // Stat tiles rendered across the top of the page
   const STATS = [
     {
       label: 'Streak',
@@ -239,6 +263,7 @@ export default function ProgressDashboard() {
     },
   ]
 
+  // Donut legend rows: mastered / due / not-started, in that ring order
   const PATH_BREAKDOWN = [
     { color: 'var(--color-accent-2)', label: `${conceptsDone} mastered` },
     { color: 'var(--color-accent)', label: `${cardsDue} due for review` },
@@ -248,8 +273,9 @@ export default function ProgressDashboard() {
     },
   ]
 
-  const DONUT_FILLED = Math.round((pathPct / 100) * DONUT_CIRCUMFERENCE)
+  const DONUT_FILLED = Math.round((pathPct / 100) * DONUT_CIRCUMFERENCE) // arc length, in stroke-dasharray units, for the completed slice
 
+  // UP_NEXT_TEMPLATE with the flashcards row's label swapped in for the live due count
   const upNext = UP_NEXT_TEMPLATE.map((item) =>
     item.to === '/flashcards'
       ? { ...item, label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (HTTP deck)` }

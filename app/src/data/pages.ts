@@ -1,18 +1,35 @@
+/**
+ * The page registry — one entry per route, used by `PageGallery` to render
+ * and search the card grid. It is *not* wired automatically to routing:
+ * adding a page here does not add a `<Route>` to it, and vice versa. Keep
+ * three things in lockstep by hand when a page is added or removed:
+ *  - `App.tsx`'s lazy import + `<Route>` (the actual route)
+ *  - this file's `PAGES` entry (the gallery card + slug used for search)
+ *  - `scripts/routes.mjs`'s `ROUTES` array (what the verification suites visit)
+ * `slug` is the single source of truth other files build a route from —
+ * `ConceptSidebar`/`Roadmap` links and `App.tsx`'s paths must match it exactly.
+ */
 import type { TagTone } from '../components/ui'
 
+/** Which section of the gallery (and the Dev Hub landing page) a card sorts into. */
 export type PageGroup = 'learn' | 'practice' | 'reference' | 'meta'
 
 export interface PageEntry {
+  /** Route path without the leading slash — `App.tsx`'s `<Route path="/${slug}">`. */
   slug: string
   /** Card title in the gallery. */
   title: string
   /** The uppercase archetype label on the card. */
   kind: string
+  /** Which `Tag` color the archetype label renders in. */
   tone: TagTone
+  /** One-line card description shown under the title. */
   blurb: string
+  /** Which gallery section (and Dev Hub landing group) this card belongs to. */
   group: PageGroup
 }
 
+/** Section headings the gallery and Dev Hub landing page render above each `PageGroup`. */
 export const GROUP_TITLES: Record<PageGroup, string> = {
   learn: 'Learn — concept pages',
   practice: 'Practice — hands-on pages',
@@ -20,6 +37,7 @@ export const GROUP_TITLES: Record<PageGroup, string> = {
   meta: 'Meta — journey pages',
 }
 
+/** Every routable page, grouped by section in render order. */
 export const PAGES: PageEntry[] = [
   // ── Learn ───────────────────────────────────────────────────────────────
   {
@@ -28,6 +46,14 @@ export const PAGES: PageEntry[] = [
     kind: 'INTERACTIVE LESSON',
     tone: 'accent',
     blurb: 'The flagship concept page: quiz, anatomy clicker, walkthrough.',
+    group: 'learn',
+  },
+  {
+    slug: 'shell-scripting',
+    title: 'Shell Scripting',
+    kind: 'STEP-THROUGH VIZ',
+    tone: 'accent',
+    blurb: 'Turn a chain of commands into backup.sh — step through what each line actually does.',
     group: 'learn',
   },
   {

@@ -4,16 +4,25 @@ A React implementation of the **Coding Learning App Redesign** handed off from C
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
 All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
-mockups only depicted is now real. A 24th page, Rebase & History, was added afterward: the Roadmap
-mockup already named it as Version Control's fourth concept, but no design existed for it — it's
-new content in the app's own style, not a ported prototype.
+mockups only depicted is now real. Two pages were added afterward, in the app's own style rather
+than ported from a prototype:
+
+- **Rebase & History** — the Roadmap mockup already named it as Version Control's fourth concept,
+  but no design existed for it.
+- **Shell Scripting** — CLI Basics' own concept sidebar listed it as `state: 'open'` (the state the
+  component's doc comment defines as "reachable") but with no `to`, which the sidebar renders as a
+  plain, unclickable label regardless of that state. It's now a real step-through lesson (walking
+  `backup.sh` line by line, terminal output and variable values updating as you go), wired up from
+  every place that named it: that sidebar, and the Roadmap's Stage 1 chip.
 
 ## Beyond the mockups
 
 The designs showed a learner's progress as fixed numbers: a 4-day streak, 8 of 23 concepts, a
 hardcoded minutes chart. Nothing was recorded, so a refresh erased everything. `src/lib/progress.ts`
-makes it true — a small localStorage store, shared across tabs via the `storage` event, with no
-server and no account.
+makes it true — a small localStorage store, shared across tabs via the `storage` event. It has no
+notion of a server or an account itself; an *optional* cross-device sync layer sits outside it (see
+"Optional account sync" below), so the app is still fully usable, and still a $0 static deploy, with
+no backend at all.
 
 - **Quiz scores persist**, accumulating a personal best across attempts; passing a checkpoint marks
   the concept complete.
@@ -29,6 +38,21 @@ server and no account.
   gallery gained a filter across all 24 archetypes. Both have empty states.
 - **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
 - **Progress can be reset** from the dashboard, with a note that data never leaves the device.
+
+## Optional account sync
+
+`/sign-in` and `/sign-up` talk to a separate Spring Boot backend (`../server/`) if — and only if —
+the app was built with `VITE_API_BASE_URL` set. With no backend configured (the normal case for the
+GitHub Pages deploy), those pages still render but `useAuth()`'s `login`/`register` reject
+immediately with an inline "Sign-in isn't available in this deployment" message; every other page is
+unaffected.
+
+Signed in, `src/lib/progressSync.ts` pulls the account's saved progress once (server's copy wins,
+overwriting local — there's no per-field merge) and pushes local changes back, debounced, on every
+change after that. `src/lib/auth.tsx` holds the account/token in `localStorage`
+(`dev-hub.auth.v1`, separate from the progress key), and `src/lib/api.ts` is the thin fetch layer
+both use. See `../server/README.md` for the backend's endpoints, and `../BACKLOG.md` for what's
+still open (conflict-free merge on sign-in, actual hosting for the backend, etc.).
 
 ## Running it
 
@@ -69,7 +93,7 @@ npm run audit:content    # needs no server
 ```
 
 It pulls every substantial run of prose out of each `.dc.html` prototype and checks it survived
-into the corresponding React source. It currently reports **3 phrases to review, all known
+into the corresponding React source. It currently reports **4 phrases to review, all known
 extractor artifacts**, not omissions:
 
 - Two CLI Basics entries are the prototype's flat clipboard payload strings. Here those are derived
@@ -77,8 +101,13 @@ extractor artifacts**, not omissions:
   blob. The payloads are asserted byte-for-byte against the prototype in `verify:interactions`.
 - One Quiz Mode entry is a sentence that's now a template literal (`you only need ${PASS_MARK} of
   ${QUESTIONS.length}`). The rendered wording is asserted in `verify:interactions`.
+- One Page Gallery entry is the prototype's original archetype count. The prototype is a frozen
+  snapshot that will always say "20"; the gallery's own lede is deliberately kept current as
+  archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 now that
+  Shell Scripting has too) — see `PAGES.length` in `data/pages.ts` for the number that's actually
+  true.
 
-If that count rises, something was dropped — go read what it flags.
+If that count rises *beyond* this, something was dropped — go read what it flags.
 
 ### Accessibility
 
@@ -182,5 +211,6 @@ was verified this way: 24/24 pixel-identical.
   Simulator carries a visually hidden one. Neither changes the rendered design.
 - `CLI Basics` keeps the labelled mount point for the user's existing step-by-step playthrough
   component, as the design intends.
-- `Video Lesson`'s poster frame is still an empty slot — pass `src` to `ImageSlot` once there's a
-  real still, as flagged in the design session.
+- `Video Lesson`'s poster frame now has a real `src` (`src/assets/recursion-poster.svg`, drawn from
+  the app's own design tokens) — it's no longer the empty `ImageSlot` placeholder flagged in the
+  design session.

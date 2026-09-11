@@ -1,3 +1,13 @@
+/**
+ * Project Build-Along — route `/project-build-along`, a capstone project
+ * brief (a CLI log-watcher tool) for the terminal-and-shell path: acceptance
+ * criteria, a suggested file layout, and a milestone checklist. Checking a
+ * milestone persists via `useProgress().toggleMilestone`, keyed
+ * `"project-build-along:<index>"`; until the learner's first click, the
+ * checklist falls back to `INITIAL_DONE` so the page still looks like the
+ * original design mockup instead of an empty list. Each milestone links back
+ * to the concept page that covers it (CLI Basics, Regex Lab, Git Basics).
+ */
 import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
@@ -6,6 +16,7 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+// The capstone's milestone checklist, each linking back to the concept that covers it
 const MILESTONES = [
   {
     title: '1 · Print the last 10 lines of a file',
@@ -34,8 +45,10 @@ const MILESTONES = [
   },
 ]
 
+// Default checked state for each milestone, shown until the learner's first toggle
 const INITIAL_DONE = [true, true, false, false, false]
 
+/** One bullet row in the "Definition of done" acceptance-criteria list. */
 function Criterion({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', gap: 9 }}>
@@ -45,6 +58,7 @@ function Criterion({ children }: { children: React.ReactNode }) {
   )
 }
 
+/** Inline monospace snippet used for commands and flags in the "Definition of done" list. */
 function Mono({ children }: { children: string }) {
   return (
     <code
@@ -60,8 +74,10 @@ function Mono({ children }: { children: string }) {
   )
 }
 
+// Prefix for this page's milestone keys in `useProgress()`'s `state.milestones`
 const PAGE = 'project-build-along'
 
+/** Capstone brief page: acceptance criteria, file layout, and a persisted milestone checklist. */
 export default function ProjectBuildAlong() {
   useDocumentTitle('Project Build-Along')
   const { state, toggleMilestone } = useProgress()
@@ -73,6 +89,7 @@ export default function ProjectBuildAlong() {
     touched ? !!state.milestones[`${PAGE}:${i}`] : INITIAL_DONE[i],
   )
 
+  /** Toggles milestone `i`; on the very first touch, seeds every milestone from `INITIAL_DONE` so the click doesn't silently clear the others. */
   const toggle = (i: number) => {
     if (!touched) {
       // Seed every box from the design defaults so the first click doesn't

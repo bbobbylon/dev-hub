@@ -1,5 +1,15 @@
+/**
+ * The app's route table. Every path here has three siblings that must be
+ * kept in sync when a page is added or removed: the corresponding entry in
+ * `data/pages.ts` (drives the gallery card and its slug), the `ROUTES` array
+ * in `scripts/routes.mjs` (drives the Playwright verification suites), and
+ * the page's own `ConceptSidebar`/`Roadmap` links (which point at a route by
+ * string, so a typo there silently renders an unclickable label instead of a
+ * broken link — see `ConceptSidebar`'s `SidebarLink`).
+ */
 import { Suspense, lazy, useEffect } from 'react'
 import { useActivityTracker } from './lib/progress'
+import { useProgressSync } from './lib/progressSync'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -7,10 +17,11 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import PageGallery from './pages/PageGallery'
 import NotFound from './pages/NotFound'
 
-// Lazy: the 23 page-sized lessons/tools. A visit only ever needs a handful of
+// Lazy: the 25 page-sized lessons/tools. A visit only ever needs a handful of
 // these, so there's no reason to ship all of them in the initial bundle.
 const DevHub = lazy(() => import('./pages/DevHub'))
 const CliBasics = lazy(() => import('./pages/CliBasics'))
+const ShellScripting = lazy(() => import('./pages/ShellScripting'))
 const DecoratorPattern = lazy(() => import('./pages/DecoratorPattern'))
 const VideoLesson = lazy(() => import('./pages/VideoLesson'))
 const ArchitectureDeepDive = lazy(() => import('./pages/ArchitectureDeepDive'))
@@ -33,6 +44,8 @@ const Glossary = lazy(() => import('./pages/Glossary'))
 const Roadmap = lazy(() => import('./pages/Roadmap'))
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'))
 const CourseComplete = lazy(() => import('./pages/CourseComplete'))
+const SignIn = lazy(() => import('./pages/SignIn'))
+const SignUp = lazy(() => import('./pages/SignUp'))
 
 /** Every navigation lands at the top of the new page, as a document would. */
 function ScrollToTop() {
@@ -43,9 +56,18 @@ function ScrollToTop() {
   return null
 }
 
+/**
+ * The app root: mounted once by `main.tsx` inside a `BrowserRouter`. Wires
+ * the global activity tracker, resets scroll on navigation, wraps the whole
+ * route tree in one `ErrorBoundary` (keyed on `pathname` so a crash on one
+ * page clears itself when you navigate away), and lazy-loads every page
+ * except the two most commonly hit first (`PageGallery`, `NotFound`).
+ */
 export default function App() {
   // Counts real time-on-page, which drives the streak and the minutes chart.
   useActivityTracker()
+  // Syncs progress with the optional backend when signed in; a no-op otherwise (see `lib/progressSync.ts`).
+  useProgressSync()
   const { pathname } = useLocation()
 
   return (
@@ -57,6 +79,7 @@ export default function App() {
             <Route path="/" element={<PageGallery />} />
             <Route path="/dev-hub" element={<DevHub />} />
             <Route path="/cli-basics" element={<CliBasics />} />
+            <Route path="/shell-scripting" element={<ShellScripting />} />
             <Route path="/decorator-pattern" element={<DecoratorPattern />} />
             <Route path="/video-lesson" element={<VideoLesson />} />
             <Route path="/architecture-deep-dive" element={<ArchitectureDeepDive />} />
@@ -79,6 +102,8 @@ export default function App() {
             <Route path="/roadmap" element={<Roadmap />} />
             <Route path="/progress-dashboard" element={<ProgressDashboard />} />
             <Route path="/course-complete" element={<CourseComplete />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

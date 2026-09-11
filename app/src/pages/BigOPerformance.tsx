@@ -1,3 +1,12 @@
+/**
+ * Big-O Performance — route `/big-o-performance`, a chart-led concept page
+ * on algorithmic complexity. A single inline-SVG line chart (built from
+ * `CURVES`) plots O(1)/O(log n)/O(n)/O(n²) growth against input size; below
+ * it, cost cards (`COMPLEXITIES`) and a lookup-cost comparison table
+ * (`LOOKUP_COSTS`) restate the same four complexities in prose and in a
+ * concrete "is this name in the list?" scenario, meant to settle Big-O
+ * interview questions. No interactivity — every value here is static.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
@@ -8,6 +17,7 @@ const mono = 'ui-monospace, Menlo, monospace'
 
 /* Each curve gets its own accent step so the four read apart at a glance —
    sage for the cheap ones, terracotta for the expensive ones. */
+// Growth-curve paths and labels for the SVG chart, one per complexity class
 const CURVES = [
   { label: 'O(n²)', d: 'M50 268 Q 150 240 500 30', color: 'var(--color-accent-600)', y: 30, labelX: 437, labelY: 26 },
   { label: 'O(n)', d: 'M50 268 L 500 130', color: 'var(--color-accent)', y: 130, labelX: 463, labelY: 124 },
@@ -15,6 +25,7 @@ const CURVES = [
   { label: 'O(1)', d: 'M50 252 L 500 252', color: 'var(--color-accent-2-700)', y: 252, labelX: 452, labelY: 245 },
 ]
 
+/** One complexity-class card: its name, a plain-language blurb, and the color it shares with its chart curve. */
 interface Complexity {
   name: string
   blurb: ReactNode
@@ -22,6 +33,7 @@ interface Complexity {
   rule: string
 }
 
+// Complexity cards rendered beside the growth-curve chart
 const COMPLEXITIES: Complexity[] = [
   {
     name: 'O(1) — constant',
@@ -57,6 +69,7 @@ const COMPLEXITIES: Complexity[] = [
   },
 ]
 
+// Rows of the "same job, four costs" comparison table
 const LOOKUP_COSTS: {
   structure: string
   code: string
@@ -88,6 +101,7 @@ const LOOKUP_COSTS: {
   },
 ]
 
+/** Inline monospace snippet used inside a complexity card's blurb. */
 function InlineCode({ children }: { children: string }) {
   return (
     <code
@@ -103,6 +117,7 @@ function InlineCode({ children }: { children: string }) {
   )
 }
 
+/** Chart-led concept page explaining the four common Big-O growth rates with a chart, cards, and a lookup-cost table. */
 export default function BigOPerformance() {
   useDocumentTitle('Big-O Performance')
 

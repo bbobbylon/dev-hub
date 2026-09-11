@@ -1,3 +1,10 @@
+/**
+ * Route `/debugging-challenge` — "BUG HUNT" detective case ("Case #017") presenting a buggy
+ * Python function (`SOURCE`), a fixed number of progressive hints (`HINTS`) revealed one at a
+ * time, and a final diff-style reveal of the fix with a takeaway note. All case content is
+ * local to this file and self-contained; it does not read or write `useProgress()` and isn't
+ * linked from another page's sidebar.
+ */
 import { useState, type ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { CodeListing, syn } from '../components/CodeListing'
@@ -48,6 +55,7 @@ const SOURCE: { content: ReactNode; suspect?: boolean }[] = [
   },
 ]
 
+// Progressive hints revealed one per click of "Give me a hint" / "One more hint".
 const HINTS: ReactNode[] = [
   <>
     The bug is not in what the loop <em>does</em> — it's in how many times it does it. Count the
@@ -61,11 +69,12 @@ const HINTS: ReactNode[] = [
   </>,
 ]
 
+/** The Debugging Challenge page — buggy code, progressive hints, then a diff reveal of the fix. */
 export default function DebuggingChallenge() {
   useDocumentTitle('Debugging Challenge')
 
-  const [hints, setHints] = useState(0)
-  const [solved, setSolved] = useState(false)
+  const [hints, setHints] = useState(0) // number of HINTS revealed so far
+  const [solved, setSolved] = useState(false) // whether the fix has been revealed
 
   return (
     <div className="page">

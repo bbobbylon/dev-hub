@@ -23,3 +23,15 @@ The design medium is **HTML/CSS/JS** — these are prototypes, not production co
 - `README.md` — this file
 - `chats/` — conversation transcripts (read these!)
 - `project/` — the `Coding Learning App Redesign` project files (HTML prototypes, assets, components)
+
+## Project documentation (added after the port)
+
+The bundle above is the original design handoff. The built app and its docs live alongside it:
+
+- `app/` — the React 19 + Vite app, with its own `app/README.md` (architecture narrative, verification suites)
+- `server/` — an optional Spring Boot backend that syncs progress across devices for signed-in learners; never required to use the app (see `docs/ARCHITECTURE.md` §11)
+- `docs/SRS.md` — requirements: what the app does, for whom, and how success is measured
+- `docs/ARCHITECTURE.md` — file-by-file map of the app, data models, design patterns, security
+- `docs/UI-DESIGN.md` — the "Organic" design system, component library, layouts, accessibility
+- `DEPLOYMENT.md` — how it got onto GitHub Pages (https://bbobbylon.github.io/dev-hub/) and how to redeploy or roll back
+- `BACKLOG.md` — open feature ideas and known gaps, ranked

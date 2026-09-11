@@ -1,3 +1,13 @@
+/**
+ * Shared Playwright bootstrap for this directory's verification and audit
+ * scripts. Not an npm script itself — it has no `main` behaviour, only
+ * exports consumed by the scripts that drive a browser:
+ * verify-routes.mjs, verify-responsive.mjs, verify-interactions.mjs,
+ * audit-a11y.mjs and snapshot.mjs (audit-content.mjs doesn't use a browser at
+ * all — it diffs static source text). Exports `BASE`, the preview server URL
+ * every route is resolved against, and `openPage()`, which every consumer
+ * calls to get a `{ browser, page }` pair aimed at that server.
+ */
 import { existsSync, readdirSync } from 'node:fs'
 import { chromium } from 'playwright'
 
@@ -15,12 +25,13 @@ function findChromium() {
   if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH
   const root = process.env.PLAYWRIGHT_BROWSERS_PATH
   if (!root || !existsSync(root)) return undefined
+  // Highest-numbered chromium-<revision> directory under the browsers root.
   const dir = readdirSync(root)
     .filter((d) => /^chromium-\d+$/.test(d))
     .sort()
     .pop()
   if (!dir) return undefined
-  const exe = `${root}/${dir}/chrome-linux/chrome`
+  const exe = `${root}/${dir}/chrome-linux/chrome` // resolved binary path
   return existsSync(exe) ? exe : undefined
 }
 

@@ -1,3 +1,11 @@
+/**
+ * API Anatomy — route `/api-anatomy`, a labeled-dissection page: one
+ * hand-written HTTP request/response pair with numbered `Marker` callouts
+ * pinned to the wire dump, each cross-referenced to a matching `Note` card by
+ * number. There is no live network call — the request/response bytes are
+ * static JSX made to look like a raw wire dump. The status-code decoder strip
+ * at the bottom reuses `Tag`'s tone system to color-group 2xx/4xx/5xx codes.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag, type TagTone } from '../components/ui'
@@ -7,6 +15,7 @@ const mono = 'ui-monospace, Menlo, monospace'
 
 /* ── the numbered callout markers pinned to the wire dump ───────────────── */
 
+/** A small numbered pill pinned next to one line of the request/response, cross-referencing a `Note`. */
 function Marker({ n, label, tone }: { n: number; label: string; tone: 'accent' | 'accent-2' }) {
   return (
     <span
@@ -26,6 +35,7 @@ function Marker({ n, label, tone }: { n: number; label: string; tone: 'accent' |
   )
 }
 
+// Inline style objects for the wire-dump syntax coloring
 const dim = { color: 'var(--color-neutral-500)' }
 const body = { color: 'var(--color-neutral-300)' }
 const header = { color: 'var(--color-accent-2-300)' }
@@ -33,12 +43,14 @@ const str = { color: 'var(--code-string)' }
 
 /* ── the annotations that pair with each marker ────────────────────────── */
 
+/** One annotation card, matched to a `Marker` in the wire dump by `n`. */
 interface Note {
   n: number
   tone: 'accent' | 'accent-2'
   text: ReactNode
 }
 
+// Annotation cards rendered beside the wire dump, one per numbered marker
 const NOTES: Note[] = [
   {
     n: 1,
@@ -100,6 +112,7 @@ const NOTES: Note[] = [
   },
 ]
 
+// Status-code chips shown in the "Status decoder" strip at the page bottom
 const STATUS_CODES: { code: string; tone: TagTone }[] = [
   { code: '200 OK', tone: 'accent-2' },
   { code: '201 Created', tone: 'accent-2' },
@@ -112,6 +125,7 @@ const STATUS_CODES: { code: string; tone: TagTone }[] = [
   { code: '503 Unavailable', tone: 'neutral' },
 ]
 
+/** A labeled block of the wire dump (the request or the response half), with its section heading. */
 function WireSection({ label, tone, children }: { label: string; tone: 'accent' | 'accent-2'; children: ReactNode }) {
   return (
     <>
@@ -143,6 +157,7 @@ function WireSection({ label, tone, children }: { label: string; tone: 'accent' 
   )
 }
 
+/** Labeled-dissection page: a static HTTP request/response pair with numbered callouts explaining each part. */
 export default function ApiAnatomy() {
   useDocumentTitle('API Anatomy')
 

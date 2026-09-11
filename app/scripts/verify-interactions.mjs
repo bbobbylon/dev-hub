@@ -1,13 +1,18 @@
 /**
  * Behavioural test: drives every page that carried DCLogic state in the design
  * prototypes, asserting the ported React state machines behave the same.
- * Run against `npm run preview`.
+ * Run via `npm run verify:interactions` (the third leg of `npm run verify`,
+ * alongside verify-routes.mjs and verify-responsive.mjs). Run against
+ * `npm run preview`. Depends only on browser.mjs (BASE, openPage) — routes
+ * are hardcoded per check below rather than sourced from routes.mjs, since
+ * each block targets one specific page and interaction, not every route.
  */
 import { BASE, openPage } from './browser.mjs'
 
 const { browser, page } = await openPage({ width: 1440, height: 1000 })
 
-const results = []
+const results = [] // every check's { name, pass, detail }, for the final tally
+/** Records one named assertion's outcome and prints it immediately. */
 const check = (name, pass, detail = '') => {
   results.push({ name, pass, detail })
   console.log(`${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`)
@@ -15,6 +20,7 @@ const check = (name, pass, detail = '') => {
 // Pages are code-split (React.lazy) — 'load' fires once the shell script has
 // loaded, before the route's own chunk has been fetched and mounted. Waiting
 // for real content is what makes every body() read right after go() reliable.
+/** Navigates to a route and waits for its lazy-loaded content to mount. */
 const go = async (path) => {
   await page.goto(BASE + path, { waitUntil: 'load' })
   await page.waitForSelector('main, h1', { timeout: 10_000 }).catch(() => {})
@@ -23,11 +29,13 @@ const go = async (path) => {
 // Progress persists in localStorage now, so any block whose expectations
 // depend on a fresh learner must say so explicitly — otherwise an earlier
 // block's ratings and scores leak into it.
+/** Clears persisted progress (quiz scores, flashcard schedule, milestones). */
 const resetProgress = async () => {
   await page.goto(BASE + '/', { waitUntil: 'load' })
   await page.evaluate(() => localStorage.clear())
 }
 await resetProgress()
+/** Snapshot of the current page's visible text, for asserting rendered state. */
 const body = () => page.evaluate(() => document.body.innerText)
 
 /* ── Quiz Mode: full 5-question run, scoring, restart ─────────────────── */
@@ -85,6 +93,18 @@ check('rebase: replay count reads 2 of 2', rebaseEnd.includes('2 of 2'))
 check('rebase: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
 await page.getByRole('button', { name: 'Reset' }).click()
 check('rebase: reset returns to step 1', (await body()) === rebase0)
+
+/* ── Shell Scripting: stepping through backup.sh reveals terminal + vars ── */
+await go('/shell-scripting')
+check('shell: Back disabled at step 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
+const shell0 = await body()
+check('shell: STAMP unknown before stepping', shell0.includes('STAMP') && !shell0.includes('20260907'))
+for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
+const shellEnd = await body()
+check('shell: final step reveals the echo output', shellEnd.includes('Backed up to backups/devhub-20260907.tar.gz'))
+check('shell: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
+await page.getByRole('button', { name: 'Reset' }).click()
+check('shell: reset returns to step 1', (await body()) === shell0)
 
 /* ── Regex Lab: real matching, counts change per pattern ──────────────── */
 await go('/regex-lab')
@@ -155,7 +175,7 @@ check(
 // PowerShell $LASTEXITCODE line is shown for contrast but must not be copied.
 await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
 await page.getByRole('button', { name: 'Copy Pipes, redirection, exit codes' }).click()
-const clip = await page.evaluate(() => navigator.clipboard.readText())
+const clip = await page.evaluate(() => navigator.clipboard.readText()) // text the copy button placed on the clipboard
 check('cli: copy payload is 9 lines', clip.split('\n').length === 9, `${clip.split('\n').length}`)
 check('cli: copy payload omits $LASTEXITCODE', !clip.includes('$LASTEXITCODE'))
 check('cli: copy payload keeps the bash lines', clip.includes('ls /var/log; echo "exit: $?"'))
@@ -233,7 +253,7 @@ check('decorator edge: description is the bare drink', empty.includes('"House Bl
 
 // Milestones at both extremes.
 await go('/project-build-along')
-const boxes = page.getByRole('button', { name: /covered in:/ })
+const boxes = page.getByRole('button', { name: /covered in:/ }) // every milestone checkbox
 const total = await boxes.count()
 for (let i = 0; i < total; i++) {
   const b = boxes.nth(i)

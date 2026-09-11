@@ -1,0 +1,31 @@
+# Shared configuration (all profiles). Values come from environment variables (.env);
+# the defaults after ":" are safe local fallbacks so the app boots for development.
+
+jwt:
+  secret: ${JWT_SECRET}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  profiles:
+    active: ${SPRING_ACTIVE_PROFILES:dev}
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:appdb}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
+  sql:
+    init:
+      # schema.sql is the single idempotent table definition. Run it by hand
+      # (mysql ... < schema.sql). Set to "always" only if you want Boot to apply it
+      # on every startup — it is safe because the script uses CREATE TABLE IF NOT EXISTS.
+      mode: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never

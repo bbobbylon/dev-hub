@@ -1,3 +1,10 @@
+/**
+ * Route `/glossary` — "JARGON DECODER" reference of coding terms (`TERMS`), each structured as
+ * a plain-English definition plus either a "heard at work" / "what it's not" contrast pair or a
+ * short code sample, never both (see the `Term` comment below). The alphabet strip (`ALPHABET`)
+ * and search box are currently static chrome — only the "A" terms are rendered here, with a
+ * "Show N more" button that isn't wired up yet. Self-contained; not linked from another page.
+ */
 import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { syn } from '../components/CodeListing'
@@ -6,8 +13,10 @@ import { useDocumentTitle } from '../components/useDocumentTitle'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
+// Letter/range chips for the A–Z jump strip; only "A" is marked active.
 const ALPHABET = ['A', 'B', 'C', 'D', 'E–H', 'I–L', 'M–P', 'Q–T', 'U–Z']
 
+/** One glossary entry: a definition plus either a heard-at-work/isNot pair or a code `sample`, never both. */
 interface Term {
   term: string
   pronunciation: string
@@ -20,6 +29,7 @@ interface Term {
   sample?: ReactNode[]
 }
 
+// The glossary entries rendered as cards under the "A" heading.
 const TERMS: Term[] = [
   {
     term: 'API',
@@ -69,6 +79,7 @@ const TERMS: Term[] = [
   },
 ]
 
+/** One "Heard at work" / "Not" tinted box inside a term card. */
 function ContrastPanel({
   tone,
   label,
@@ -94,6 +105,7 @@ function ContrastPanel({
   )
 }
 
+/** The Glossary page — searchable(-looking) jargon decoder listing `TERMS`. */
 export default function Glossary() {
   useDocumentTitle('Glossary')
 

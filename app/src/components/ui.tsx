@@ -2,8 +2,10 @@ import type { CSSProperties, ReactNode } from 'react'
 
 /* ── tags ──────────────────────────────────────────────────────────────── */
 
+/** The color/border treatment a `Tag` (or a `data/pages.ts` gallery card) renders in. */
 export type TagTone = 'accent' | 'accent-2' | 'neutral' | 'outline'
 
+/** A small pill label — quiz results, gallery card kinds, glossary categories. */
 export function Tag({
   tone = 'accent',
   children,
@@ -22,6 +24,7 @@ export function Tag({
 
 /* ── code ──────────────────────────────────────────────────────────────── */
 
+/** An inline `<code>` snippet styled with the design system's monospace treatment. */
 export function Code({ children }: { children: ReactNode }) {
   return <code className="code-inline">{children}</code>
 }
