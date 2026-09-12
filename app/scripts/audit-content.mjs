@@ -17,7 +17,14 @@ import { readFileSync, readdirSync } from 'node:fs'
 const PROTO_DIR = '../project' // design-handoff .dc.html prototypes, outside app/
 const SRC = 'src' // ported React source root, resolved relative to app/
 
-/** Prototype file → the source files its copy should land in. */
+/**
+ * Prototype file → the source files its copy should land in.
+ *
+ * Several entries list a `data/` module alongside the page: content extracted out of a component
+ * (CLI Basics' lesson data, the HTTP flashcard deck, the curriculum's own numbers) still has to be
+ * found somewhere, or this audit reports it as dropped copy. Moving prose out of a page means
+ * adding its new home here in the same change.
+ */
 const MAP = {
   'Page Gallery': ['pages/PageGallery.tsx', 'data/pages.ts'],
   'Dev Hub': ['pages/DevHub.tsx'],
@@ -31,7 +38,7 @@ const MAP = {
   'API Anatomy': ['pages/ApiAnatomy.tsx'],
   'Framework Comparison': ['pages/FrameworkComparison.tsx'],
   'Quiz Mode': ['pages/QuizMode.tsx'],
-  Flashcards: ['pages/Flashcards.tsx'],
+  Flashcards: ['pages/Flashcards.tsx', 'data/httpDeck.ts'],
   'Algorithm Visualizer': ['pages/AlgorithmVisualizer.tsx'],
   'Code Playground': ['pages/CodePlayground.tsx'],
   'Terminal Simulator': ['pages/TerminalSimulator.tsx'],
@@ -40,9 +47,9 @@ const MAP = {
   'Project Build-Along': ['pages/ProjectBuildAlong.tsx'],
   'Cheat Sheet': ['pages/CheatSheet.tsx'],
   Glossary: ['pages/Glossary.tsx'],
-  Roadmap: ['pages/Roadmap.tsx'],
-  'Progress Dashboard': ['pages/ProgressDashboard.tsx'],
-  'Course Complete': ['pages/CourseComplete.tsx'],
+  Roadmap: ['pages/Roadmap.tsx', 'data/curriculum.ts'],
+  'Progress Dashboard': ['pages/ProgressDashboard.tsx', 'data/curriculum.ts', 'data/httpDeck.ts'],
+  'Course Complete': ['pages/CourseComplete.tsx', 'data/curriculum.ts'],
 }
 
 /** Decode the small set of HTML entities the prototypes actually use. */

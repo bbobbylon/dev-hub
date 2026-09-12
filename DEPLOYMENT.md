@@ -34,6 +34,16 @@ GitHub Pages serves a project site from `https://bbobbylon.github.io/dev-hub/`
   SPA fallback — deep links and typos load the app instead of GitHub's own
   404 page), and deploys.
 
+## Workflow action versions (2026-09-11)
+
+Every action was bumped to its current major — `checkout@v7`, `configure-pages@v6`,
+`setup-node@v7`, `upload-pages-artifact@v5`, `deploy-pages@v5` — clearing the "Node.js 20 is
+deprecated" annotation each deploy had started logging, and the build's own `node-version` went
+22 → 24 to match what development runs on. One breaking change rode along and is commented in the
+workflow: `upload-pages-artifact` stopped including hidden files in the artifact at v4. That's
+harmless for this build (`app/dist` is `index.html` plus `assets/`, no dotfiles), but anything
+added there starting with a "." would be silently dropped without `include-hidden-files: true`.
+
 ## Go-live runbook
 
 1. Push to `master` (see branch note above).

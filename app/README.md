@@ -71,11 +71,11 @@ npm run preview    # serve the build on :4173
 
 ## Verifying it
 
-Three Playwright suites, all run against `npm run preview` on port 4173:
+Four Playwright suites, all run against `npm run preview` on port 4173:
 
 ```bash
 npm run preview &        # must be up first
-npm run verify           # routes + responsive + interactions
+npm run verify           # routes + responsive + interactions + a11y
 ```
 
 - `verify:routes` — loads all 25 routes, asserting each renders real content, has an `<h1>`,
@@ -85,8 +85,10 @@ npm run verify           # routes + responsive + interactions
   reasoning about each layout; this is what holds them honest.
 - `verify:interactions` — drives every page that carried state in the prototypes (quiz flow and
   scoring, flashcard flip/rate, sort stepping, regex matching, terminal mission, hint reveal,
-  decorator cost arithmetic, walkthrough gating, milestone checklist, test runner) and asserts the
-  ported behaviour matches.
+  decorator cost arithmetic, walkthrough gating, milestone checklist, test runner, the progress
+  backup round trip) and asserts the ported behaviour matches.
+- `audit:a11y` — contrast, accessible names and focus, checked against a recorded baseline. See
+  **Accessibility** below for why it's baselined rather than pass/fail.
 
 They block outbound requests, so the Google Fonts link is not fetched during verification. The
 running app still loads Caprasimo and Figtree normally.
@@ -121,7 +123,8 @@ If that count rises *beyond* this, something was dropped — go read what it fla
 npm run audit:a11y       # needs the preview server
 ```
 
-Checks WCAG text contrast, accessible names on every control, and reports what it finds.
+Checks WCAG text contrast, accessible names on every control, and reports what it finds — then
+compares the result against `scripts/a11y-baseline.json` and fails only on a **regression**.
 
 **Passing:** every interactive control has an accessible name (0 unnamed), keyboard focus draws the
 design system's 2px accent ring on all of them, and tab order follows the visual order.
@@ -133,6 +136,21 @@ audit from 137 failures across 51 colour pairs down to **31 across 18**, with ze
 introduced (verified by diffing the failure sets before and after). It reads **39 across 20** today:
 the pages added since that pass brought their own inherited pairs with them (Shell Scripting alone
 accounts for 7 of the reported lines), and none of them have been through the same treatment.
+
+**Why it's baselined.** Those 39 are inherited and accepted, so a plain pass/fail could only ever
+say "fail" — and a check that can never pass is one nobody can gate on. That's precisely how the
+count drifted 31 → 39 unnoticed: the script was correct, it just wasn't in `npm run verify` and
+couldn't be. `scripts/a11y-baseline.json` records the accepted set, and the audit now fails on:
+
+- a contrast pair that isn't in the baseline,
+- a rise in the *total* failure count with no new pair — which is the "new page repeats an
+  already-accepted bad pair" case, the one that actually happened, or
+- any unnamed interactive control at all (that count is 0 and stays 0).
+
+Fixing something never fails; it prints a nudge to re-record. Re-record deliberately with
+`npm run audit:a11y -- --update-baseline`, which leaves a reviewable diff — not to turn a red run
+green. The standing content work is to put the newer pages through the same `-700` ramp treatment
+the original pass applied, and shrink the baseline as that lands.
 Tokens on dark grounds — the
 terminal, code panes, gutters — were deliberately left alone, since darkening them would *reduce*
 contrast.

@@ -1,0 +1,147 @@
+{
+  "note": "Accepted contrast failures inherited from the design prototypes. Regenerate with `npm run audit:a11y -- --update-baseline` (with the preview server up) only as a deliberate, reviewed change. See app/README.md, \"Accessibility\".",
+  "routes": 26,
+  "contrastTotal": 39,
+  "pairs": {
+    "a.btn|3.03|14": {
+      "el": "a.btn",
+      "text": "Continue — Branching & Merging",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 14
+    },
+    "button.btn|2.69|14": {
+      "el": "button.btn",
+      "text": "Reset",
+      "ratio": 2.69,
+      "required": 4.5,
+      "size": 14
+    },
+    "button.btn|3.03|13": {
+      "el": "button.btn",
+      "text": "Exit quiz",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 13
+    },
+    "button.btn|3.03|14": {
+      "el": "button.btn",
+      "text": "Step →",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 14
+    },
+    "button|3.03|13": {
+      "el": "button",
+      "text": "Run it →",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 13
+    },
+    "button|3.03|13.5": {
+      "el": "button",
+      "text": "\\d+",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 13.5
+    },
+    "button|3.03|14": {
+      "el": "button",
+      "text": "▶ Run",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 14
+    },
+    "button|3.03|19": {
+      "el": "button",
+      "text": "ls",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 19
+    },
+    "button|3.14|13": {
+      "el": "button",
+      "text": "+ Soy · $ 0.10",
+      "ratio": 3.14,
+      "required": 4.5,
+      "size": 13
+    },
+    "button|3.91|14": {
+      "el": "button",
+      "text": "Type it for me →",
+      "ratio": 3.91,
+      "required": 4.5,
+      "size": 14
+    },
+    "div|2.69|20": {
+      "el": "div",
+      "text": "01",
+      "ratio": 2.69,
+      "required": 4.5,
+      "size": 20
+    },
+    "span|3.03|13": {
+      "el": "span",
+      "text": "POST",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 13
+    },
+    "span|3.03|18": {
+      "el": "span",
+      "text": "React",
+      "ratio": 3.03,
+      "required": 4.5,
+      "size": 18
+    },
+    "span|3.14|18": {
+      "el": "span",
+      "text": "Vue",
+      "ratio": 3.14,
+      "required": 4.5,
+      "size": 18
+    },
+    "span|3.29|11.5": {
+      "el": "span",
+      "text": "state is explicit",
+      "ratio": 3.29,
+      "required": 4.5,
+      "size": 11.5
+    },
+    "span|3.29|13": {
+      "el": "span",
+      "text": "10",
+      "ratio": 3.29,
+      "required": 4.5,
+      "size": 13
+    },
+    "span|3.46|11.5": {
+      "el": "span",
+      "text": "template + reactivity",
+      "ratio": 3.46,
+      "required": 4.5,
+      "size": 11.5
+    },
+    "span|3.46|8.5": {
+      "el": "span",
+      "text": "VERIFIED",
+      "ratio": 3.46,
+      "required": 4.5,
+      "size": 8.5
+    },
+    "span|3.78|13": {
+      "el": "span",
+      "text": "201 Created",
+      "ratio": 3.78,
+      "required": 4.5,
+      "size": 13
+    },
+    "span|3.91|13": {
+      "el": "span",
+      "text": "cd /var/log/payments",
+      "ratio": 3.91,
+      "required": 4.5,
+      "size": 13
+    }
+  }
+}

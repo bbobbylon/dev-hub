@@ -22,6 +22,8 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { TOTAL_CONCEPTS } from '../data/curriculum'
+import { DECK_NAME, DECK_TAGS } from '../data/httpDeck'
 
 /* ── data ──────────────────────────────────────────────────────────────── */
 
@@ -31,10 +33,6 @@ const DAILY_GOAL = 20
 const CHART_CEILING = 45
 // Target weekly hours shown in the "This week" stat's note
 const WEEKLY_GOAL_HOURS = 4
-// Denominator for the path-completion percentage
-const TOTAL_CONCEPTS = 23
-// Flashcard tags checked against state.cards to compute the due count
-const DECK = ['STATUS CODES', 'METHODS', 'HEADERS', 'CACHING', 'STATE']
 // Single-letter weekday labels under the minutes bar chart
 const DAY_INITIAL = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
@@ -130,7 +128,7 @@ const BADGES: Badge[] = [
 const UP_NEXT_TEMPLATE = [
   {
     to: '/flashcards',
-    label: '5 flashcards due (HTTP deck)',
+    label: `5 flashcards due (${DECK_NAME})`,
     time: '4 min',
     accented: true,
     icon: (
@@ -267,7 +265,7 @@ export default function ProgressDashboard() {
       )
     : 0
   const pathPct = Math.round((conceptsDone / TOTAL_CONCEPTS) * 100)
-  const cardsDue = DECK.filter((tag) => isDue(state.cards[tag])).length
+  const cardsDue = DECK_TAGS.filter((tag) => isDue(state.cards[tag])).length
 
   // Stat tiles rendered across the top of the page
   const STATS = [
@@ -316,7 +314,7 @@ export default function ProgressDashboard() {
   // UP_NEXT_TEMPLATE with the flashcards row's label swapped in for the live due count
   const upNext = UP_NEXT_TEMPLATE.map((item) =>
     item.to === '/flashcards'
-      ? { ...item, label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (HTTP deck)` }
+      ? { ...item, label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (${DECK_NAME})` }
       : item,
   )
 

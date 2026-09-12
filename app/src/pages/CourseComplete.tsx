@@ -10,6 +10,7 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { TOTAL_CHECKPOINTS, TOTAL_CONCEPTS } from '../data/curriculum'
 
 // Placeholder certificate data (name, path, date, stats) shown on the completion card.
 const CERT = {
@@ -17,7 +18,7 @@ const CERT = {
   path: 'Terminal & Shell',
   date: 'August 30, 2026',
   id: 'cert #TS-0231',
-  stats: ['23 concepts', '14 checkpoints', '1 capstone shipped'],
+  stats: [`${TOTAL_CONCEPTS} concepts`, `${TOTAL_CHECKPOINTS} checkpoints`, '1 capstone shipped'],
 }
 
 // The "where to next" recommendation cards below the certificate.

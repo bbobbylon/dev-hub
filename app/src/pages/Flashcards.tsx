@@ -8,54 +8,16 @@
  * reshuffle it, and ends with a summary screen instead of looping the last
  * card. The Progress Dashboard reads this same `state.cards` data to show a
  * due count and links here from its "up next" queue.
+ *
+ * The deck's content lives in `data/httpDeck.ts`, not here, because the
+ * dashboard needs the card ids too and used to keep its own copy of them.
  */
 import { useMemo, useState } from 'react'
 import { isDue, useProgress } from '../lib/progress'
+import { CARDS, DECK_NAME } from '../data/httpDeck'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
-
-/** One flashcard: `tag` doubles as its id in `useProgress()`'s `state.cards`. */
-interface Card {
-  tag: string
-  front: string
-  back: string
-  example: string
-}
-
-// The HTTP Essentials deck's cards, front/back/example
-const CARDS: Card[] = [
-  {
-    tag: 'STATUS CODES',
-    front: '404 vs 403 — what is the difference?',
-    back: '404 Not Found: the resource does not exist (or the server hides it). 403 Forbidden: it exists, the server knows who you are, and you still may not have it.',
-    example: 'GET /admin → 403',
-  },
-  {
-    tag: 'METHODS',
-    front: 'Which HTTP methods are idempotent?',
-    back: 'GET, PUT, DELETE, HEAD. Calling them N times has the same effect as once. POST is not idempotent — each call may create a new resource.',
-    example: 'PUT /users/7 {name:"Ada"}',
-  },
-  {
-    tag: 'HEADERS',
-    front: 'What does Content-Type tell the receiver?',
-    back: 'How to parse the body — its MIME type. The server is not guessing: send JSON with the wrong Content-Type and many APIs will reject it.',
-    example: 'Content-Type: application/json',
-  },
-  {
-    tag: 'CACHING',
-    front: 'What does a 304 response contain?',
-    back: 'No body at all. "Not Modified" tells the client its cached copy is still valid, saving the transfer.',
-    example: 'If-None-Match: "abc123" → 304',
-  },
-  {
-    tag: 'STATE',
-    front: 'Why is HTTP called stateless?',
-    back: 'Each request stands alone — the server keeps no memory between them. Sessions are rebuilt per-request from cookies or tokens carried by the client.',
-    example: 'Cookie: session=xyz',
-  },
-]
 
 /** Self-rating a learner can give a card after flipping it. */
 type Rating = 'again' | 'good' | 'easy'
@@ -163,7 +125,7 @@ export default function Flashcards() {
             }}
           >
             <h1 style={{ fontSize: 16, margin: 0, color: 'var(--color-accent-700)' }}>
-              HTTP Essentials deck
+              {DECK_NAME} deck
             </h1>
             <span style={{ fontSize: 13, color: 'var(--color-neutral-700)' }}>
               Card {Math.min(index + 1, session.length)} of {session.length}
