@@ -189,6 +189,24 @@ export function useProgress() {
     )
   }, [])
 
+  /**
+   * Un-completes a concept — `completeConcept`'s inverse, behind `<ConceptComplete>`'s Undo.
+   *
+   * Without it the only way back from a mis-clicked "Mark complete" was the dashboard's Reset
+   * progress, which also wipes quiz scores, flashcard schedules and milestones (BACKLOG item 22).
+   * Deletes the key rather than storing a timestamp of the undo: `pathDone()` and every chip in
+   * the Roadmap test for the slug's *presence*, so an un-completed concept has to look exactly
+   * like one that was never completed.
+   */
+  const clearConcept = useCallback((slug: string) => {
+    update((s) => {
+      if (!s.concepts[slug]) return s
+      const concepts = { ...s.concepts }
+      delete concepts[slug]
+      return { ...s, concepts }
+    })
+  }, [])
+
   /** Records one quiz attempt, keeping the personal-best score. */
   const recordQuiz = useCallback((id: string, score: number, total: number) => {
     update((s) => {
@@ -232,7 +250,17 @@ export function useProgress() {
   /** Replaces the whole state — used by `lib/progressSync.ts` to apply a synced server copy. */
   const importState = useCallback((next: ProgressState) => update(() => ({ ...EMPTY, ...next })), [])
 
-  return { state, completeConcept, recordQuiz, rateCard, toggleMilestone, addActivity, reset, importState }
+  return {
+    state,
+    completeConcept,
+    clearConcept,
+    recordQuiz,
+    rateCard,
+    toggleMilestone,
+    addActivity,
+    reset,
+    importState,
+  }
 }
 
 /**

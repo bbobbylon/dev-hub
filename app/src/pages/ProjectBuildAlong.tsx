@@ -8,6 +8,7 @@
  * original design mockup instead of an empty list. Each milestone links back
  * to the concept page that covers it (CLI Basics, Regex Lab, Git Basics).
  */
+import { useEffect, useState } from 'react'
 import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
@@ -102,6 +103,17 @@ export default function ProjectBuildAlong() {
   }
 
   const pct = Math.round((done.filter(Boolean).length / done.length) * 100)
+
+  // `<ConceptComplete earned>` wants a moment in this visit, not a state the store remembers — see
+  // its doc comment. Every box ticked is persisted, so passing it straight through would re-record
+  // the concept on the next visit even if the learner had just un-marked it on the panel below.
+  // `wasIncomplete` turns it back into a transition: arriving to find the checklist already full
+  // earns nothing, while un-ticking and re-ticking a box earns it again.
+  const allDone = touched && done.every(Boolean)
+  const [wasIncomplete, setWasIncomplete] = useState(!allDone)
+  useEffect(() => {
+    if (!allDone) setWasIncomplete(true)
+  }, [allDone])
 
   return (
     <div className="page">
@@ -336,7 +348,7 @@ export default function ProjectBuildAlong() {
         </div>
         <ConceptComplete
           slug="project-build-along"
-          earned={touched && done.every(Boolean)}
+          earned={allDone && wasIncomplete}
           hint="Tick every milestone and this records itself."
         />
 

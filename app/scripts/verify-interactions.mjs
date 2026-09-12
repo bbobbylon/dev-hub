@@ -67,6 +67,15 @@ const completed = (label) =>
     .then(() => true)
     .catch(() => false)
 
+/** The inverse: resolves true once the panel is back to offering `label`, false if it never does. */
+const notCompleted = (label) =>
+  page
+    .getByText(`Finished with ${label}?`)
+    .first()
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false)
+
 /* ── Quiz Mode: full 5-question run, scoring, restart ─────────────────── */
 await go('/quiz-mode')
 await page.getByRole('button', { name: /Check answer/ }).isDisabled()
@@ -483,6 +492,83 @@ const road1 = await body()
 check('concepts: the path count moved to 1', road1.includes('1 of 25 concepts'))
 check('concepts: stage 1 now reads 1 of 3', road1.includes('1 OF 3'))
 check('concepts: next up advanced past it', road1.includes('Continue — Shell Scripting'))
+
+/* ── Un-marking: completion's inverse (BACKLOG item 22) ───────────────── */
+// `completeConcept()` used to be write-once with no inverse, so the only way back from a mis-clicked
+// "Mark complete" was the dashboard's Reset progress — which also wipes quiz scores, flashcard
+// schedules and milestones. Four things have to hold: the panel offers the inverse, it sticks on a
+// page still sitting in its earned state, the counts reverse, and nothing else in the blob moves.
+
+// The plain case: an asserted, off-path concept, completed near the top of this block.
+await go('/api-anatomy')
+await page.getByRole('button', { name: 'Un-mark complete' }).click()
+check('un-mark: the panel offers completion again', await notCompleted('API Anatomy'))
+check('un-mark: it says what just happened', (await body()).includes('Un-marked'))
+await go('/api-anatomy')
+check('un-mark: it survives a reload', await notCompleted('API Anatomy'))
+await go('/progress-dashboard')
+check('un-mark: the dashboard drops the off-path count', !(await body()).includes('off-path'))
+
+// The case the naive implementation gets wrong: the trace is still on its final frame, so
+// <ConceptComplete>'s record-on-earned effect would re-record this on the very next render unless
+// un-marking suppresses it for as long as `earned` stays true.
+await go('/algorithm-visualizer')
+for (let i = 0; i < 9; i++) await page.getByRole('button', { name: 'Step →' }).click()
+check('un-mark: the trace records the concept first', await completed('Algorithm Visualizer'))
+await page.getByRole('button', { name: 'Un-mark complete' }).click()
+check('un-mark: it sticks on a still-earned page', await notCompleted('Algorithm Visualizer'))
+check(
+  'un-mark: the earned effect does not re-record it',
+  !(await completed('Algorithm Visualizer')),
+)
+
+// The one page whose earned condition comes from the store rather than session state: every
+// milestone ticked stays ticked across a visit, so un-marking here only sticks because the page
+// hands the panel a transition instead of that state. Leaving and coming back is the whole test.
+await go('/project-build-along')
+const marks = page.getByRole('button', { name: /covered in:/ })
+const markCount = await marks.count()
+for (let i = 0; i < markCount; i++) {
+  const m = marks.nth(i)
+  if ((await m.getAttribute('aria-pressed')) !== 'true') await m.click()
+}
+check('un-mark: ticking every milestone records the capstone', await completed('Project Build-Along'))
+await page.getByRole('button', { name: 'Un-mark complete' }).click()
+check('un-mark: the capstone un-marks', await notCompleted('Project Build-Along'))
+await go('/project-build-along')
+check('un-mark: a revisit with the list still full does not re-record it',
+  await notCompleted('Project Build-Along'))
+
+// A path concept: the count and the "next up" marker both have to rewind.
+await go('/cli-basics')
+await page.getByRole('button', { name: 'Un-mark complete' }).click()
+check('un-mark: a path concept un-marks too', await notCompleted('CLI Basics'))
+await go('/roadmap')
+const road2 = await body()
+check('un-mark: the path count went back to 0', road2.includes('0 of 25 concepts'))
+check('un-mark: stage 1 reads 0 of 3 again', road2.includes('0 OF 3'))
+check('un-mark: next up rewound to it', road2.includes('Continue — CLI Basics'))
+
+// The checkpoint quiz records git-basics through the same panel rather than a bare
+// completeConcept() call, so it un-marks like anything else — and the attempt itself, the thing
+// Reset progress would have taken with it, has to still be there afterwards.
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('un-mark: acing the checkpoint passes it', (await body()).includes('Checkpoint passed!'))
+check('un-mark: the checkpoint records git-basics', await completed('Git Basics'))
+await page.getByRole('button', { name: 'Un-mark complete' }).click()
+check('un-mark: the checkpoint concept un-marks', await notCompleted('Git Basics'))
+await go('/roadmap')
+check('un-mark: the path count is back to 0 again', (await body()).includes('0 of 25 concepts'))
+await go('/progress-dashboard')
+check(
+  'un-mark: the quiz attempt itself survived',
+  (await body()).includes('Best score, per checkpoint'),
+)
 await resetProgress()
 
 const failed = results.filter((r) => !r.pass)

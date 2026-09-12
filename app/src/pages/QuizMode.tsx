@@ -2,9 +2,11 @@
  * Route `/quiz-mode` — the "CHECKPOINT" exam flow for the Git Basics concept: a question
  * palette that doubles as a progress bar, per-question answer feedback, and a final score
  * screen. Answers live entirely in local component state; only the finished attempt is
- * persisted, via `useProgress().recordQuiz` keyed by `QUIZ_ID`, and a passing score unlocks
- * the next concept through `completeConcept`. The question bank (`QUESTIONS`) is local to
- * this page and not shared with any other quiz.
+ * persisted, via `useProgress().recordQuiz` keyed by `QUIZ_ID`, and a passing score records the
+ * `git-basics` concept — through the shared `<ConceptComplete>` panel below the score card rather
+ * than a bare `completeConcept()` call, so this checkpoint can be un-marked like any other concept
+ * (BACKLOG item 22). The question bank (`QUESTIONS`) is local to this page and not shared with any
+ * other quiz.
  */
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
@@ -12,6 +14,7 @@ import { useProgress } from '../lib/progress'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 /** One multiple-choice quiz question, its options, and the explanation shown after checking. */
 interface Question {
@@ -97,7 +100,7 @@ const QUIZ_ID = 'git-basics'
 /** The Quiz Mode checkpoint page — steps through `QUESTIONS`, then shows the score screen. */
 export default function QuizMode() {
   useDocumentTitle('Quiz Mode')
-  const { state, recordQuiz, completeConcept } = useProgress()
+  const { state, recordQuiz } = useProgress()
   const previous = state.quizzes[QUIZ_ID]
 
   const [index, setIndex] = useState(0) // current question index
@@ -109,12 +112,13 @@ export default function QuizMode() {
   const question = QUESTIONS[Math.min(index, QUESTIONS.length - 1)]
   const isCorrect = checked && selected === question.correct
   const score = results.filter(Boolean).length
+  const passed = score >= PASS_MARK
 
-  // Persist the attempt exactly once, as the score screen appears.
+  // Persist the attempt exactly once, as the score screen appears. The concept itself is recorded
+  // by the <ConceptComplete> panel further down, from the same `passed`.
   useEffect(() => {
     if (!done) return
     recordQuiz(QUIZ_ID, score, QUESTIONS.length)
-    if (score >= PASS_MARK) completeConcept('git-basics')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done])
 
@@ -396,7 +400,7 @@ export default function QuizMode() {
                 </span>
               </div>
               <h1 style={{ fontSize: 30, margin: '0 0 10px', color: 'var(--color-accent-700)' }}>
-                {score >= PASS_MARK ? 'Checkpoint passed!' : 'Worth another pass'}
+                {passed ? 'Checkpoint passed!' : 'Worth another pass'}
               </h1>
               <p
                 style={{
@@ -406,7 +410,7 @@ export default function QuizMode() {
                   lineHeight: 1.6,
                 }}
               >
-                {score >= PASS_MARK
+                {passed
                   ? 'You have the git mental model down. Branching & Merging is unlocked.'
                   : `Review the snapshot model and staging area, then retry — you only need ${PASS_MARK} of ${QUESTIONS.length}.`}
               </p>
@@ -431,6 +435,14 @@ export default function QuizMode() {
               </div>
             </div>
           )}
+
+          {/* The checkpoint is the authority on `git-basics`, so unlike a lesson page this panel
+              appears only once the quiz has actually been passed — or when an earlier attempt
+              passed, which is what keeps the un-mark control reachable after a failed retry.
+              Rendered outside the score card because that card centres its text. */}
+          {done && (passed || state.concepts['git-basics']) ? (
+            <ConceptComplete slug="git-basics" earned={passed} />
+          ) : null}
         </div>
       </div>
     </div>

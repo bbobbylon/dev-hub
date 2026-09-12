@@ -1,13 +1,13 @@
 # Backlog — Dev Hub
 
-_Last updated: 2026-09-11._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
+_Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-11):** the account UI is now gated on `apiEnabled`, so a
-backend-free build has no `/sign-in` route and no "Sign in" link rather than a form that fails on
-submit; and item 14, export/import progress as a JSON file (`app/src/lib/progressFile.ts`), which
-was the cheap answer to "I want my progress on another browser" that doesn't need item 1 first.
+**Shipped since the last update (2026-09-12):** item 22 — a completed concept can now be
+un-marked, one concept at a time, instead of a mis-click costing the whole progress blob. Earlier
+sessions closed items 6, 14, 16, 17, 18 and 19; each is struck through in place below with what
+was actually done, rather than summarised here.
 
 ## Backend / account
 
@@ -133,11 +133,31 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
 
 Turned up while wiring concept completion (item 6). Numbered from 22 so earlier references hold.
 
-22. **A completed concept can't be un-completed.** `completeConcept()` is deliberately write-once
-    and there is no inverse, so a mis-click on `<ConceptComplete>`'s "Mark complete" is only
-    undoable via the dashboard's "Reset progress", which clears *everything* — quiz scores,
-    flashcard schedules, milestones. The panel should offer an undo, or `lib/progress.ts` should
-    grow a `clearConcept(slug)`; the file backup added earlier is the only current escape hatch.
+22. ~~**A completed concept can't be un-completed.**~~ — **done 2026-09-12.** Both halves of the
+    suggested fix, since each needed the other: `lib/progress.ts` grew `clearConcept(slug)` (it
+    *deletes* the key rather than storing an undo timestamp — every counter tests for the slug's
+    presence, so an un-completed concept has to look exactly like one that was never completed),
+    and `<ConceptComplete>` offers it as "Un-mark complete". Labelled that, not "Undo", because
+    `DecoratorPattern` already has an Undo button for its own condiment stack and two of them on
+    one page would be ambiguous to a learner and to `verify-interactions.mjs` alike.
+
+    Two things the naive version gets wrong, both now pinned by checks that were made to fail
+    first. (1) **Un-marking on a still-earned page bounces straight back**: the panel's
+    record-on-`earned` effect re-fires on the very next render when the walkthrough is still on its
+    last frame, so the un-mark sets a local flag that suppresses it for as long as `earned` stays
+    true, cleared when `earned` goes false so a fresh earning records again. (2) That turned what
+    had been a habit into a contract — **`earned` must describe a moment in this visit, not a state
+    the store remembers** — and `ProjectBuildAlong` was the one page breaking it: its condition was
+    the persisted "every milestone ticked", so leaving and returning re-recorded the concept. It
+    now passes the transition (`allDone && wasIncomplete`) instead.
+
+    `QuizMode` was the other gap: `git-basics` was recorded by a bare `completeConcept()` call with
+    no panel on the page, so the one concept behind a checkpoint was the one concept with no way
+    back. It now renders `<ConceptComplete earned={passed}>` below the score card — but only once
+    an attempt has passed, or an earlier one did (which keeps the un-mark reachable after a failed
+    retry), since the quiz rather than the learner is the authority on that concept. Un-marking it
+    leaves the attempt and the personal best intact, which is the whole point of not reaching for
+    Reset progress. Interactions 113 → 132.
 23. **The Roadmap said 23 concepts while listing 25, and had for the whole port.** The prose read
     "Five stages, twenty-three concepts"; the chips enumerated 3 + 4 for the built stages and "— 6
     concepts" for each of the three locked ones. Fixed by deriving `TOTAL_CONCEPTS` from the list
@@ -159,3 +179,27 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
     script already declines to compare *totals* across differing route counts; it needs the same
     treatment for pairs (a second baseline, or recording the auth pages' pairs unconditionally).
     Same shape as item 18: a check that can't pass in one configuration is one nobody runs there.
+
+## Found while working (2026-09-12)
+
+Turned up while adding the un-mark control (item 22). Numbered from 27 so earlier references hold.
+
+27. **The interaction-check count is hand-written in `docs/SRS.md` and had already drifted.** §6 read
+    "All 95 interaction checks pass" while the suite was on 113 — the count moved twice without the
+    prose following, which is item 16's problem in a document instead of a component. It reads 132
+    now, and will be wrong again the next time a check is added. Either drop the number ("every
+    check in `verify-interactions.mjs` passes" needs no maintenance) or have the script write it
+    somewhere the docs can cite.
+28. **A stale `vite preview` can silently take the port the suites verify against.** Eleven orphaned
+    preview servers from earlier sessions were holding 4173-4182; `npm run preview` reports "Port
+    4173 is in use, trying another one..." and happily starts on 4183, while `scripts/browser.mjs`
+    still points `BASE` at 4173 — so a verify run either can't connect or, worse, passes against
+    whatever *that* server is serving. `vite preview --strictPort` would turn it into a loud failure
+    at the point the mistake is made; a `verify` that started and owned its own preview would be
+    better still.
+29. **Un-marking a concept means going back to its page.** `<ConceptComplete>` is the only place
+    `clearConcept()` is wired, so tidying up a wrongly-recorded concept means navigating to the page
+    that recorded it — fine for a mis-click you notice immediately, awkward for cleaning up several.
+    The Progress Dashboard has the whole record in hand and no per-concept view; a list there, next
+    to "Your data", would be the natural home (and would cover `environment-variables` and
+    `staging-commits`, which no page can reach at all — see item 24).
