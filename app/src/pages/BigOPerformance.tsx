@@ -12,6 +12,7 @@ import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -297,6 +298,11 @@ export default function BigOPerformance() {
           "O(n²) — can I trade memory for time with a hash map?" That single sentence solves a third
           of all interview problems.
         </Aside>
+        <ConceptComplete
+          slug="big-o-performance"
+          hint="Read the curves and the cost table, then mark it done."
+        />
+
       </main>
     </div>
   )

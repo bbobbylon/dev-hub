@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 /**
  * Each frame is one comparison of a bubble sort — the array as it stands, which
@@ -326,6 +327,12 @@ export default function AlgorithmVisualizer() {
             </div>
           </div>
         </div>
+        <ConceptComplete
+          slug="algorithm-visualizer"
+          earned={atEnd}
+          hint="Step the trace to its final frame and this records itself."
+        />
+
       </main>
     </div>
   )

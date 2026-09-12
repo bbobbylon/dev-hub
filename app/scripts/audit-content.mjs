@@ -52,6 +52,36 @@ const MAP = {
   'Course Complete': ['pages/CourseComplete.tsx', 'data/curriculum.ts'],
 }
 
+/**
+ * Prototype phrases the source deliberately *composes* rather than spelling out, listed per
+ * prototype. A grep over source can't find a string that only exists once React has run, so
+ * without this the audit would report working copy as dropped — and the usual way that gets
+ * "fixed" is putting the literal back, undoing the deduplication that motivated it.
+ *
+ * This is not a suppression list. Each phrase is still checked, just piece by piece: every
+ * segment either side of a `·` separator has to appear in the source, so dropping one of the six
+ * concept labels still fails. `stale` at the bottom of this file flags entries no prototype asks
+ * for any more, so the excuse dies with the copy it covered.
+ */
+const COMPOSED = {
+  // Roadmap.tsx builds each locked stage's syllabus line from `UPCOMING_STAGES[n].concepts` in
+  // data/curriculum.ts — the same array TOTAL_CONCEPTS is counted from, which is the point: the
+  // page claimed "twenty-three concepts" while listing 25 for as long as the two were separate.
+  Roadmap: [
+    'Variables · Control flow · Functions · Collections · Errors · Files — 6 concepts',
+    'Arrays · Hash maps · Stacks & queues · Trees · Big-O · Sorting — 6 concepts',
+    'HTTP · REST · SQL basics · Joins · Auth · Deploy — 6 concepts.',
+  ],
+}
+
+/** The separately-findable pieces of a composed phrase — its `·`-separated items, suffix stripped. */
+const partsOf = (phrase) =>
+  phrase
+    .replace(/ — \d+ concepts[.]?$/, '')
+    .split(' · ')
+    .map((part) => part.trim())
+    .filter(Boolean)
+
 /** Decode the small set of HTML entities the prototypes actually use. */
 const entities = (s) =>
   s
@@ -150,7 +180,14 @@ for (const file of files) {
   }
   const proto = phrases(prototypeText(`${PROTO_DIR}/${file}`)) // prototype's prose, chunked into phrases
   const src = sourceText(targets) // ported React source, flattened to plain text
-  const missing = proto.filter((p) => !src.includes(p)) // prototype phrases not found in the source
+  const composed = COMPOSED[name] ?? [] // phrases this page assembles at runtime (see COMPOSED)
+  // A phrase counts as present if the source spells it out, or — when it's a listed composed
+  // phrase — if every one of its pieces is there.
+  const missing = proto.filter(
+    (p) =>
+      !src.includes(p) &&
+      !(composed.includes(p) && partsOf(p).every((part) => src.includes(part))),
+  )
   missingTotal += missing.length
   if (missing.length) {
     report.push(`MISS ${name} — ${missing.length}/${proto.length} phrases not found:`)
@@ -161,4 +198,15 @@ for (const file of files) {
 }
 
 console.log(report.join('\n'))
+// A COMPOSED entry for a phrase no prototype carries any more is dead weight that would quietly
+// keep excusing copy nobody checks. Name it so it gets deleted alongside the copy it covered.
+const protoPhrases = new Set(files.flatMap((f) => phrases(prototypeText(`${PROTO_DIR}/${f}`))))
+const stale = Object.entries(COMPOSED).flatMap(([proto, list]) =>
+  list.filter((p) => !protoPhrases.has(p)).map((p) => `${proto}: "${p.slice(0, 90)}"`),
+)
+if (stale.length) {
+  console.log('\nstale COMPOSED entr(ies) — no prototype has this copy any more:')
+  for (const line of stale) console.log(`       ${line}`)
+}
+
 console.log(`\n${missingTotal} phrase(s) to review across ${files.length} prototypes`)

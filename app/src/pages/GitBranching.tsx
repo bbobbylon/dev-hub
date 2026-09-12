@@ -12,6 +12,7 @@ import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -304,6 +305,11 @@ export default function GitBranching() {
           files; two lines merged daily barely overlap. The cure isn't avoiding branches — it's
           merging often.
         </Aside>
+        <ConceptComplete
+          slug="git-branching"
+          hint="Read all four frames — one line, branch, diverge, merge — then mark it done."
+        />
+
       </main>
     </div>
   )

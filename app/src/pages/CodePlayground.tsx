@@ -13,6 +13,7 @@ import { CodeListing, syn } from '../components/CodeListing'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -267,6 +268,12 @@ export default function CodePlayground() {
               </div>
             )}
           </div>
+          <ConceptComplete
+            slug="code-playground"
+            earned={passed}
+            hint="Run the tests green and this records itself."
+          />
+
         </section>
       </div>
     </div>

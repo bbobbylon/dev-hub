@@ -17,6 +17,7 @@ import { syn } from '../components/CodeListing'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -365,6 +366,11 @@ export default function VideoLesson() {
               </p>
             </div>
           </div>
+          <ConceptComplete
+            slug="video-lesson"
+            hint="Watch it through and read the transcript, then mark it done."
+          />
+
         </section>
 
         <aside style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>

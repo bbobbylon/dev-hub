@@ -23,6 +23,7 @@ import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { TOTAL_CONCEPTS } from '../data/curriculum'
+import { offPathDone, pathDone } from '../data/concepts'
 import { DECK_NAME, DECK_TAGS } from '../data/httpDeck'
 
 /* ── data ──────────────────────────────────────────────────────────────── */
@@ -257,7 +258,11 @@ export default function ProgressDashboard() {
   const days = recentMinutes(state.activity, 14) // last 14 days' minutes, oldest first
   const streak = streakOf(state.activity) // consecutive active days counting back from today
   const weekMinutes = days.slice(-7).reduce((n, d) => n + d.minutes, 0) // minutes across the last 7 of those days
-  const conceptsDone = Object.keys(state.concepts).length
+  // Counted against the concept registry, not `Object.keys(...).length`: the record also holds
+  // concepts that sit off the five-stage path, and those must not move a figure labelled
+  // "Backend path". They get their own line under the tile instead.
+  const conceptsDone = pathDone(state.concepts)
+  const extraDone = offPathDone(state.concepts)
   const attempts = Object.values(state.quizzes)
   const accuracy = attempts.length
     ? Math.round(
@@ -288,7 +293,9 @@ export default function ProgressDashboard() {
       label: 'Concepts done',
       value: String(conceptsDone),
       unit: `of ${TOTAL_CONCEPTS}`,
-      note: `Backend path · ${pathPct}%`,
+      note: extraDone
+        ? `Backend path · ${pathPct}% · +${extraDone} off-path`
+        : `Backend path · ${pathPct}%`,
       valueColor: 'var(--color-accent-700)',
     },
     {

@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 /** One executed command in the scripted terminal transcript. */
 interface ScriptLine {
@@ -243,6 +244,12 @@ export default function TerminalSimulator() {
               Restart mission
             </button>
           </div>
+          <ConceptComplete
+            slug="terminal-simulator"
+            earned={complete}
+            hint="Run every command in the mission and this records itself."
+          />
+
         </section>
 
         <aside

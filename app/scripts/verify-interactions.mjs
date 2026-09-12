@@ -41,6 +41,32 @@ await resetProgress()
 /** Snapshot of the current page's visible text, for asserting rendered state. */
 const body = () => page.evaluate(() => document.body.innerText)
 
+// A lesson page's <ConceptComplete> panel is deliberately *not* part of that page's own state
+// machine: stepping a walkthrough to its end records the concept, and the walkthrough's Reset
+// button rewinds the walkthrough without un-learning it. The before/after comparisons below are
+// about the walkthrough, so they read the page with the panel's text subtracted — and then assert
+// separately that the panel did *not* rewind.
+/** Page text minus the concept-completion panel, for "did Reset restore the start state?" checks. */
+const bodyMinusCompletion = () =>
+  page.evaluate(() => {
+    const panel = document.querySelector('section[aria-label$="completion"]')
+    const text = document.body.innerText
+    return panel ? text.replace(panel.innerText, '') : text
+  })
+
+// An earned completion lands one tick behind the click that earns it: the page's own state
+// updates, an effect in <ConceptComplete> sees `earned` turn true, and only then does the panel
+// re-render. A body() read on the next line is a read of the frame before that, so wait for the
+// panel instead of snapshotting and hoping.
+/** Resolves true once this page's completion panel reports `label` recorded, false if it never does. */
+const completed = (label) =>
+  page
+    .getByText(`${label} — complete`)
+    .first()
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false)
+
 /* ── Quiz Mode: full 5-question run, scoring, restart ─────────────────── */
 await go('/quiz-mode')
 await page.getByRole('button', { name: /Check answer/ }).isDisabled()
@@ -74,7 +100,7 @@ check('cards: rating advances to card 2', (await body()).includes('Card 2 of 5')
 /* ── Algorithm Visualizer: stepping changes the frame + counters ──────── */
 await go('/algorithm-visualizer')
 check('viz: Back disabled at frame 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
-const viz0 = await body()
+const viz0 = await bodyMinusCompletion()
 await page.getByRole('button', { name: 'Step →' }).click()
 const viz1 = await body()
 check('viz: stepping changes the note', viz0 !== viz1)
@@ -82,32 +108,36 @@ for (let i = 0; i < 8; i++) await page.getByRole('button', { name: 'Step →' })
 const vizEnd = await body()
 check('viz: reaches the sorted end state', vizEnd.includes('the array is sorted'))
 check('viz: final counters read 9 / 4', vizEnd.includes('9') && vizEnd.includes('Swaps'))
+check('viz: reaching the end records the concept', await completed('Algorithm Visualizer'))
 await page.getByRole('button', { name: 'Reset' }).click()
-check('viz: reset returns to frame 1', (await body()) === viz0)
+check('viz: reset returns to frame 1', (await bodyMinusCompletion()) === viz0)
+check('viz: reset does not un-complete the concept', (await body()).includes('Algorithm Visualizer — complete'))
 
 /* ── Rebase & History: stepping replays commits, ends linear ──────────── */
 await go('/rebase-history')
 check('rebase: Back disabled at step 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
-const rebase0 = await body()
+const rebase0 = await bodyMinusCompletion()
 for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
 const rebaseEnd = await body()
 check('rebase: reaches the done state', rebaseEnd.includes('Rebase complete'))
 check('rebase: replay count reads 2 of 2', rebaseEnd.includes('2 of 2'))
 check('rebase: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
+check('rebase: reaching the end records the concept', await completed('Rebase & History'))
 await page.getByRole('button', { name: 'Reset' }).click()
-check('rebase: reset returns to step 1', (await body()) === rebase0)
+check('rebase: reset returns to step 1', (await bodyMinusCompletion()) === rebase0)
 
 /* ── Shell Scripting: stepping through backup.sh reveals terminal + vars ── */
 await go('/shell-scripting')
 check('shell: Back disabled at step 1', await page.getByRole('button', { name: '← Back' }).isDisabled())
-const shell0 = await body()
+const shell0 = await bodyMinusCompletion()
 check('shell: STAMP unknown before stepping', shell0.includes('STAMP') && !shell0.includes('20260907'))
 for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
 const shellEnd = await body()
 check('shell: final step reveals the echo output', shellEnd.includes('Backed up to backups/devhub-20260907.tar.gz'))
 check('shell: Step disabled at the end', await page.getByRole('button', { name: 'Done' }).isDisabled())
+check('shell: reaching the end records the concept', await completed('Shell Scripting'))
 await page.getByRole('button', { name: 'Reset' }).click()
-check('shell: reset returns to step 1', (await body()) === shell0)
+check('shell: reset returns to step 1', (await bodyMinusCompletion()) === shell0)
 
 /* ── Regex Lab: real matching, counts change per pattern ──────────────── */
 await go('/regex-lab')
@@ -407,6 +437,53 @@ await page.getByRole('button', { name: 'Reset progress' }).click()
 await go('/quiz-mode')
 for (let i = 0; i < 5; i++) await page.getByRole('button', { name: 'Skip' }).click()
 check('progress: reset clears the personal best', !(await body()).includes('Best so far'))
+
+/* ── Concept completion: what the Roadmap and dashboard actually count ── */
+// BACKLOG item 6. Before this, completeConcept() had a single call site and the Roadmap floored
+// its count at a hardcoded 8 to hide that "N of 23" was always "0 of 23". These checks pin down
+// the things that made the number meaningless: that it moves at all, that it survives a reload,
+// that a concept with no page can't be quietly counted, and — the one most likely to be broken by
+// a later change — that an off-path concept doesn't move a figure labelled "Backend path".
+await resetProgress()
+await go('/roadmap')
+const road0 = await body()
+check('concepts: roadmap starts at 0 of 25', road0.includes('0 of 25 concepts'))
+check('concepts: stage 1 reports its real fraction', road0.includes('0 OF 3'))
+check('concepts: a page-less concept is still listed', road0.includes('Environment Variables'))
+check('concepts: the first routed concept is next up', road0.includes('Continue — CLI Basics'))
+
+// A static lesson page has no earned moment, so the panel's own button is the way to complete it.
+await go('/api-anatomy')
+check('concepts: a static page offers the button', (await body()).includes('Finished with API Anatomy?'))
+await page.getByRole('button', { name: 'Mark complete' }).click()
+check('concepts: marking it says so', await completed('API Anatomy'))
+await go('/api-anatomy')
+check('concepts: it survives a reload', (await body()).includes('API Anatomy — complete'))
+
+// API Anatomy sits off the five-stage path, so the path figure must not budge for it.
+await go('/roadmap')
+check('concepts: an off-path concept leaves the path count alone', (await body()).includes('0 of 25 concepts'))
+await go('/progress-dashboard')
+const dash1 = await body()
+check('concepts: the dashboard agrees the path is untouched', dash1.includes('0\nof 25'))
+check('concepts: the dashboard counts it off-path instead', dash1.includes('+1 off-path'))
+
+// A path concept, earned rather than asserted: the CLI Basics quick quiz answered perfectly.
+await go('/cli-basics')
+for (const option of [
+  'pwd',
+  'It failed — 2 identifies the kind of error',
+  'Lists files, then filters to ones matching ".java"',
+]) {
+  await page.getByRole('button', { name: option, exact: true }).click()
+}
+check('concepts: acing the quick quiz records CLI Basics', await completed('CLI Basics'))
+await go('/roadmap')
+const road1 = await body()
+check('concepts: the path count moved to 1', road1.includes('1 of 25 concepts'))
+check('concepts: stage 1 now reads 1 of 3', road1.includes('1 OF 3'))
+check('concepts: next up advanced past it', road1.includes('Continue — Shell Scripting'))
+await resetProgress()
 
 const failed = results.filter((r) => !r.pass)
 console.log(`\n${results.length - failed.length}/${results.length} interaction checks passed`)
