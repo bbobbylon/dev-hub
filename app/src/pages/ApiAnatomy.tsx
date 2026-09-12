@@ -10,6 +10,7 @@ import type { ReactNode } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -341,6 +342,11 @@ export default function ApiAnatomy() {
             </Tag>
           ))}
         </div>
+        <ConceptComplete
+          slug="api-anatomy"
+          hint="Read the request and response against their numbered notes, then mark it done."
+        />
+
       </main>
     </div>
   )

@@ -10,6 +10,7 @@ import { TopNav } from '../components/TopNav'
 import { syn } from '../components/CodeListing'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -299,6 +300,11 @@ export default function FrameworkComparison() {
             </div>
           ))}
         </div>
+        <ConceptComplete
+          slug="framework-comparison"
+          hint="Compare all three counters and the decision table, then mark it done."
+        />
+
       </main>
     </div>
   )

@@ -11,6 +11,7 @@ import { TopNav } from '../components/TopNav'
 import { Code, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { Aside } from '../components/Aside'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -467,6 +468,12 @@ export default function RebaseHistory() {
             </tbody>
           </table>
         </div>
+        <ConceptComplete
+          slug="rebase-history"
+          earned={atEnd}
+          hint="Step the walkthrough to its last frame and this records itself."
+        />
+
       </main>
     </div>
   )

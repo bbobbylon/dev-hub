@@ -34,17 +34,26 @@ was the cheap answer to "I want my progress on another browser" that doesn't nee
 
 ## Content gaps (pre-existing, found while reviewing the app for this pass)
 
-6. **Most lesson pages never call `useProgress()` at all** — `TerminalSimulator`,
-   `DebuggingChallenge`, `ApiAnatomy`, `GitBranching`, `BigOPerformance`, `DataStructuresVisual`,
-   `FrameworkComparison`, `RegexLab`, `CodePlayground`, `AlgorithmVisualizer`,
-   `ArchitectureDeepDive`, `Glossary`, and `CheatSheet` don't mark their concept complete or record
-   any activity beyond the global time-on-page tracker. **Sharper than first written (2026-09-11):**
-   `completeConcept()` has exactly *one* call site in the entire app — `QuizMode.tsx`, on a passing
-   score, for the slug `git-basics`. Not five pages, one. So "concepts done" can only ever read 0 or
-   1 of 23, which is also why `Roadmap.tsx` floors its count at the design's `BASELINE_DONE = 8`
-   rather than showing the truth. Other pages do record *something* (`recordQuiz`, `rateCard`,
-   `toggleMilestone`), just never a completed concept. Wiring `completeConcept()` into the rest is
-   what would make the number mean what it claims to.
+6. ~~**Most lesson pages never call `useProgress()` at all.**~~ — **done 2026-09-11.** The
+   diagnosis, kept because it explains the shape of the fix: `completeConcept()` had exactly *one*
+   call site in the entire app (`QuizMode.tsx`, on a passing score, for `git-basics`), so "concepts
+   done" could only ever read 0 or 1 of 23 — which is why `Roadmap.tsx` floored its count at the
+   design's `BASELINE_DONE = 8` rather than showing the truth.
+
+   Now: `data/concepts.ts` is a registry of all 20 concepts the app can teach — slug, label, the
+   route that teaches it, its Roadmap stage (or `null` for the ones off the five-stage path), and
+   the action that earns it. Each of those pages ends with a shared `<ConceptComplete>` panel that
+   either records the concept the moment the page's own condition fires (walkthrough stepped to the
+   end, tests run green, mission finished, quick quiz aced) or offers a button where the page has
+   no such moment. `BASELINE_DONE` is gone, and every chip, stage badge and count on the Roadmap is
+   derived from `state.concepts`. Counting goes through `pathDone()`/`offPathDone()` rather than
+   `Object.keys(state.concepts).length`, so an off-path concept can't move a figure labelled
+   "Backend path" — that invariant plus completion-survives-reload and reset-doesn't-un-complete
+   are pinned by 18 new checks in `verify-interactions.mjs` (113 total).
+
+   Deliberately *not* wired: `Glossary` and `CheatSheet` are look-it-up references you never
+   "finish", and `Flashcards` already has its own SM-2 state in `state.cards`. See items 24-26 for
+   what this exposed.
 7. **`CourseComplete.tsx`'s certificate stats are hardcoded**, not read from `useProgress()` — per
    `docs/ARCHITECTURE.md` §7, this was already known and never fixed.
 8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
@@ -86,7 +95,8 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     be written three times, not once: `ProgressDashboard.tsx`, `Roadmap.tsx`, and as the string
     `'23 concepts'` in `CourseComplete.tsx`'s certificate. All three now read `data/curriculum.ts`,
     which also records *why* it isn't `PAGES.length` — a concept is a unit of the designed path, a
-    page is one of ~26 screens. The number is deliberate; what's missing is a numerator (item 6).
+    page is one of ~26 screens. The numerator arrived with item 6, and the denominator turned out
+    to be wrong: see item 23.
 17. ~~**`DECK` duplicates the Flashcards deck's tags**~~ — **done 2026-09-11.** The deck moved to
     `data/httpDeck.ts`; `Flashcards` renders `CARDS`, the dashboard counts `DECK_TAGS` derived from
     them, and the "(HTTP deck)" label now comes from `DECK_NAME` too.
@@ -118,3 +128,34 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     `verify-routes.mjs`'s render floor (144 and 177 chars) — a heading, two fields, a button, and no
     explanation of what an account actually gets you, which is the one question someone on that page
     has. Fixing the copy would also remove the need for their special-cased floor.
+
+## Found while working (2026-09-11, second pass)
+
+Turned up while wiring concept completion (item 6). Numbered from 22 so earlier references hold.
+
+22. **A completed concept can't be un-completed.** `completeConcept()` is deliberately write-once
+    and there is no inverse, so a mis-click on `<ConceptComplete>`'s "Mark complete" is only
+    undoable via the dashboard's "Reset progress", which clears *everything* — quiz scores,
+    flashcard schedules, milestones. The panel should offer an undo, or `lib/progress.ts` should
+    grow a `clearConcept(slug)`; the file backup added earlier is the only current escape hatch.
+23. **The Roadmap said 23 concepts while listing 25, and had for the whole port.** The prose read
+    "Five stages, twenty-three concepts"; the chips enumerated 3 + 4 for the built stages and "— 6
+    concepts" for each of the three locked ones. Fixed by deriving `TOTAL_CONCEPTS` from the list
+    rather than restating it (`UPCOMING_STAGES` in `data/curriculum.ts`), so the two can't disagree
+    again — but worth recording that a hand-written total was wrong by two for as long as it was
+    hand-written, which is the argument for item 16's whole approach.
+24. **Two path concepts have no page to earn them on.** "Environment Variables" (stage 1) and
+    "Staging & Commits" (stage 2) are named by the design and taught nowhere, so they now render as
+    permanently grey unlinked chips — honest, but it means stage 1 can never reach COMPLETE. Either
+    build the two lessons or drop them from the path.
+25. **Completing everything the app has tops out at 5 of 25 (20%).** Only 5 of the 7 path concepts
+    have pages (item 24) and stages 3-5 are placeholders, so the Roadmap's bar is capped at a fifth
+    even for a learner who finishes every lesson. The other 13 concepts the app teaches sit off the
+    path and are counted separately ("+N off-path" under the dashboard tile) rather than inflating
+    it. Not wrong, but the path bar is a weak reward until stages 3-5 exist.
+26. **`audit:a11y` can never pass in an API-enabled build.** `a11y-baseline.json` was recorded over
+    the 26-route configuration, so `/sign-in` and `/sign-up`'s own contrast pairs are absent from
+    it and report as `NEW` every time — a guaranteed FAIL whenever `VITE_API_BASE_URL` is set. The
+    script already declines to compare *totals* across differing route counts; it needs the same
+    treatment for pairs (a second baseline, or recording the auth pages' pairs unconditionally).
+    Same shape as item 18: a check that can't pass in one configuration is one nobody runs there.

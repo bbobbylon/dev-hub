@@ -20,6 +20,7 @@ import { Aside } from '../components/Aside'
 import { Icon } from '../components/Icon'
 import { Code, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -335,6 +336,12 @@ export default function ShellScripting() {
             second run silently overwrites the first. What's the smallest change to STAMP that would
             let it run more than once a day without collisions?
           </Aside>
+          <ConceptComplete
+            slug="shell-scripting"
+            earned={atEnd}
+            hint="Step the walkthrough to its last line and this records itself."
+          />
+
         </main>
       </div>
     </div>

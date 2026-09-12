@@ -11,6 +11,7 @@ import { CodeListing, syn } from '../components/CodeListing'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -269,6 +270,12 @@ export default function DebuggingChallenge() {
             </div>
           </div>
         ) : null}
+        <ConceptComplete
+          slug="debugging-challenge"
+          earned={solved}
+          hint="Reveal the fix and this records itself."
+        />
+
       </main>
     </div>
   )

@@ -13,6 +13,7 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -333,6 +334,12 @@ export default function ProjectBuildAlong() {
             </div>
           </div>
         </div>
+        <ConceptComplete
+          slug="project-build-along"
+          earned={touched && done.every(Boolean)}
+          hint="Tick every milestone and this records itself."
+        />
+
       </main>
     </div>
   )

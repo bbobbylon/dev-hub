@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react'
 import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
@@ -80,8 +81,17 @@ export default function RegexLab() {
   useDocumentTitle('Regex Lab')
   // index into PATTERNS for the pattern currently selected
   const [active, setActive] = useState(0)
+  // every pattern index looked at this visit — seeing all of them is what completes the concept,
+  // and the first one counts because it's already on screen when the page loads
+  const [seen, setSeen] = useState<number[]>([0])
 
   const pattern = PATTERNS[active]
+
+  /** Selects pattern `i` and remembers that it's been looked at. */
+  const show = (i: number) => {
+    setActive(i)
+    setSeen((s) => (s.includes(i) ? s : [...s, i]))
+  }
 
   // segmented log lines and total match count for the active pattern, recomputed only when it changes
   const { lines, matchCount } = useMemo(() => {
@@ -120,7 +130,7 @@ export default function RegexLab() {
               <button
                 key={p.label}
                 type="button"
-                onClick={() => setActive(i)}
+                onClick={() => show(i)}
                 aria-pressed={on}
                 style={{
                   cursor: 'pointer',
@@ -251,6 +261,12 @@ export default function RegexLab() {
             </div>
           ))}
         </div>
+        <ConceptComplete
+          slug="regex-lab"
+          earned={seen.length === PATTERNS.length}
+          hint="Try every pattern against the log lines and this records itself."
+        />
+
       </main>
     </div>
   )

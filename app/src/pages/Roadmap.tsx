@@ -3,8 +3,17 @@
  * "you are here" and locked-stage states and progress toward `TOTAL_CONCEPTS`
  * via `useProgress()`. Stage 2's chip grid links out to individual lesson
  * pages, including `/shell-scripting` and `/rebase-history` — this page is
- * one of the places those two link from. Stages 3-5 (`UPCOMING`) are locked
- * placeholders with no pages behind them yet.
+ * one of the places those two link from. Stages 3-5 (`UPCOMING_STAGES`) are
+ * locked placeholders with no pages behind them yet.
+ *
+ * Every chip state, stage badge and count on this page is derived from
+ * `state.concepts` against `data/concepts.ts`; none of it is hardcoded. It
+ * used to be: the chips were fixed done/next/todo literals and the headline
+ * count was floored at a `BASELINE_DONE = 8` that existed purely because
+ * `completeConcept()` had one call site in the whole app and the real number
+ * was almost always 0. Two of stage 1 and 2's seven concepts still have no
+ * page to earn them on (`data/concepts.ts`, entries with no `route`), so they
+ * render as unlinked chips that stay grey — which is the honest picture.
  */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -13,10 +22,8 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
-import { TOTAL_CONCEPTS } from '../data/curriculum'
-
-/** The design's starting point, used until the learner completes anything. */
-const BASELINE_DONE = 8
+import { TOTAL_CONCEPTS, UPCOMING_STAGES, syllabusOf } from '../data/curriculum'
+import { type Concept, conceptsInStage, pathDone } from '../data/concepts'
 
 /** A concept chip inside a stage: done, next up, or not started. */
 function Chip({
@@ -155,40 +162,25 @@ function NumberNode({ n, state }: { n: number; state: 'current' | 'locked' }) {
   )
 }
 
-/** Stages 3–5 share one shape: dimmed heading, lock tag, one-line syllabus. */
-const UPCOMING = [
-  {
-    n: 3,
-    title: '3 · A First Language: Python',
-    lock: 'UNLOCKS AT STAGE 2',
-    syllabus: 'Variables · Control flow · Functions · Collections · Errors · Files — 6 concepts',
-    last: false,
-  },
-  {
-    n: 4,
-    title: '4 · Data Structures & Algorithms',
-    lock: 'LOCKED',
-    syllabus: 'Arrays · Hash maps · Stacks & queues · Trees · Big-O · Sorting — 6 concepts',
-    last: false,
-  },
-  {
-    n: 5,
-    title: '5 · APIs & Databases',
-    lock: 'LOCKED',
-    syllabus:
-      'HTTP · REST · SQL basics · Joins · Auth · Deploy — 6 concepts. Ends with the capstone project.',
-    last: true,
-  },
-]
-
 /** The Roadmap page mounted at `/roadmap` (see file header). */
 export default function Roadmap() {
   useDocumentTitle('Roadmap')
   const { state } = useProgress()
-  const completed = Object.keys(state.concepts).length // concepts actually recorded as done
-  const doneCount = Math.max(BASELINE_DONE, completed) // never regress below the design's baseline
+  const doneCount = pathDone(state.concepts) // path concepts recorded complete, counted against the registry
   const pct = Math.round((doneCount / TOTAL_CONCEPTS) * 100)
   const streak = streakOf(state.activity)
+
+  const stage1 = conceptsInStage(1)
+  const stage2 = conceptsInStage(2)
+  const isDone = (c: Concept) => Boolean(state.concepts[c.slug])
+  // Exactly one chip on the page reads as "next up": the earliest concept in path order that
+  // isn't done and has a page to do it on. Concepts with no `route` can't be next — nothing
+  // would happen if you clicked them.
+  const nextUp = [...stage1, ...stage2].find((c) => !isDone(c) && c.route)
+  /** done / next / todo for one chip, from the learner's actual record. */
+  const chipState = (c: Concept) => (isDone(c) ? 'done' : c === nextUp ? 'next' : 'todo')
+  const stage1Done = stage1.filter(isDone).length
+  const stage2Done = stage2.filter(isDone).length
 
   return (
     <div className="page">
@@ -220,8 +212,8 @@ export default function Roadmap() {
             margin: '0 0 10px',
           }}
         >
-          Five stages, twenty-three concepts. Finish a stage to unlock the next — the path remembers
-          where you left off.
+          Five stages, {TOTAL_CONCEPTS} concepts. Finish a stage to unlock the next — the path
+          remembers where you left off.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '18px 0 6px' }}>
           <div style={{ flex: 1, maxWidth: 320 }}>
@@ -237,25 +229,29 @@ export default function Roadmap() {
 
       <main style={{ maxWidth: 960, margin: '0 auto', padding: '32px 48px 120px' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* stage 1 — complete */}
+          {/* stage 1 — complete once all three of its concepts are */}
           <div style={{ display: 'flex', gap: 22 }}>
             <StageRail
-              connector="accent-2"
+              connector={stage1Done === stage1.length ? 'accent-2' : 'neutral'}
               node={
-                <div
-                  className="elev-sm"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: '50%',
-                    background: 'var(--color-accent-2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon name="check" size={20} color="var(--color-bg)" />
-                </div>
+                stage1Done === stage1.length ? (
+                  <div
+                    className="elev-sm"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      background: 'var(--color-accent-2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon name="check" size={20} color="var(--color-bg)" />
+                  </div>
+                ) : (
+                  <NumberNode n={1} state="current" />
+                )
               }
             />
             <div style={{ flex: 1, paddingBottom: 34 }}>
@@ -263,12 +259,18 @@ export default function Roadmap() {
                 style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}
               >
                 <h2 style={{ fontSize: 24, margin: 0 }}>1 · Terminal &amp; Shell</h2>
-                <Tag tone="accent-2">COMPLETE</Tag>
+                {stage1Done === stage1.length ? (
+                  <Tag tone="accent-2">COMPLETE</Tag>
+                ) : (
+                  <Tag tone="neutral">
+                    {stage1Done} OF {stage1.length}
+                  </Tag>
+                )}
               </div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <Chip label="CLI Basics" state="done" to="/cli-basics" />
-                <Chip label="Shell Scripting" state="done" to="/shell-scripting" />
-                <Chip label="Environment Variables" state="done" />
+                {stage1.map((c) => (
+                  <Chip key={c.slug} label={c.label} state={chipState(c)} to={c.route} />
+                ))}
               </div>
             </div>
           </div>
@@ -295,30 +297,39 @@ export default function Roadmap() {
                     lineHeight: 1.55,
                   }}
                 >
-                  Git is the tool every team assumes you know. Two concepts down, two to go in this
-                  stage.
+                  Git is the tool every team assumes you know. {stage2Done} of {stage2.length}{' '}
+                  concepts down in this stage.
                 </p>
                 <div className="grid grid-2" style={{ gap: 10 }}>
-                  <Chip label="Git Basics" state="done" block />
-                  <Chip label="Staging & Commits" state="done" block />
-                  <Chip label="Branching & Merging — next up" state="next" block />
-                  <Chip label="Rebase & History" state="todo" to="/rebase-history" block />
+                  {stage2.map((c) => (
+                    <Chip
+                      key={c.slug}
+                      label={c === nextUp ? `${c.label} — next up` : c.label}
+                      state={chipState(c)}
+                      to={c.route}
+                      block
+                    />
+                  ))}
                 </div>
-                <Link to="/git-branching" className="btn btn-primary" style={{ marginTop: 16 }}>
-                  Continue — Branching &amp; Merging
-                </Link>
+                {nextUp?.route ? (
+                  <Link to={nextUp.route} className="btn btn-primary" style={{ marginTop: 16 }}>
+                    Continue — {nextUp.label}
+                  </Link>
+                ) : null}
               </div>
             </div>
           </div>
 
           {/* stages 3–5 — locked */}
-          {UPCOMING.map((stage) => (
+          {UPCOMING_STAGES.map((stage, i) => {
+            const last = i === UPCOMING_STAGES.length - 1
+            return (
             <div key={stage.n} style={{ display: 'flex', gap: 22 }}>
               <StageRail
-                connector={stage.last ? 'none' : 'neutral'}
+                connector={last ? 'none' : 'neutral'}
                 node={<NumberNode n={stage.n} state="locked" />}
               />
-              <div style={{ flex: 1, paddingBottom: stage.last ? 0 : 34, opacity: 0.65 }}>
+              <div style={{ flex: 1, paddingBottom: last ? 0 : 34, opacity: 0.65 }}>
                 <div
                   style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}
                 >
@@ -328,11 +339,12 @@ export default function Roadmap() {
                   <LockedTag>{stage.lock}</LockedTag>
                 </div>
                 <p style={{ fontSize: 13.5, color: 'var(--color-neutral-700)', margin: 0 }}>
-                  {stage.syllabus}
+                  {syllabusOf(stage)}
                 </p>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </main>
     </div>

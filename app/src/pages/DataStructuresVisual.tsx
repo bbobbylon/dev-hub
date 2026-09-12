@@ -10,6 +10,7 @@ import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const INK = 'var(--color-neutral-700)'
 const MUTED = 'var(--color-neutral-700)'
@@ -388,6 +389,11 @@ export default function DataStructuresVisual() {
           Need lookup by name? Hash map. Need cheap inserts mid-sequence? Linked list. Say the need
           out loud and the structure picks itself.
         </Aside>
+        <ConceptComplete
+          slug="data-structures-visual"
+          hint="Read all four field-guide entries, then mark it done."
+        />
+
       </main>
     </div>
   )

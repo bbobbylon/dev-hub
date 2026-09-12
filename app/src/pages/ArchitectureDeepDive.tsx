@@ -9,6 +9,7 @@ import { TopNav } from '../components/TopNav'
 import { Aside } from '../components/Aside'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 const INK = 'var(--color-neutral-700)'
 const SURFACE = 'var(--color-neutral-200)'
@@ -294,6 +295,11 @@ export default function ArchitectureDeepDive() {
           stops disappear? (Answer: 4's read; the write still happens. Money always hits the
           database.)
         </Aside>
+        <ConceptComplete
+          slug="architecture-deep-dive"
+          hint="Trace the request through every numbered stop, then mark it done."
+        />
+
       </main>
     </div>
   )

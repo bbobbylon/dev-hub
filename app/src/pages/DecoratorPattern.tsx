@@ -14,6 +14,7 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { streakOf, useProgress } from '../lib/progress'
+import { ConceptComplete } from '../components/ConceptComplete'
 
 /* ── content ───────────────────────────────────────────────────────────── */
 
@@ -337,8 +338,12 @@ function OrderBuilder() {
 
 /* ── predict-then-run code runner ──────────────────────────────────────── */
 
-/** Predict-then-run panel: shows the Java source, reveals fixed output only once "Run" is clicked. */
-function PredictThenRun() {
+/**
+ * Predict-then-run panel: shows the Java source, reveals fixed output only once "Run" is clicked.
+ * `onRun` tells the page that reveal happened, which is what records the concept — predicting the
+ * output and then checking it is the point of the page, so it's the thing worth completing on.
+ */
+function PredictThenRun({ onRun }: { onRun: () => void }) {
   const [showOutput, setShowOutput] = useState(false) // whether the fixed console output is revealed
 
   return (
@@ -431,7 +436,10 @@ function PredictThenRun() {
       <div style={{ display: 'flex', gap: 12, marginTop: 16, alignItems: 'center' }}>
         <button
           type="button"
-          onClick={() => setShowOutput(true)}
+          onClick={() => {
+            setShowOutput(true)
+            onRun()
+          }}
           style={{
             cursor: 'pointer',
             padding: '11px 22px',
@@ -491,6 +499,8 @@ export default function DecoratorPattern() {
   useDocumentTitle('Decorator Pattern')
   const { state } = useProgress()
   const streak = streakOf(state.activity)
+  // set once the learner reveals the runner's output; see <ConceptComplete> below
+  const [ran, setRan] = useState(false)
 
   return (
     <div className="page">
@@ -825,7 +835,13 @@ export default function DecoratorPattern() {
         </section>
 
         <OrderBuilder />
-        <PredictThenRun />
+        <PredictThenRun onRun={() => setRan(true)} />
+
+        <ConceptComplete
+          slug="decorator-pattern"
+          earned={ran}
+          hint="Predict the output, then run it — revealing the result records this."
+        />
       </main>
     </div>
   )

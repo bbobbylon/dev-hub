@@ -21,6 +21,7 @@ import { Code } from '../components/ui'
 import { useCopy } from '../components/useCopy'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { streakOf, useProgress } from '../lib/progress'
+import { ConceptComplete } from '../components/ConceptComplete'
 import {
   ANATOMY,
   ANATOMY_ORDER,
@@ -113,15 +114,23 @@ function CommandAnatomy() {
 
 /* ── the quiz: answer once, then the row locks and explains itself ─────── */
 
-/** Renders each quiz question as a row of option buttons; answering locks the row and reveals its explanation. */
-function QuickQuiz() {
+/**
+ * Renders each quiz question as a row of option buttons; answering locks the row and reveals its
+ * explanation. Calls `onPass` the moment every question has been answered and every answer was
+ * right — the page turns that into the CLI Basics concept being recorded complete. Rows lock on
+ * first click, so a wrong answer costs the automatic pass for this visit; the completion panel's
+ * own button is the way back from that.
+ */
+function QuickQuiz({ onPass }: { onPass: () => void }) {
   // question index -> chosen option index, once answered
   const [answers, setAnswers] = useState<Record<number, number>>({})
 
   /** Records the chosen option for question `qi`; a second click on an already-answered question is a no-op. */
   const answer = (qi: number, oi: number) => {
     if (answers[qi] !== undefined) return
-    setAnswers((prev) => ({ ...prev, [qi]: oi }))
+    const next = { ...answers, [qi]: oi }
+    setAnswers(next)
+    if (QUIZ.every((q, i) => next[i] === q.correct)) onPass()
   }
 
   return (
@@ -370,6 +379,8 @@ export default function CliBasics() {
   const { copied, copy } = useCopy()
   const { state } = useProgress()
   const streak = streakOf(state.activity)
+  // set when the quick quiz is answered perfectly; see <ConceptComplete> at the foot of the page
+  const [quizPassed, setQuizPassed] = useState(false)
 
   return (
     <div className="page">
@@ -704,7 +715,7 @@ export default function CliBasics() {
             ? Take a guess — the walkthrough below builds up to the real answer, one step at a time.
           </Aside>
 
-          <QuickQuiz />
+          <QuickQuiz onPass={() => setQuizPassed(true)} />
 
           <Walkthrough />
 
@@ -721,6 +732,12 @@ export default function CliBasics() {
             Your existing full step-by-step playthrough component mounts here — restyle it with the
             same tokens (rounded terminal panels, accent-2 for success states) used above.
           </div>
+
+          <ConceptComplete
+            slug="cli-basics"
+            earned={quizPassed}
+            hint="Answer every quick-quiz question correctly and this records itself."
+          />
         </main>
       </div>
     </div>

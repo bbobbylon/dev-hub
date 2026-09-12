@@ -59,6 +59,15 @@ follow them across devices can optionally create an account.
   last card forever.
 - **Milestone checklists (Project Build-Along)** — a fixed list of capstone milestones can be
   checked/unchecked, and the checked state survives a reload.
+- **Concept completion** — every lesson and practice page can record the concept it teaches
+  (`data/concepts.ts` registers all 20, with the route that teaches each and the action that earns
+  it). Where the page has a real finishing moment — a walkthrough stepped to its last frame, the
+  tests run green, the mission's last command entered, the quick quiz answered perfectly — it
+  records itself; the static field-guide pages offer an explicit "mark complete" control instead.
+  A completion survives a reload, and rewinding a page's own walkthrough does not undo it. The
+  Roadmap derives every chip, stage badge, "next up" marker and total from that record; concepts
+  taught off the five-stage path are counted separately so they can't inflate a figure labelled
+  "Backend path".
 - **Progress Dashboard** — reads and displays, without any hardcoded numbers: current streak,
   hours studied this week, concepts completed, quiz accuracy, a 14-day minutes-per-day chart, a
   completion donut, and cards due for review; includes a "Your data" panel that tells the learner
