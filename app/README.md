@@ -33,8 +33,9 @@ no backend at all.
 - **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 20 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
-  aced) record it themselves; the static field-guide pages offer a button instead. The Roadmap's
-  chips, stage badges and totals are all derived from that record.
+  aced) record it themselves; the static field-guide pages offer a button instead, and any completed
+  panel offers "Un-mark complete" so a mis-click costs nothing (it used to take a full progress
+  reset). The Roadmap's chips, stage badges and totals are all derived from that record.
 - **The Progress Dashboard reads live data** — streak, hours this week, concepts completed, quiz
   accuracy, the 14-day minutes chart and the completion donut all derive from real activity.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the

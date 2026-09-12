@@ -20,8 +20,24 @@
  *
  * `hint` is what the page would rather they did — shown next to the button so "mark complete"
  * never looks like the intended path on a page that has a real one.
+ *
+ * **Un-marking.** A completed panel offers the inverse, calling `clearConcept()` (BACKLOG item 22
+ * — before this the only way back from a mis-click was the dashboard's Reset progress, which also
+ * wipes quiz scores and flashcard schedules). It is labelled "Un-mark complete" rather than "Undo"
+ * because `DecoratorPattern` already has an Undo button for its own stack, and two of them on one
+ * page would be ambiguous to a learner and to `verify-interactions.mjs` alike. Un-marking sets a
+ * local flag that suppresses the automatic record for as long as `earned` stays true, so an
+ * un-mark on a walkthrough already at its last step sticks instead of being re-recorded by the
+ * effect on the very next render.
+ *
+ * That makes a contract of something that was previously only a habit: **`earned` must describe a
+ * moment in this visit, not a state the store remembers.** Every page derives it from its own
+ * `useState` — a step index, a revealed answer, a passing quiz — which resets when the learner
+ * leaves. A page passing an `earned` read back out of `useProgress()` would re-record the concept
+ * on the next visit and quietly undo the undo; `ProjectBuildAlong` is the one page whose condition
+ * comes from persisted milestones, and it converts it to a transition for exactly this reason.
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProgress } from '../lib/progress'
 import { CONCEPT_BY_SLUG } from '../data/concepts'
@@ -42,15 +58,22 @@ export function ConceptComplete({
   /** What earns it automatically, e.g. "Step the walkthrough to the last line". */
   hint?: string
 }) {
-  const { state, completeConcept } = useProgress()
+  const { state, completeConcept, clearConcept } = useProgress()
   const concept = CONCEPT_BY_SLUG[slug]
   const completedAt = state.concepts[slug]
+
+  // Set by "Un-mark complete", cleared the moment `earned` goes false again: "don't re-record what
+  // I just un-marked, until I earn it afresh".
+  const [undone, setUndone] = useState(false)
+  useEffect(() => {
+    if (!earned) setUndone(false)
+  }, [earned])
 
   // Record as soon as the page says it was earned. Guarded on `completedAt` so a learner who
   // finished this months ago keeps their original date instead of having it reset on every visit.
   useEffect(() => {
-    if (earned && !completedAt) completeConcept(slug)
-  }, [earned, completedAt, completeConcept, slug])
+    if (earned && !completedAt && !undone) completeConcept(slug)
+  }, [earned, completedAt, undone, completeConcept, slug])
 
   const done = Boolean(completedAt)
   const label = concept?.label ?? slug
@@ -112,13 +135,29 @@ export function ConceptComplete({
               </Link>
               .
             </>
+          ) : undone ? (
+            // The hint would be wrong here: on an earned page the learner has already done the
+            // thing it describes, and doing it again won't re-record while `undone` holds.
+            'Un-marked — off your roadmap and progress dashboard again.'
           ) : (
             (hint ?? 'Marking it complete adds it to your roadmap and progress dashboard.')
           )}
         </div>
       </div>
 
-      {done ? null : (
+      {done ? (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ flex: 'none' }}
+          onClick={() => {
+            clearConcept(slug)
+            setUndone(true)
+          }}
+        >
+          Un-mark complete
+        </button>
+      ) : (
         <button
           type="button"
           className="btn btn-secondary"

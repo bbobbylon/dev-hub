@@ -52,7 +52,8 @@ follow them across devices can optionally create an account.
   (Cheat Sheet, Glossary). See `docs/ARCHITECTURE.md` §7 for the full page-by-page breakdown.
 - **Quizzes** — a learner answers a fixed question bank one at a time, sees per-question
   feedback and an explanation, and receives a final score; passing a checkpoint marks the
-  associated concept complete and records a personal-best score across attempts.
+  associated concept complete (through the same completion panel every lesson page uses, so it can
+  be un-marked without losing the attempt) and records a personal-best score across attempts.
 - **Flashcards** — a deck of cards uses real SM-2 spaced repetition (`lib/progress.ts`'s
   `schedule()`): rating a card "again"/"good"/"easy" reschedules its next due date; a study
   session only includes cards currently due, and ends (with a summary) rather than looping the
@@ -64,10 +65,12 @@ follow them across devices can optionally create an account.
   it). Where the page has a real finishing moment — a walkthrough stepped to its last frame, the
   tests run green, the mission's last command entered, the quick quiz answered perfectly — it
   records itself; the static field-guide pages offer an explicit "mark complete" control instead.
-  A completion survives a reload, and rewinding a page's own walkthrough does not undo it. The
-  Roadmap derives every chip, stage badge, "next up" marker and total from that record; concepts
-  taught off the five-stage path are counted separately so they can't inflate a figure labelled
-  "Backend path".
+  A completion survives a reload, and rewinding a page's own walkthrough does not undo it. A
+  completed panel offers the inverse — "Un-mark complete" — which removes that one concept and
+  nothing else; before it existed the only way back from a mis-click was resetting all progress.
+  The Roadmap derives every chip, stage badge, "next up" marker and total from that record;
+  concepts taught off the five-stage path are counted separately so they can't inflate a figure
+  labelled "Backend path".
 - **Progress Dashboard** — reads and displays, without any hardcoded numbers: current streak,
   hours studied this week, concepts completed, quiz accuracy, a 14-day minutes-per-day chart, a
   completion donut, and cards due for review; includes a "Your data" panel that tells the learner
@@ -143,9 +146,10 @@ follow them across devices can optionally create an account.
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
   a backend has 28: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
-- All 95 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
+- All 132 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
   page's actual behavior (quiz flow, flashcard scheduling, milestone persistence, step-through
-  gating, search, the backup round trip and the files it refuses, and more).
+  gating, search, the backup round trip and the files it refuses, concept completion and its
+  inverse, and more).
 - The content-fidelity audit (`npm run audit:content`) reports only known, explained extractor
   artifacts — never a genuinely dropped phrase from the original design.
 - The accessibility audit (`npm run audit:a11y`, now the fourth leg of `npm run verify`) reports
