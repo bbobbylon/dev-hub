@@ -43,13 +43,13 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
         with:
           enablement: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
           cache-dependency-path: app/package-lock.json
 
@@ -65,7 +65,11 @@ jobs:
         working-directory: app/dist
         run: cp index.html 404.html
 
-      - uses: actions/upload-pages-artifact@v3
+      # v4 of this action stopped including hidden files in the artifact. That's
+      # fine for this build — `app/dist` is index.html plus assets/, no dotfiles —
+      # but anything added here that starts with a "." (a .nojekyll, say) would be
+      # silently dropped; it needs `include-hidden-files: true` if that ever changes.
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: app/dist
 
@@ -77,4 +81,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

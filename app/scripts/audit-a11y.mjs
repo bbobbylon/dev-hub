@@ -5,13 +5,34 @@
  * ~3:1 — fine for icons and large text, not for body copy — so paragraph text
  * in the accent must use a deep ramp step. This checks that held.
  *
- * Run via `npm run audit:a11y` — not part of `npm run verify`, and (unlike
- * audit-content.mjs) does drive a real browser, so it needs `npm run preview`
+ * Run via `npm run audit:a11y` — the fourth leg of `npm run verify`. Unlike
+ * audit-content.mjs it drives a real browser, so it needs `npm run preview`
  * up. Depends on browser.mjs (BASE, openPage) and routes.mjs (ROUTES), and
  * loops over every route like verify-routes.mjs/verify-responsive.mjs do.
+ *
+ * **Baselined.** The prototypes arrived with contrast failures this port
+ * deliberately inherited (see app/README.md's accessibility section), so a
+ * plain pass/fail could only ever say "fail" — and a check that can never
+ * pass is one nobody can gate on, which is exactly how the count drifted from
+ * 31 to 39 between passes with nobody noticing. Instead, `a11y-baseline.json`
+ * records the accepted set and this script fails only on a *regression*:
+ *
+ *   - any contrast pair not in the baseline, or
+ *   - more total failures than the baseline records, which catches a new page
+ *     repeating an already-accepted bad pair, or
+ *   - any unnamed interactive control at all (that count is 0 and stays 0).
+ *
+ * Fixing something is never a failure — it's reported as a nudge to re-record.
+ * `npm run audit:a11y -- --update-baseline` rewrites the file; do that as a
+ * deliberate act with a reviewable diff, not to make a red run go green.
  */
+import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { BASE, openPage } from './browser.mjs'
 import { ROUTES } from './routes.mjs'
+
+const BASELINE_PATH = fileURLToPath(new URL('./a11y-baseline.json', import.meta.url))
+const UPDATING = process.argv.includes('--update-baseline')
 
 const { browser, page } = await openPage({ width: 1280, height: 900 })
 
@@ -157,4 +178,69 @@ console.log(
 )
 
 await browser.close()
-process.exit(contrastTotal || namelessTotal ? 1 : 0)
+
+/* ── baseline comparison ───────────────────────────────────────────────── */
+
+/** The shape written to disk: enough to re-identify a pair, plus what it cost. */
+const snapshot = () => ({
+  note:
+    'Accepted contrast failures inherited from the design prototypes. Regenerate with ' +
+    '`npm run audit:a11y -- --update-baseline` (with the preview server up) only as a ' +
+    'deliberate, reviewed change. See app/README.md, "Accessibility".',
+  routes: ROUTES.length,
+  contrastTotal,
+  pairs: Object.fromEntries(
+    [...seen.entries()]
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([key, c]) => [key, { el: c.el, text: c.text, ratio: c.ratio, required: c.required, size: c.size }]),
+  ),
+})
+
+if (UPDATING) {
+  writeFileSync(BASELINE_PATH, JSON.stringify(snapshot(), null, 2) + '\n')
+  console.log(`\nbaseline rewritten: ${seen.size} pairs, ${contrastTotal} failures, ${ROUTES.length} routes`)
+  process.exit(namelessTotal ? 1 : 0)
+}
+
+let baseline
+try {
+  baseline = JSON.parse(readFileSync(BASELINE_PATH, 'utf8'))
+} catch {
+  console.log('\nNo a11y-baseline.json — run with --update-baseline to record the accepted set.')
+  process.exit(1)
+}
+
+const added = [...seen.keys()].filter((k) => !(k in baseline.pairs))
+const fixed = Object.keys(baseline.pairs).filter((k) => !seen.has(k))
+// The account routes are only in ROUTES when VITE_API_BASE_URL is set (see routes.mjs),
+// so a run over a different route set can't be compared on totals — only on new pairs.
+const comparable = baseline.routes === ROUTES.length
+const grew = comparable && contrastTotal > baseline.contrastTotal
+
+for (const k of added) {
+  const c = seen.get(k)
+  console.log(`\nNEW  ${c.ratio}:1 (needs ${c.required}) ${c.size}px  ${c.el}  "${c.text}"\n     on: ${c.routes.join(', ')}`)
+}
+if (fixed.length) {
+  console.log(`\nFixed since the baseline (re-record to lock it in): ${fixed.join(', ')}`)
+}
+if (grew) {
+  console.log(
+    `\nTotal failures rose ${baseline.contrastTotal} → ${contrastTotal} with no new pair — a page is ` +
+      'repeating an already-accepted bad pair. Fix it, or re-record deliberately.',
+  )
+}
+if (!comparable) {
+  console.log(
+    `\n(Baseline was recorded over ${baseline.routes} routes, this run saw ${ROUTES.length} — ` +
+      'comparing new pairs only, not totals.)',
+  )
+}
+
+const regressed = added.length > 0 || grew || namelessTotal > 0
+console.log(
+  regressed
+    ? '\nFAIL — accessibility regressed against the baseline.'
+    : `\nok — no regression (${contrastTotal} accepted failures across ${seen.size} pairs).`,
+)
+process.exit(regressed ? 1 : 0)

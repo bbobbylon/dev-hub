@@ -38,10 +38,13 @@ was the cheap answer to "I want my progress on another browser" that doesn't nee
    `DebuggingChallenge`, `ApiAnatomy`, `GitBranching`, `BigOPerformance`, `DataStructuresVisual`,
    `FrameworkComparison`, `RegexLab`, `CodePlayground`, `AlgorithmVisualizer`,
    `ArchitectureDeepDive`, `Glossary`, and `CheatSheet` don't mark their concept complete or record
-   any activity beyond the global time-on-page tracker. The Roadmap/Progress Dashboard's completion
-   counts only reflect a handful of pages (`CliBasics`, `QuizMode`, `DecoratorPattern`,
-   `ProjectBuildAlong`, `Flashcards`) — wiring `completeConcept()` into the rest would make "concepts
-   completed" mean what it claims to.
+   any activity beyond the global time-on-page tracker. **Sharper than first written (2026-09-11):**
+   `completeConcept()` has exactly *one* call site in the entire app — `QuizMode.tsx`, on a passing
+   score, for the slug `git-basics`. Not five pages, one. So "concepts done" can only ever read 0 or
+   1 of 23, which is also why `Roadmap.tsx` floors its count at the design's `BASELINE_DONE = 8`
+   rather than showing the truth. Other pages do record *something* (`recordQuiz`, `rateCard`,
+   `toggleMilestone`), just never a completed concept. Wiring `completeConcept()` into the rest is
+   what would make the number mean what it claims to.
 7. **`CourseComplete.tsx`'s certificate stats are hardcoded**, not read from `useProgress()` — per
    `docs/ARCHITECTURE.md` §7, this was already known and never fixed.
 8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
@@ -79,24 +82,34 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     "4 min"/"5 min"/"6 min" estimates are fixed, with only the flashcard due count swapped in live.
     The stat tiles, chart and donut around them are all real, which makes the fake parts *more*
     conspicuous, not less.
-16. **`TOTAL_CONCEPTS = 23` is a hardcoded denominator** in `ProgressDashboard.tsx`, driving both
-    "Concepts done · of 23" and the completion donut, while the app now ships 25 pages. Worth
-    deciding whether 23 is a deliberate count of *concepts* (distinct from pages) or just drift —
-    and if the former, saying so in a comment, because nothing in the file explains the number.
-17. **`DECK` duplicates the Flashcards deck's tags** as a literal array in the dashboard, purely to
-    compute "cards due". Change the deck in `Flashcards.tsx` and the dashboard's due count silently
-    goes wrong. The deck should be one exported list both pages read.
-18. **The a11y audit has no regression guard.** `audit:a11y` prints its count and always exits 0, so
-    new pages quietly add contrast failures — it went 31→39 across 20 pairs between passes, entirely
-    from pages added since the ramp fix, and nobody noticed until this session. A `--max` threshold
-    or a checked-in baseline file would make `docs/SRS.md`'s "documented, non-regressing set of
-    contrast exceptions" actually enforced instead of aspirational. The related content fix is to
-    put the newer pages (Shell Scripting is the worst at 7 lines) through the same `-700` ramp
-    treatment the original pass applied.
-19. **The workflow's actions all target deprecated Node 20.** Every deploy now logs a warning that
-    `actions/checkout@v4`, `configure-pages@v5`, `setup-node@v4`, `upload-artifact@v4` and
-    `deploy-pages@v4` are being force-run on Node 24. They still work; bump them before a runner
-    change makes it a failure instead of an annotation.
+16. ~~**`TOTAL_CONCEPTS = 23` is a hardcoded denominator**~~ — **done 2026-09-11.** It turned out to
+    be written three times, not once: `ProgressDashboard.tsx`, `Roadmap.tsx`, and as the string
+    `'23 concepts'` in `CourseComplete.tsx`'s certificate. All three now read `data/curriculum.ts`,
+    which also records *why* it isn't `PAGES.length` — a concept is a unit of the designed path, a
+    page is one of ~26 screens. The number is deliberate; what's missing is a numerator (item 6).
+17. ~~**`DECK` duplicates the Flashcards deck's tags**~~ — **done 2026-09-11.** The deck moved to
+    `data/httpDeck.ts`; `Flashcards` renders `CARDS`, the dashboard counts `DECK_TAGS` derived from
+    them, and the "(HTTP deck)" label now comes from `DECK_NAME` too.
+18. ~~**The a11y audit has no regression guard.**~~ — **done 2026-09-11**, but the reason first
+    recorded here was wrong and is worth correcting rather than quietly deleting. The claim was that
+    `audit:a11y` "always exits 0". It never did: it exits 1 whenever it finds anything. The real
+    problem was the opposite — with 39 accepted inherited failures it could only ever exit 1, so it
+    could never pass, could never be gated on, and therefore wasn't in `npm run verify` and wasn't
+    in CI. A check nobody can run is indistinguishable from one that doesn't fail, which is how the
+    count drifted 31→39 unnoticed. Now baselined in `app/scripts/a11y-baseline.json`: the audit
+    fails on a new contrast pair, on a rise in total failures with no new pair (the "new page
+    repeats an accepted pair" case, i.e. the one that actually happened), or on any unnamed control,
+    and it's the fourth leg of `npm run verify`. Both failure paths were tested by deliberately
+    injecting each. **Still open:** put the newer pages (Shell Scripting is the worst at 7 lines)
+    through the same `-700` ramp treatment the original pass applied, and shrink the baseline as
+    that lands.
+19. ~~**The workflow's actions all target deprecated Node 20.**~~ — **done 2026-09-11.** Bumped to
+    `checkout@v7`, `configure-pages@v6`, `setup-node@v7`, `upload-pages-artifact@v5` and
+    `deploy-pages@v5`, and the build's own `node-version` from 22 to 24 to match what development
+    actually runs on. One breaking change came with it and is called out in the workflow: since
+    `upload-pages-artifact@v4`, hidden files are excluded from the artifact — harmless today
+    (`app/dist` is `index.html` plus `assets/`), but a future `.nojekyll` would need
+    `include-hidden-files: true`.
 20. **`SignIn`/`SignUp` chunks still ship in a backend-free build.** They're `lazy()`-declared in
     `App.tsx` whether or not the routes are registered, so Rollup emits both chunks and nothing ever
     fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy — a conditional dynamic import

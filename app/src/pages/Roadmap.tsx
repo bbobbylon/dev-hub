@@ -13,9 +13,8 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
+import { TOTAL_CONCEPTS } from '../data/curriculum'
 
-// total concepts across all five stages; drives the progress meter's denominator
-const TOTAL_CONCEPTS = 23
 /** The design's starting point, used until the learner completes anything. */
 const BASELINE_DONE = 8
 

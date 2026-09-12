@@ -139,8 +139,11 @@ follow them across devices can optionally create an account.
   gating, search, the backup round trip and the files it refuses, and more).
 - The content-fidelity audit (`npm run audit:content`) reports only known, explained extractor
   artifacts — never a genuinely dropped phrase from the original design.
-- The accessibility audit (`npm run audit:a11y`) reports zero unnamed interactive controls and a
-  documented, non-regressing set of contrast exceptions.
+- The accessibility audit (`npm run audit:a11y`, now the fourth leg of `npm run verify`) reports
+  zero unnamed interactive controls and no regression against `scripts/a11y-baseline.json`. The
+  contrast exceptions inherited from the prototypes are recorded there rather than merely described,
+  so "non-regressing" is enforced: a new pair, or a new page repeating an accepted pair, fails the
+  run. Shrinking that baseline is ongoing work, not a release gate.
 - The live site smoke-tests clean after every deploy: correct card count, working 404 fallback,
   progress surviving a reload, no console errors (see `DEPLOYMENT.md`'s go-live checklist).
 
