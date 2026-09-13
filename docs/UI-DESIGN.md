@@ -55,6 +55,7 @@ shared shell ended up hiding more than it saved.
 | `CopyPanel` | Dark cheat-sheet column with a working copy button. |
 | `ImageSlot` | Real `<img>` when `src` is given, else a dashed "not supplied" placeholder. |
 | `Tag` / `Code` / `Meter` (`ui.tsx`) | Pill label, inline code span, labeled progress bar. |
+| `CommandPalette` | Global Cmd/Ctrl+K "jump to any page" dialog — mounted once outside the route tree, not composed per-page. Reuses the handoff's own `.dialog`/`.dialog-backdrop` classes. |
 
 One inconsistency worth knowing about rather than silently "fixing": `CheatSheet.tsx` defines
 its own local callout box instead of importing the shared `Aside`, so it doesn't automatically
