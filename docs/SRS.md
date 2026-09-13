@@ -156,10 +156,9 @@ follow them across devices can optionally create an account.
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
   a backend has 28: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
-- All 170 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
-  page's actual behavior (quiz flow, flashcard scheduling, milestone persistence, step-through
-  gating, search, the backup round trip and the files it refuses, concept completion and its
-  inverse, and more).
+- Every check in `scripts/verify-interactions.mjs` passes, covering every stateful page's actual
+  behavior (quiz flow, flashcard scheduling, milestone persistence, step-through gating, search,
+  the backup round trip and the files it refuses, concept completion and its inverse, and more).
 - The content-fidelity audit (`npm run audit:content`) reports only known, explained extractor
   artifacts — never a genuinely dropped phrase from the original design.
 - The accessibility audit (`npm run audit:a11y`, now the fourth leg of `npm run verify`) reports

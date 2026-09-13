@@ -4,11 +4,13 @@ _Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** item 28 — `npm run verify` now starts and owns its
-own preview server (`scripts/run-verify.mjs`, via Vite's JS API with `strictPort: true`) instead of
-assuming one is already up on 4173, so a stale server from an earlier session fails loudly instead
-of silently taking a different port while the suites keep checking the wrong one. Earlier the same
-day: items 29 and 24 — the Progress Dashboard's new
+**Shipped since the last update (2026-09-12):** item 27 — `docs/SRS.md` §6 no longer states a fixed
+interaction-check count (it had already drifted twice, 95 → 132 → 155 → 170 by hand); it now says
+"every check ... passes," which can't go stale. Earlier the same day: item 28 — `npm run verify` now
+starts and owns its own preview server (`scripts/run-verify.mjs`, via Vite's JS API with
+`strictPort: true`) instead of assuming one is already up on 4173, so a stale server from an earlier
+session fails loudly instead of silently taking a different port while the suites keep checking the
+wrong one. Earlier the same day: items 29 and 24 — the Progress Dashboard's new
 "Your concepts" panel un-marks any concept without returning to its page, and is the only place
 "Environment Variables" and "Staging & Commits" can be marked at all, since neither has a lesson
 page. Earlier the same day: items 15 and 7 — the Progress Dashboard's badges, weakest-topic
@@ -227,12 +229,13 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
 
 Turned up while adding the un-mark control (item 22). Numbered from 27 so earlier references hold.
 
-27. **The interaction-check count is hand-written in `docs/SRS.md` and had already drifted.** §6 read
-    "All 95 interaction checks pass" while the suite was on 113 — the count moved twice without the
-    prose following, which is item 16's problem in a document instead of a component. It's read 132,
-    then 155, and reads 170 now, updated by hand each time — proving the point rather than fixing it.
-    Either drop the number ("every check in `verify-interactions.mjs` passes" needs no maintenance)
-    or have the script write it somewhere the docs can cite.
+27. ~~**The interaction-check count is hand-written in `docs/SRS.md` and had already drifted.**~~ —
+    **done 2026-09-12.** §6 read "All 95 interaction checks pass" while the suite was on 113 — the
+    count moved twice without the prose following, which is item 16's problem in a document instead
+    of a component. It's read 132, then 155, and read 170 by the time this was fixed, updated by
+    hand each time — proving the point rather than fixing it. Took the drop-the-number option over
+    having the script write it somewhere to cite: §6 now says "Every check in
+    `scripts/verify-interactions.mjs` passes," which needs no maintenance and can't drift again.
 28. ~~**A stale `vite preview` can silently take the port the suites verify against.**~~ — **done
     2026-09-12.** Eleven orphaned preview servers from earlier sessions were holding 4173-4182;
     `npm run preview` reports "Port 4173 is in use, trying another one..." and happily starts on
