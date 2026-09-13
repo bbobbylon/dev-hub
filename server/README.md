@@ -45,6 +45,24 @@ Repeat the `user` pattern: `XQuery` → `XRowMapper` → `XRepo`/`XRepoImpl` →
 → `XController`, add the table to `schema.sql`, and gate endpoints with
 `requestMatchers(...).hasAuthority("…")` in `SecurityConfig` (above `anyRequest().authenticated()`).
 
+## Deploying (groundwork only — not yet live, see `BACKLOG.md` item 1)
+The `Dockerfile` builds a runtime image on the `prod` profile (`application-prod.yml`), which talks
+TLS (`sslMode=VERIFY_IDENTITY`) to a managed MySQL instance instead of `application.yml`'s permissive
+local default. Which MySQL host and which app host actually run this is still an open decision (a
+free-tier managed MySQL — e.g. Aiven — plus a free-tier app host — Railway/Render/Fly.io — are the
+candidates in `BACKLOG.md`); once that's picked:
+
+1. Download that MySQL instance's CA certificate and save it as `server/mysql-ca.pem` (gitignored,
+   never commit it).
+2. `docker build -t devhub-backend server/` — this also bakes `mysql-ca.pem` into a truststore the
+   image reads at `/app/truststore.p12`; the build fails without that file present.
+3. On the host, set real env vars: `JWT_SECRET`, `SPRING_ACTIVE_PROFILES=prod`, `MYSQL_HOST`,
+   `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USERNAME`, `MYSQL_PASSWORD` — never the `.env` file itself.
+4. Load `schema.sql` against that instance once, by hand, same as local setup.
+5. Once the app is reachable over HTTPS, set `VITE_API_BASE_URL` in
+   `.github/workflows/deploy-pages.yml` to its URL — see the root `DEPLOYMENT.md` for the routes
+   coupling that comes with it.
+
 ## Notes
 - `schema.sql` is idempotent and run by hand (`spring.sql.init.mode: never`). No Flyway by design.
 - Ships no tests — add them. Keep business logic in the service layer as the app grows.

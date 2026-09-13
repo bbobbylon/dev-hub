@@ -111,6 +111,12 @@ Hosting it for real is a separate, not-yet-made decision — it would mean:
   does, as of this pass) and that the host's own `JWT_SECRET`/DB credentials are set as real secrets,
   never committed.
 
+**2026-09-13:** `server/` now has the groundwork for whichever host gets picked — a `Dockerfile`
+plus a `prod` Spring profile (`application-prod.yml`) that talks TLS to a managed MySQL instance
+(`sslMode=VERIFY_IDENTITY` against a CA baked into the image at build time, never committed). See
+`server/README.md`'s "Deploying" section. The host and MySQL provider themselves are still not
+chosen — this only means the image is ready to build once they are.
+
 Until that happens the live site simply has no account layer: `apiEnabled` is `false`, so `App.tsx`
 never registers `/sign-in` or `/sign-up` (both fall through to the 404 page) and `TopNav` renders no
 "Sign in" link. That's the fix for what shipped on 2026-09-11, where the link appeared on all ~27

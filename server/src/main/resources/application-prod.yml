@@ -1,0 +1,19 @@
+# Production overrides, activated by SPRING_ACTIVE_PROFILES=prod (the Dockerfile's default).
+# A managed MySQL host (e.g. Aiven's free tier) terminates TLS with a CA that isn't in the JVM's
+# default trust store, so this profile re-specifies the full datasource URL rather than just
+# tightening application.yml's sslMode default: VERIFY_IDENTITY needs a truststore to check the
+# server cert against, built into the image at Docker build time (see ../../../Dockerfile) from a
+# CA file that never gets committed. The truststore password below ("changeit", the Java default)
+# isn't a real secret — it only gates a store that holds a public CA certificate.
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT:3306}/${MYSQL_DATABASE}?sslMode=VERIFY_IDENTITY&allowPublicKeyRetrieval=false&trustCertificateKeyStoreUrl=file:/app/truststore.p12&trustCertificateKeyStorePassword=changeit&trustCertificateKeyStoreType=PKCS12
+
+logging:
+  level:
+    com.devhub.backend: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: never

@@ -1,8 +1,14 @@
 # Backlog — Dev Hub
 
-_Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
+_Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
+
+**In progress (2026-09-13):** item 1 — `server/` has a `Dockerfile` and a `prod` Spring profile
+(`application-prod.yml`) that talks real TLS to a managed MySQL instance, ready to build once a
+host and MySQL provider are picked. See `server/README.md`'s "Deploying" section. The host/provider
+choice itself, the actual deploy, and wiring `VITE_API_BASE_URL` into the Pages workflow are still
+open — item 1 stays open until the backend is actually reachable over HTTPS.
 
 **Shipped since the last update (2026-09-12):** item 27 — `docs/SRS.md` §6 no longer states a fixed
 interaction-check count (it had already drifted twice, 95 → 132 → 155 → 170 by hand); it now says
@@ -22,11 +28,13 @@ rather than summarised here.
 
 ## Backend / account
 
-1. **Host the backend somewhere real.** `server/` builds (`mvn package`) but isn't deployed — sign-in
-   only works when `VITE_API_BASE_URL` points at a running instance. Needs a host (Railway/Render/
-   Fly.io free tier, or paid) plus a real MySQL instance — the first place this stops being
-   $0/month — and `VITE_API_BASE_URL` wired into `.github/workflows/deploy-pages.yml` as a build-time
-   variable. See `DEPLOYMENT.md`'s "optional backend is not deployed" section. Note that setting
+1. **Host the backend somewhere real.** `server/` builds (`mvn package`) and now has a `Dockerfile` +
+   `prod` profile ready to build, but isn't deployed — sign-in only works when `VITE_API_BASE_URL`
+   points at a running instance. Still needs: a host and MySQL provider actually picked (Railway/
+   Render/Fly.io free tier, or paid, plus a managed MySQL like Aiven's free tier — the first place
+   this stops being $0/month), the image actually deployed there, and `VITE_API_BASE_URL` wired into
+   `.github/workflows/deploy-pages.yml` as a build-time variable. See `DEPLOYMENT.md`'s "optional
+   backend is not deployed" section and `server/README.md`'s "Deploying" section. Note that setting
    that variable also switches the account routes back on (and `scripts/routes.mjs` with them), so
    the sign-in/sign-up pages need a real smoke test the first time a deploy carries it.
 2. **Real merge on sign-in, not "server wins."** `lib/progressSync.ts` currently overwrites local

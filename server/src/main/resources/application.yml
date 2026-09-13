@@ -11,7 +11,10 @@ spring:
   profiles:
     active: ${SPRING_ACTIVE_PROFILES:dev}
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:appdb}?useSSL=false&allowPublicKeyRetrieval=true
+    # sslMode replaces the legacy useSSL/requireSSL pair (Connector/J 8.0.13+). PREFERRED is fine
+    # for a local MySQL with no TLS listener; application-prod.yml overrides it to VERIFY_IDENTITY
+    # for the public Aiven endpoint, which also needs the CA the Dockerfile imports at build time.
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:appdb}?sslMode=${MYSQL_SSL_MODE:PREFERRED}&allowPublicKeyRetrieval=${MYSQL_ALLOW_PUBLIC_KEY_RETRIEVAL:true}
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:}
   sql:
