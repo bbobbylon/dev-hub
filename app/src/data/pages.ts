@@ -57,6 +57,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'python-variables',
+    title: 'Variables',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Four graded Python snippets — predict what prints, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

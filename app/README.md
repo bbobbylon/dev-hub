@@ -4,7 +4,7 @@ A React implementation of the **Coding Learning App Redesign** handed off from C
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
 All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
-mockups only depicted is now real. Two pages were added afterward, in the app's own style rather
+mockups only depicted is now real. Three pages were added afterward, in the app's own style rather
 than ported from a prototype:
 
 - **Rebase & History** — the Roadmap mockup already named it as Version Control's fourth concept,
@@ -14,6 +14,9 @@ than ported from a prototype:
   plain, unclickable label regardless of that state. It's now a real step-through lesson (walking
   `backup.sh` line by line, terminal output and variable values updating as you go), wired up from
   every place that named it: that sidebar, and the Roadmap's Stage 1 chip.
+- **Variables** (`/python-variables`) — the Roadmap named Stage 3's first concept but the stage was
+  entirely locked; it's now four graded predict-the-value questions, the first real page on the
+  Python stage, with the other five concepts still honestly labelled "not built yet."
 
 ## Beyond the mockups
 
@@ -30,7 +33,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 20 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 21 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -93,7 +96,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 25 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 27 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -116,7 +119,7 @@ npm run audit:content    # needs no server
 ```
 
 It pulls every substantial run of prose out of each `.dc.html` prototype and checks it survived
-into the corresponding React source. It currently reports **4 phrases to review, all known
+into the corresponding React source. It currently reports **5 phrases to review, all known
 extractor artifacts**, not omissions:
 
 - Two CLI Basics entries are the prototype's flat clipboard payload strings. Here those are derived
@@ -129,6 +132,11 @@ extractor artifacts**, not omissions:
   archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 now that
   Shell Scripting has too) — see `PAGES.length` in `data/pages.ts` for the number that's actually
   true.
+- One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
+  the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
+  item 9), not a copied string — it happens to compute to the exact same text, but a static text
+  search can't see that. Asserted byte-for-byte against the prototype in `verify:interactions`,
+  same as the CLI Basics entries above.
 
 If that count rises *beyond* this, something was dropped — go read what it flags.
 

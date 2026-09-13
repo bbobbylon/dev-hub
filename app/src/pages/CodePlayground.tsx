@@ -1,11 +1,15 @@
 /**
- * Code Playground — route `/code-playground`, a code-challenge page
- * (FizzBuzz, challenge 4 of 12): a brief, a read-only `CodeListing` showing
- * the finished solution, and a test checklist. "Run tests" is simulated —
- * `setPassed(true)` just flips every checklist item and prints a
- * pre-written `EXPECTED_OUTPUT` block; there is no real code execution or
- * editing here (the editor chrome is cosmetic, per the "editable in the real
- * app" note passed to `CodeListing`).
+ * Code Playground — route `/code-playground`, a code-challenge page (FizzBuzz, challenge 4 of
+ * 12): a brief, a read-only `CodeListing` showing the solution, and a test checklist. "Run
+ * tests" really runs `SOURCE_JS` — the exact source the listing displays — in a Web Worker
+ * (`lib/sandboxRun.ts`, its own realm, no DOM access), then grades each checklist item off the
+ * `console.log` output that run actually produced. The listing itself is still read-only (the
+ * "editable in the real app" note is honest about that), but the pass/fail state is not
+ * scripted: a broken solution would genuinely fail here.
+ *
+ * The prototype's exercise was written as Python pseudocode; a browser can't execute that
+ * without a large WASM runtime (Pyodide), which is disproportionate for one exercise, so this
+ * pass translated the same FizzBuzz logic to JavaScript — the language a Worker can actually run.
  */
 import { useState } from 'react'
 import { TopNav } from '../components/TopNav'
@@ -14,16 +18,26 @@ import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { ConceptComplete } from '../components/ConceptComplete'
+import { runInSandbox, type SandboxResult } from '../lib/sandboxRun'
 
 const mono = 'ui-monospace, Menlo, monospace'
 
-// Syntax-highlighted lines rendered in the read-only solution CodeListing
+// The real source executed by "Run tests" — kept as plain text (rather than only the
+// syntax-highlighted JSX below) because it has to be exactly what runs, not just what's shown.
+const SOURCE_JS = `for (let i = 1; i <= 15; i++) {
+  if (i % 15 === 0) console.log("FizzBuzz")
+  else if (i % 3 === 0) console.log("Fizz")
+  else if (i % 5 === 0) console.log("Buzz")
+  else console.log(i)
+}`
+
+// Syntax-highlighted rendering of the exact lines in SOURCE_JS, for the read-only listing.
 const SOLUTION = [
   {
     content: (
       <>
-        <span style={syn.kw}>for</span> i <span style={syn.kw}>in</span>{' '}
-        <span style={syn.fn}>range</span>(1, 16):
+        <span style={syn.kw}>for</span> (<span style={syn.kw}>let</span> i = 1; i {'<='} 15;
+        i++) {'{'}
       </>
     ),
   },
@@ -31,15 +45,8 @@ const SOLUTION = [
     content: (
       <>
         {'  '}
-        <span style={syn.kw}>if</span> i % 15 == 0:
-      </>
-    ),
-  },
-  {
-    content: (
-      <>
-        {'    '}
-        <span style={syn.fn}>print</span>(<span style={syn.str}>"FizzBuzz"</span>)
+        <span style={syn.kw}>if</span> (i % 15 === 0) <span style={syn.fn}>console.log</span>(
+        <span style={syn.str}>"FizzBuzz"</span>)
       </>
     ),
   },
@@ -47,15 +54,8 @@ const SOLUTION = [
     content: (
       <>
         {'  '}
-        <span style={syn.kw}>elif</span> i % 3 == 0:
-      </>
-    ),
-  },
-  {
-    content: (
-      <>
-        {'    '}
-        <span style={syn.fn}>print</span>(<span style={syn.str}>"Fizz"</span>)
+        <span style={syn.kw}>else if</span> (i % 3 === 0) <span style={syn.fn}>console.log</span>
+        (<span style={syn.str}>"Fizz"</span>)
       </>
     ),
   },
@@ -63,15 +63,8 @@ const SOLUTION = [
     content: (
       <>
         {'  '}
-        <span style={syn.kw}>elif</span> i % 5 == 0:
-      </>
-    ),
-  },
-  {
-    content: (
-      <>
-        {'    '}
-        <span style={syn.fn}>print</span>(<span style={syn.str}>"Buzz"</span>)
+        <span style={syn.kw}>else if</span> (i % 5 === 0) <span style={syn.fn}>console.log</span>
+        (<span style={syn.str}>"Buzz"</span>)
       </>
     ),
   },
@@ -79,31 +72,25 @@ const SOLUTION = [
     content: (
       <>
         {'  '}
-        <span style={syn.kw}>else</span>:
+        <span style={syn.kw}>else</span> <span style={syn.fn}>console.log</span>(i)
       </>
     ),
   },
-  {
-    content: (
-      <>
-        {'    '}
-        <span style={syn.fn}>print</span>(i)
-      </>
-    ),
-  },
+  { content: <>{'}'}</> },
 ]
 
-// Test-checklist labels shown in the sidebar; all flip to "passed" together on Run
-const TESTS = [
-  'Prints 15 lines',
-  '3, 6, 9, 12 → Fizz',
-  '5, 10 → Buzz',
-  '15 → FizzBuzz',
-]
+// Test-checklist labels shown in the sidebar; each is graded independently off real output — see checksFor().
+const TESTS = ['Prints 15 lines', '3, 6, 9, 12 → Fizz', '5, 10 → Buzz', '15 → FizzBuzz']
 
-// Simulated stdout printed to the output pane after "Run tests"
-const EXPECTED_OUTPUT =
-  '1  2  Fizz  4  Buzz  Fizz  7  8  Fizz  Buzz  11  Fizz  13  14  FizzBuzz'
+/** One boolean per TESTS entry, computed from the sandbox's actual captured output lines. */
+function checksFor(lines: string[]): boolean[] {
+  return [
+    lines.length === 15,
+    [2, 5, 8, 11].every((i) => lines[i] === 'Fizz'),
+    [4, 9].every((i) => lines[i] === 'Buzz'),
+    lines[14] === 'FizzBuzz',
+  ]
+}
 
 /** Inline monospace snippet used in the challenge brief. */
 function BriefCode({ children }: { children: string }) {
@@ -114,10 +101,25 @@ function BriefCode({ children }: { children: string }) {
   )
 }
 
-/** Code-challenge page: a brief, a solution listing, and a simulated run-tests loop. */
+/** Code-challenge page: a brief, a solution listing, and a real sandboxed run-tests loop. */
 export default function CodePlayground() {
   useDocumentTitle('Code Playground')
-  const [passed, setPassed] = useState(false) // whether "Run tests" has been clicked since the last "Clear output"
+  const [status, setStatus] = useState<'idle' | 'running' | 'done'>('idle')
+  const [result, setResult] = useState<SandboxResult | null>(null)
+
+  const checks = result?.ok ? checksFor(result.lines) : TESTS.map(() => false)
+  const allPassed = result?.ok === true && checks.every(Boolean)
+
+  const run = async () => {
+    setStatus('running')
+    setResult(await runInSandbox(SOURCE_JS))
+    setStatus('done')
+  }
+
+  const clear = () => {
+    setStatus('idle')
+    setResult(null)
+  }
 
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -141,7 +143,7 @@ export default function CodePlayground() {
           style={{ borderRight: '1px solid var(--color-neutral-300)', padding: '36px 28px' }}
         >
           <Tag tone="accent" style={{ marginBottom: 12, display: 'inline-flex' }}>
-            PYTHON · LOOPS
+            JAVASCRIPT · LOOPS
           </Tag>
           <h1 style={{ fontSize: 30, margin: '10px 0 12px', color: 'var(--color-accent-700)' }}>
             FizzBuzz
@@ -195,21 +197,24 @@ export default function CodePlayground() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {TESTS.map((t) => (
-              <div
-                key={t}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 9,
-                  fontSize: 13.5,
-                  color: passed ? 'var(--color-accent-2-700)' : 'var(--color-neutral-700)',
-                }}
-              >
-                <Icon name="check" size={14} />
-                {t}
-              </div>
-            ))}
+            {TESTS.map((t, i) => {
+              const on = status === 'done' && checks[i]
+              return (
+                <div
+                  key={t}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 9,
+                    fontSize: 13.5,
+                    color: on ? 'var(--color-accent-2-700)' : 'var(--color-neutral-700)',
+                  }}
+                >
+                  <Icon name="check" size={14} />
+                  {t}
+                </div>
+              )
+            })}
           </div>
         </aside>
 
@@ -217,7 +222,7 @@ export default function CodePlayground() {
           style={{ display: 'flex', flexDirection: 'column', padding: '36px 40px', gap: 16 }}
         >
           <CodeListing
-            filename="solution.py"
+            filename="solution.js"
             lines={SOLUTION}
             note="editable in the real app"
             gutterWidth={44}
@@ -226,13 +231,18 @@ export default function CodePlayground() {
           />
 
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-            <button type="button" className="btn btn-primary" onClick={() => setPassed(true)}>
-              ▶ Run tests
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={run}
+              disabled={status === 'running'}
+            >
+              {status === 'running' ? 'Running…' : '▶ Run tests'}
             </button>
-            <button type="button" className="btn btn-ghost" onClick={() => setPassed(false)}>
+            <button type="button" className="btn btn-ghost" onClick={clear}>
               Clear output
             </button>
-            {passed ? (
+            {allPassed ? (
               <Tag tone="accent-2" style={{ animation: 'pop 0.3s ease' }}>
                 ALL {TESTS.length} TESTS PASSED
               </Tag>
@@ -251,26 +261,40 @@ export default function CodePlayground() {
               lineHeight: 1.7,
             }}
           >
-            {passed ? (
+            {status === 'done' && result ? (
               <div style={{ animation: 'pop 0.25s ease' }}>
-                <div style={{ color: 'var(--color-neutral-400)' }}>$ python solution.py</div>
-                <div style={{ color: 'var(--color-neutral-100)', whiteSpace: 'pre-wrap' }}>
-                  {EXPECTED_OUTPUT}
-                </div>
-                <div style={{ color: 'var(--color-accent-2-300)', marginTop: 8 }}>
-                  ✓ prints 15 lines&nbsp;&nbsp;✓ Fizz on multiples of 3&nbsp;&nbsp;✓ Buzz on
-                  multiples of 5&nbsp;&nbsp;✓ FizzBuzz on 15
-                </div>
+                <div style={{ color: 'var(--color-neutral-400)' }}>$ node solution.js</div>
+                {result.ok ? (
+                  <>
+                    <div style={{ color: 'var(--color-neutral-100)', whiteSpace: 'pre-wrap' }}>
+                      {result.lines.join('  ')}
+                    </div>
+                    <div
+                      style={{
+                        color: allPassed ? 'var(--color-accent-2-300)' : 'var(--color-accent-300)',
+                        marginTop: 8,
+                      }}
+                    >
+                      {TESTS.map((t, i) => `${checks[i] ? '✓' : '✗'} ${t}`).join('  ')}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ color: 'var(--color-accent-300)' }}>
+                    {result.error ?? 'The sandbox reported an error.'}
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ color: 'var(--color-neutral-500)' }}>
-                Output appears here. Run the tests when you think the solution is right.
+                {status === 'running'
+                  ? 'Running in a sandboxed worker…'
+                  : 'Output appears here. Run the tests when you think the solution is right.'}
               </div>
             )}
           </div>
           <ConceptComplete
             slug="code-playground"
-            earned={passed}
+            earned={allPassed}
             hint="Run the tests green and this records itself."
           />
 

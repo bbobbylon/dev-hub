@@ -237,15 +237,94 @@ check('build: checking a milestone → 60%', (await body()).includes('60% BUILT'
 await page.getByRole('button', { name: /Print the last 10 lines/ }).click()
 check('build: unchecking → 40%', (await body()).includes('40% BUILT'))
 
-/* ── Code Playground: run tests flips the checklist ───────────────────── */
+/* ── Code Playground: run tests really executes the solution in a worker ──── */
 await go('/code-playground')
 check('playground: idle before running', (await body()).includes('Output appears here'))
 await page.getByRole('button', { name: '▶ Run tests' }).click()
+await page.getByText('ALL 4 TESTS PASSED').waitFor({ timeout: 5_000 })
 const ran = await body()
 check('playground: tests pass', ran.includes('ALL 4 TESTS PASSED'))
-check('playground: output printed', ran.includes('FizzBuzz'))
+check('playground: real output printed', ran.includes('FizzBuzz'))
+check('playground: all 4 checks individually graded true', ran.includes('✓ Prints 15 lines') && ran.includes('✓ 15 → FizzBuzz'))
 await page.getByRole('button', { name: 'Clear output' }).click()
 check('playground: clear resets', (await body()).includes('Output appears here'))
+
+/* ── Glossary: real search + letter-group filtering, honest term count ──── */
+await go('/glossary')
+let g = await body()
+check('glossary: honest term count badge', g.includes('36 TERMS') && !g.includes('142 TERMS'))
+check(
+  'glossary: opens on group A',
+  g.includes('API') && g.includes('Argument') && g.includes('Async') && g.includes('4 of 36 terms'),
+)
+check('glossary: does not show a term from another group', !g.includes('Backend'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+g = await body()
+check(
+  'glossary: switching group filters the list',
+  g.includes('Backend') && g.includes('Boolean') && g.includes('Branch') && !g.includes('Argument'),
+)
+check('glossary: group B count is real', g.includes('3 of 36 terms'))
+await page.getByLabel('Search terms').fill('JWT')
+g = await body()
+check(
+  'glossary: search filters across all groups',
+  g.includes('Search results') && g.includes('1 of 36 terms') && g.includes('JSON Web Token'),
+)
+check('glossary: search hides non-matching terms', !g.includes('Backend'))
+await page.getByLabel('Search terms').fill('zzzzznotaterm')
+check('glossary: no-match state is honest, not empty', (await body()).includes('No terms match'))
+await page.getByRole('button', { name: 'A', exact: true }).click()
+g = await body()
+check('glossary: clicking a group clears the search', g.includes('4 of 36 terms') && g.includes('API'))
+
+/* ── Python Variables: 4 graded predict-the-value questions (item 10) ─── */
+await resetProgress()
+await go('/python-variables')
+let pv = await body()
+check('python variables: starts unanswered', pv.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: "<class 'str'>" }).click()
+await page.getByRole('button', { name: '3', exact: true }).click()
+await page.getByRole('button', { name: '2 1', exact: true }).click()
+pv = await body()
+check('python variables: three correct reaches the pass mark', pv.includes('Score: 3 of 4 correct'))
+check('python variables: earns completion at the pass mark', await completed('Variables'))
+await page.getByRole('button', { name: '0', exact: true }).click()
+pv = await body()
+check(
+  'python variables: a wrong pick still shows the real explanation',
+  pv.includes('count += 1 is shorthand'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('python variables: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap stage 3: one real concept, the rest honestly not-yet-built (item 10) ── */
+await resetProgress()
+await go('/roadmap')
+let rm = await body()
+check('roadmap: stage 3 shows its one real concept', rm.includes('Variables'))
+check(
+  'roadmap: stage 3 lists the rest as not built yet',
+  rm.includes('Control flow') && rm.includes('not built yet'),
+)
+check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
+check(
+  'roadmap: stage 4 points at real related lessons',
+  rm.includes('Data Structures Visual') && rm.includes('Big-O Performance') && rm.includes('Algorithm Visualizer'),
+)
+check('roadmap: stage 5 points at API Anatomy', rm.includes('API Anatomy'))
+check('roadmap: stage 4 and 5 still read not yet built', (rm.match(/NOT YET BUILT/g) ?? []).length === 2)
+
+await page.getByRole('link', { name: 'Variables' }).click()
+await page.waitForURL('**/python-variables')
+check('roadmap: the Variables chip really links to the lesson', page.url().endsWith('/python-variables'))
+await page.getByRole('button', { name: "<class 'str'>" }).click()
+await page.getByRole('button', { name: '3', exact: true }).click()
+await page.getByRole('button', { name: '2 1', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing it moves the stage-3 count', rm.includes('1 OF 6'))
+check('roadmap: it also moves the path total', rm.includes('1 of 25 concepts'))
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so

@@ -8,6 +8,24 @@ layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 (`src/components/CommandPalette.tsx`) now jumps straight to any page from anywhere in the app,
 filtering the same `data/pages.ts` catalog the gallery's own search box does; see its entry below
 for the one real bug (a one-frame stale-query flash on reopen) caught and fixed before it shipped.
+Same day: item 10 (partial) — Stage 3 of the Roadmap has its first real concept, Variables
+(`/python-variables`, four graded predict-the-value questions), and Stages 3–5's remaining
+eighteen concepts now read as honest "not yet built" chips or point at real, already-shipped
+lessons that genuinely cover that syllabus, instead of a blank "locked"; see its entry below for
+exactly what's built versus what's still open. Same day: item 8 — the Glossary went from 3
+mocked-up "A" terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored terms with a
+genuinely working search box and A–Z group filter; see its entry below for what stayed faithful to
+the prototype and what's new content. Same day: item 9 — Code Playground's "run tests" now
+executes the real solution source in a sandboxed Web Worker and grades the checklist off actual
+captured output, instead of a scripted pass; see its entry below for the Python→JavaScript
+translation this required. Same day: item 26 — the two contrast pairs that made `audit:a11y` fail
+on any API-enabled build were real bugs, not inherited ones, and are fixed rather than baselined:
+`TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up cross-links use the
+design system's deep accent ramp step for paragraph-size text. Same day: item 21 — both account
+pages' subtitle now explains what an account gets you, which incidentally cleared
+`verify-routes.mjs`'s general render floor, so their special-cased lower one is gone. Investigated
+and corrected rather than shipped: item 20's suggested fix (a conditional dynamic import) was tried
+and doesn't actually work — see its entry below for why, and what would.
 
 **Shipped 2026-09-12:** item 27 — `docs/SRS.md` §6 no longer states a fixed
 interaction-check count (it had already drifted twice, 95 → 132 → 155 → 170 by hand); it now says
@@ -81,13 +99,58 @@ rather than summarised here.
    serial-number prop on the template rather than a claim about anyone's progress. Worth revisiting
    once (if) a path can actually be completed: at that point this page probably wants a real gate
    and a title that names *which* path, not just Stage 1's.
-8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
-   nothing behind the other 25 letters.
-9. **`CodePlayground`'s "running tests" is fully simulated** — a canned pass output, no real
-   execution. Real in-browser execution (a sandboxed `Function`/Web Worker) would make the pass/fail
-   state honest instead of scripted.
-10. **`Roadmap.tsx` stages 3–5 are locked placeholders** with no content behind them yet — the
-    five-stage journey only has two real stages.
+8. ~~**`Glossary.tsx` only renders "A" terms**~~ — **done 2026-09-13.** The prototype
+   (`project/Glossary.dc.html`) itself only ever mocked up 3 term cards behind a "142 TERMS" badge
+   and a "Show 11 more" button — both decorative chrome, not un-ported content — so this was a real
+   content-authoring pass, not a code fix: 36 genuine terms now span the alphabet (kept API/Argument/
+   Async's original copy verbatim), grouped into the same 9 jump-strip chips the prototype drew
+   (A/B/C/D individually, E–H/I–L/M–P/Q–T/U–Z grouped), each backed by a real filter over the
+   `letters` it covers. The search box filters live across term name, definition, category and
+   pronunciation. The term-count badge and the "N of 36 terms" line both read `TERMS.length` — no
+   more "142 TERMS", and the fake "Show 11 more" button is gone rather than wired to a lie. 9 new
+   checks in `verify-interactions.mjs` (171 → 180) cover the default group, switching groups,
+   searching, the honest no-match state, and clearing a search by picking a group.
+9. ~~**`CodePlayground`'s "running tests" is fully simulated**~~ — **done 2026-09-13.** "Run tests"
+   now executes the solution's exact source for real, in a Web Worker (`lib/sandboxRun.ts`, its own
+   realm, no DOM, timeout-guarded against infinite loops), and grades all 4 checklist items off the
+   `console.log` output that run actually produced — a broken solution genuinely fails here now.
+   Translated the exercise from the prototype's Python to JavaScript, since a Worker can only run JS
+   without pulling in a WASM runtime (Pyodide) disproportionate to one exercise; the read-only
+   listing still shows exactly what's executed. This adds a 5th known `audit:content` extractor
+   artifact (the expected-output string is now computed at runtime, not a static literal) —
+   documented in `app/README.md`, verified byte-identical to the prototype's output by hand.
+10. ~~**`Roadmap.tsx` stages 3–5 are locked placeholders**~~ — **partially done 2026-09-13.**
+    A full 18-concept build across Python, data structures/algorithms, and APIs/databases was out
+    of scope for one pass, so this shipped a bounded, honest slice rather than either skipping it
+    or faking completeness: Stage 3 has its first real concept, and Stages 3–5's remaining concepts
+    are labelled for exactly what they are instead of a blank "locked."
+
+    **Variables** (`/python-variables`, `data/concepts.ts`'s `python-variables`, `stage: 3`) is a
+    real graded lesson: four predict-the-value questions (reassignment/`type()`, value-copy vs.
+    aliasing, tuple-swap, augmented assignment), each locking on first pick with a real correct/
+    incorrect explanation. Scoring 3 of 4 earns the concept via `<ConceptComplete>`, same as every
+    other checkpoint. `stage: 1 | 2 | null` widened to `1 | 2 | 3 | null` in `data/concepts.ts` —
+    the only path-affecting change — and `data/curriculum.ts`'s `UPCOMING_STAGES[2].concepts`
+    dropped "Variables" so `TOTAL_CONCEPTS` stays exactly 25 (one item moved from the placeholder
+    list into the real registry, not added on top of it).
+
+    Stage 3's other five concepts (Control flow, Functions, Collections, Errors, Files) still show
+    as dashed "not built yet" chips, not real pages — `Roadmap.tsx`'s new `NotBuiltChip`. Stages 4
+    and 5 are still fully locked and unbuilt, but each now points at real, already-shipped off-path
+    lessons whose content genuinely overlaps that stage's syllabus (verified by reading each page,
+    not guessed from its title): Stage 4 → Data Structures Visual, Big-O Performance, Algorithm
+    Visualizer; Stage 5 → API Anatomy. These are `related` pointers in `data/curriculum.ts`, listed
+    not counted — following one doesn't move `TOTAL_CONCEPTS` or any stage's progress count, since
+    none of those four pages were reclassified onto the path (an earlier plan to do exactly that
+    was worked through and abandoned once it turned out to break the 25-concept invariant via a
+    many-to-one collapse of syllabus names into single existing pages).
+
+    Added `/python-variables` to `App.tsx`, `scripts/routes.mjs`, and `data/pages.ts` (26th
+    lesson/tool page, 27th route counting the gallery); 13 new checks in `verify-interactions.mjs`
+    (181 → 194) cover the lesson's scoring/reset and the Roadmap's stage-3 count, its real links,
+    and the two "not yet built" stages. Doc counts swept across `docs/SRS.md`, `docs/UI-DESIGN.md`,
+    `docs/ARCHITECTURE.md`, and `app/README.md`. **Still open:** Stage 3's other five concepts, and
+    all of Stages 4 and 5 (twelve concepts total) remain unbuilt.
 
 ## Nice-to-haves (not gaps, just ideas)
 
@@ -181,12 +244,21 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     `include-hidden-files: true`.
 20. **`SignIn`/`SignUp` chunks still ship in a backend-free build.** They're `lazy()`-declared in
     `App.tsx` whether or not the routes are registered, so Rollup emits both chunks and nothing ever
-    fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy — a conditional dynamic import
-    would drop them.
-21. **The sign-in and sign-up pages barely say anything.** They're the two routes that trip
-    `verify-routes.mjs`'s render floor (144 and 177 chars) — a heading, two fields, a button, and no
-    explanation of what an account actually gets you, which is the one question someone on that page
-    has. Fixing the copy would also remove the need for their special-cased floor.
+    fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy. **Tried and corrected
+    (2026-09-13):** the suggested fix ("a conditional dynamic import would drop them") doesn't work —
+    tested by actually building both ways. Rollup creates a chunk for any `import()` expression it
+    finds anywhere in the module graph, regardless of a runtime/build-time condition wrapped around
+    it (`apiEnabled ? lazy(() => import('./pages/SignIn')) : null` still emitted `SignIn-*.js`).
+    Actually dropping the chunk would need a Vite plugin that rewrites the source before Rollup ever
+    parses it, or splitting these two routes out of the main entry's module graph entirely — more
+    machinery than ~4 kB gzip combined is worth. Leaving as-is; not attempting again without a
+    different approach in mind.
+21. ~~**The sign-in and sign-up pages barely say anything.**~~ — **done 2026-09-13.** Both pages'
+    subtitle now says what an account actually gets you — progress synced across devices, and that
+    it's optional since everything already works from one browser alone — instead of one generic
+    line. That was enough to clear `verify-routes.mjs`'s general 200-char floor honestly, so the
+    special-cased 100-char floor for these two routes is gone; they're checked like every other
+    route now.
 
 ## Found while working (2026-09-11, second pass)
 
@@ -235,12 +307,21 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
     who's genuinely finished every lesson. The other 13 concepts the app teaches sit off the path
     and are counted separately ("+N off-path" under the dashboard tile) rather than inflating it.
     Not wrong, but the path bar is a weak reward until stages 3-5 exist.
-26. **`audit:a11y` can never pass in an API-enabled build.** `a11y-baseline.json` was recorded over
-    the 26-route configuration, so `/sign-in` and `/sign-up`'s own contrast pairs are absent from
-    it and report as `NEW` every time — a guaranteed FAIL whenever `VITE_API_BASE_URL` is set. The
-    script already declines to compare *totals* across differing route counts; it needs the same
-    treatment for pairs (a second baseline, or recording the auth pages' pairs unconditionally).
-    Same shape as item 18: a check that can't pass in one configuration is one nobody runs there.
+26. ~~**`audit:a11y` can never pass in an API-enabled build.**~~ — **done 2026-09-13, differently than
+    proposed.** The diagnosis was right that `/sign-in`/`/sign-up` reported `NEW` pairs every
+    API-enabled run; the proposed fix (patch the script to accept them) was wrong, because both were
+    real bugs, not inherited-and-accepted ones: (1) `TopNav`'s `dark` variant (used only by
+    `TerminalSimulator`) never set a base text color, so the "Sign in" link and the signed-in user's
+    name/"Sign out" inherited the *light-background* body color onto a dark background — 1.18:1,
+    effectively invisible. `.topnav-dark` now sets `color: var(--color-neutral-100)`. (2) The plain
+    `<Link>` cross-references ("Sign up" / "Sign in" at the bottom of each form) used the bare
+    `a { color: var(--color-accent) }` default — 3.03:1 — instead of the deep ramp step the design
+    system already documents for paragraph-size accent text (`app/README.md`'s Accessibility
+    section); both now use `--color-accent-700`, matching the `<h1>` on the same pages. Fixed for
+    real rather than baselined: `npm run audit:a11y` now passes clean with `VITE_API_BASE_URL` set
+    (28/28 routes) exactly as it did without it (26/26), no script changes needed. Same shape as
+    item 18 in reverse — that one turned out to be a check that could never pass; this one turned
+    out to be two real bugs a baselining fix would have quietly buried instead of catching.
 
 ## Found while working (2026-09-12)
 

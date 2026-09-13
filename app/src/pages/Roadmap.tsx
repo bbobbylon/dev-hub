@@ -131,13 +131,51 @@ function StageRail({
   )
 }
 
-/** A neutral `Tag` with a lock icon, used for the "LOCKED" / "UNLOCKS AT STAGE 2" labels. */
+/** A neutral `Tag` with a lock icon, used for a fully-unbuilt stage's "NOT YET BUILT" label. */
 function LockedTag({ children }: { children: string }) {
   return (
     <Tag tone="neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
       <Icon name="lock" size={11} />
       {children}
     </Tag>
+  )
+}
+
+/** A syllabus item with no page behind it yet — deliberately not a `Chip`: nothing to click. */
+function NotBuiltChip({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '9px 16px',
+        borderRadius: 999,
+        fontSize: 13.5,
+        border: '1px dashed var(--color-neutral-300)',
+        color: 'var(--color-neutral-700)',
+      }}
+    >
+      {label}
+      <span style={{ fontSize: 11, color: 'var(--color-neutral-700)' }}>· not built yet</span>
+    </span>
+  )
+}
+
+/** Real, relevant pages that exist off this path — a pointer, not a path concept. */
+function RelatedLessons({ items }: { items: readonly { label: string; route: string }[] }) {
+  return (
+    <div style={{ marginTop: 12, fontSize: 12.5, color: 'var(--color-neutral-700)' }}>
+      Related lessons already on the site:{' '}
+      {items.map((item, i) => (
+        <span key={item.route}>
+          <Link to={item.route} style={{ color: 'var(--color-accent-700)' }}>
+            {item.label}
+          </Link>
+          {i < items.length - 1 ? ', ' : ''}
+        </span>
+      ))}
+    </div>
   )
 }
 
@@ -174,15 +212,20 @@ export default function Roadmap() {
 
   const stage1 = conceptsInStage(1)
   const stage2 = conceptsInStage(2)
+  const stage3 = conceptsInStage(3)
   const isDone = (c: Concept) => Boolean(state.concepts[c.slug])
   // Exactly one chip on the page reads as "next up": the earliest concept in path order that
   // isn't done and has a page to do it on. Concepts with no `route` can't be next — nothing
   // would happen if you clicked them.
-  const nextUp = [...stage1, ...stage2].find((c) => !isDone(c) && c.route)
+  const nextUp = [...stage1, ...stage2, ...stage3].find((c) => !isDone(c) && c.route)
   /** done / next / todo for one chip, from the learner's actual record. */
   const chipState = (c: Concept) => (isDone(c) ? 'done' : c === nextUp ? 'next' : 'todo')
   const stage1Done = stage1.filter(isDone).length
   const stage2Done = stage2.filter(isDone).length
+  const stage3Done = stage3.filter(isDone).length
+  // Stage 3's remaining not-yet-built syllabus items — everything in UPCOMING_STAGES's n:3 entry.
+  const stage3Upcoming = UPCOMING_STAGES.find((s) => s.n === 3)!
+  const laterStages = UPCOMING_STAGES.filter((s) => s.n > 3)
 
   return (
     <div className="page">
@@ -322,9 +365,32 @@ export default function Roadmap() {
             </div>
           </div>
 
-          {/* stages 3–5 — locked */}
-          {UPCOMING_STAGES.map((stage, i) => {
-            const last = i === UPCOMING_STAGES.length - 1
+          {/* stage 3 — one real concept built, the rest of its syllabus honestly not-yet-built */}
+          <div style={{ display: 'flex', gap: 22 }}>
+            <StageRail connector="neutral" node={<NumberNode n={3} state="current" />} />
+            <div style={{ flex: 1, paddingBottom: 34 }}>
+              <div
+                style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}
+              >
+                <h2 style={{ fontSize: 24, margin: 0 }}>3 · A First Language: Python</h2>
+                <Tag tone="neutral">
+                  {stage3Done} OF {stage3.length + stage3Upcoming.concepts.length}
+                </Tag>
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {stage3.map((c) => (
+                  <Chip key={c.slug} label={c.label} state={chipState(c)} to={c.route} />
+                ))}
+                {stage3Upcoming.concepts.map((label) => (
+                  <NotBuiltChip key={label} label={label} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* stages 4–5 — fully locked, but honestly pointed at real related content */}
+          {laterStages.map((stage, i) => {
+            const last = i === laterStages.length - 1
             return (
             <div key={stage.n} style={{ display: 'flex', gap: 22 }}>
               <StageRail
@@ -343,6 +409,7 @@ export default function Roadmap() {
                 <p style={{ fontSize: 13.5, color: 'var(--color-neutral-700)', margin: 0 }}>
                   {syllabusOf(stage)}
                 </p>
+                {'related' in stage ? <RelatedLessons items={stage.related} /> : null}
               </div>
             </div>
             )
