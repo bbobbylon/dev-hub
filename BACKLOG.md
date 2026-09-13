@@ -10,7 +10,12 @@ host and MySQL provider are picked. See `server/README.md`'s "Deploying" section
 choice itself, the actual deploy, and wiring `VITE_API_BASE_URL` into the Pages workflow are still
 open — item 1 stays open until the backend is actually reachable over HTTPS.
 
-**Shipped since the last update (2026-09-12):** item 27 — `docs/SRS.md` §6 no longer states a fixed
+**Shipped since the last update (2026-09-13):** item 12 — a global Cmd/Ctrl+K command palette
+(`src/components/CommandPalette.tsx`) now jumps straight to any page from anywhere in the app,
+filtering the same `data/pages.ts` catalog the gallery's own search box does; see its entry below
+for the one real bug (a one-frame stale-query flash on reopen) caught and fixed before it shipped.
+
+**Shipped 2026-09-12:** item 27 — `docs/SRS.md` §6 no longer states a fixed
 interaction-check count (it had already drifted twice, 95 → 132 → 155 → 170 by hand); it now says
 "every check ... passes," which can't go stale. Earlier the same day: item 28 — `npm run verify` now
 starts and owns its own preview server (`scripts/run-verify.mjs`, via Vite's JS API with
@@ -95,8 +100,20 @@ rather than summarised here.
 ## Nice-to-haves (not gaps, just ideas)
 
 11. **Dark mode / theme toggle** — no theming beyond the one "Organic" light palette today.
-12. **A command palette** (Cmd/Ctrl+K) for jumping to any page — today's only navigation aid is the
-    gallery's own search box.
+12. ~~**A command palette** (Cmd/Ctrl+K) for jumping to any page~~ — **done 2026-09-13.**
+    `src/components/CommandPalette.tsx`, mounted once in `App.tsx` alongside the route tree rather
+    than composed into any one page, so the shortcut works from every route. Filters
+    `data/pages.ts`'s `PAGES` catalog by title/kind/blurb/slug (same idea as the gallery's own
+    filter, generalized to work before you're on the gallery), arrow keys move the highlighted
+    result, Enter navigates, Escape or a backdrop click closes. Renders nothing at all while
+    closed, so it adds no new element to any route's own a11y surface — `npm run audit:a11y`
+    stayed at its exact baseline (39 failures across 20 pairs). Built on the handoff's own
+    `.dialog`/`.dialog-backdrop` classes in `organic.css`, which no page had used until now. One
+    real bug caught before it shipped: the first version cleared the search query in a `useEffect`
+    keyed on `open`, which left a one-frame flash of the *previous* session's query visible on
+    reopen (caught by a Playwright check asserting the palette starts blank, not by eye) — fixed by
+    resetting query/selection synchronously in the same keydown handler that opens it, so React
+    batches both into one render. 7 new checks in `verify-interactions.mjs` (170 → 177).
 13. **Unit tests for the pure logic** — `lib/progress.ts`'s `schedule()` (SM-2) and `streakOf()` are
     both pure functions with real edge cases (ease floor, day boundaries) and no test coverage;
     today's verification is all Playwright e2e, nothing at the function level.
