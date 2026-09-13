@@ -569,6 +569,210 @@ check(
   'un-mark: the quiz attempt itself survived',
   (await body()).includes('Best score, per checkpoint'),
 )
+
+/* ── Dashboard: real badges, weakest topic, up next (BACKLOG items 15 & 7) ─ */
+// Before this, all four badges were fixed true/false, "weakest topic" was pinned to "Exit codes"
+// (not even a real question topic), and "up next" was a fixed template with only the flashcard
+// count swapped in live. Every value below now comes from state a step earlier drove for real.
+await resetProgress()
+await go('/progress-dashboard')
+const dashStart = await body()
+check('dashboard: no checkpoint yet reads honestly', dashStart.includes('No checkpoints yet'))
+check('dashboard: weakest-topic link offers to take one, not review', dashStart.includes('Take one →'))
+check('dashboard: checkpoint slot offers to take it', dashStart.includes('Take: Git Basics checkpoint'))
+check('dashboard: concept slot recommends the first lesson', dashStart.includes('Continue: CLI Basics'))
+check('dashboard: Terminal Tamer starts at 0 of 2 lessons', dashStart.includes('0 of 2 lessons'))
+check('dashboard: 7-Day Flame starts at 0 of 7 days', dashStart.includes('0 of 7 days'))
+check('dashboard: Bug Hunter names what earns it', dashStart.includes('Debugging Challenge'))
+check(
+  'dashboard: First Path shows the real (capped) percentage, not 34%',
+  dashStart.includes('0%') && !dashStart.includes('34%'),
+)
+
+// Solving the one real "case" earns Bug Hunter — a lock reads oddly on something just solved, so
+// the icon swaps too, but that's not visible to body(); the subtitle change is what's checked.
+await go('/debugging-challenge')
+await page.getByRole('button', { name: 'Give me a hint' }).click()
+await page.getByRole('button', { name: 'One more hint' }).click()
+await page.getByRole('button', { name: /show the fix/ }).click()
+check('dashboard-setup: solving it records the concept', await completed('Debugging Challenge'))
+await go('/progress-dashboard')
+check('dashboard: Bug Hunter earns on solving the case', (await body()).includes('Case closed'))
+
+// A sub-pass attempt (same "always B" run used above): correct on MENTAL MODEL/STAGING/BRANCHES,
+// wrong on UNDO/COLLABORATION — a real tie at 0% accuracy, broken to whichever topic the question
+// bank asks first.
+await go('/quiz-mode')
+for (let q = 0; q < 5; q++) {
+  await page.getByRole('button', { name: /^B\s/ }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('dashboard-setup: the sub-pass attempt scores 3/5', (await body()).includes('3/5'))
+await go('/progress-dashboard')
+const dashSubPass = await body()
+check('weakest topic: names Undo, not the fake Exit codes', dashSubPass.includes('Undo'))
+check('weakest topic: review link appears once a checkpoint exists', dashSubPass.includes('Review →'))
+check(
+  'up next: checkpoint offers a retry below the pass mark',
+  dashSubPass.includes('Retry: Git Basics checkpoint'),
+)
+
+// CLI Basics done: Terminal Tamer's count moves and the concept slot advances past it.
+await go('/cli-basics')
+for (const option of [
+  'pwd',
+  'It failed — 2 identifies the kind of error',
+  'Lists files, then filters to ones matching ".java"',
+]) {
+  await page.getByRole('button', { name: option, exact: true }).click()
+}
+check('dashboard-setup: CLI Basics records', await completed('CLI Basics'))
+await go('/progress-dashboard')
+const dashCli = await body()
+check('dashboard: Terminal Tamer counts the first lesson', dashCli.includes('1 of 2 lessons'))
+check('dashboard: concept slot advances to Shell Scripting', dashCli.includes('Continue: Shell Scripting'))
+
+// Shell Scripting done too: both routed Stage-1 lessons complete, so Terminal Tamer earns, and
+// the concept slot skips past the un-taught Environment Variables, the checkpoint (its own slot),
+// and the un-taught Staging & Commits to land on Branching & Merging.
+await go('/shell-scripting')
+for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
+check('dashboard-setup: Shell Scripting records', await completed('Shell Scripting'))
+await go('/progress-dashboard')
+const dashShell = await body()
+check('dashboard: Terminal Tamer earns at 2 of 2 lessons', dashShell.includes('2 of 2 lessons'))
+check(
+  'dashboard: concept slot skips page-less concepts and the checkpoint',
+  dashShell.includes('Continue: Branching & Merging'),
+)
+
+// A perfect retake overwrites the topic breakdown: every topic now reads 100%, so there is no
+// real "weakest" one left — the tie-break (first topic in question order) is what decides it, not
+// an arbitrary object-iteration accident, and the checkpoint slot moves from Retry to Review.
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('dashboard-setup: the retake is a perfect 5/5', (await body()).includes('Checkpoint passed!'))
+await go('/progress-dashboard')
+const dashPerfect = await body()
+check('weakest topic: an all-correct attempt still names one topic', dashPerfect.includes('Mental Model'))
+check(
+  'up next: a passed checkpoint offers Review, not Retry',
+  dashPerfect.includes('Review: Git Basics checkpoint'),
+)
+/* ── Dashboard: per-concept list (BACKLOG items 29 & 24) ──────────────── */
+// Before this, `clearConcept()` was only ever wired behind a concept's own <ConceptComplete>
+// panel, so un-marking meant finding that page again — and `environment-variables`/
+// `staging-commits`, which the path names but no page teaches, could never be marked at all. The
+// dashboard's "Your concepts" list fixes both from one place.
+await resetProgress()
+await go('/progress-dashboard')
+const concepts0 = await body()
+// Group headings render through the same uppercase-transform PanelLabel style as "BADGES" and "UP
+// NEXT" above, so `innerText` — which reflects computed CSS, not the DOM's literal text — reads
+// them shouting too.
+check(
+  'concepts panel: groups the way the Roadmap does',
+  concepts0.includes('STAGE 1 · TERMINAL & SHELL') &&
+    concepts0.includes('STAGE 2 · VERSION CONTROL') &&
+    concepts0.includes('OFF THE PATH'),
+)
+check(
+  'concepts panel: only the two routeless concepts read as unreachable',
+  (concepts0.match(/No lesson page — mark it yourself/g) ?? []).length === 2,
+)
+check(
+  'concepts panel: exactly two Mark complete buttons exist',
+  (await page.getByRole('button', { name: /^Mark .+ complete$/ }).count()) === 2,
+)
+
+// Marking the two routeless path concepts directly — the only way either can ever be earned.
+await page.getByRole('button', { name: 'Mark Environment Variables complete' }).click()
+check(
+  'concepts panel: Environment Variables offers Un-mark once marked',
+  await page
+    .getByRole('button', { name: 'Un-mark Environment Variables' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await page.getByRole('button', { name: 'Mark Staging & Commits complete' }).click()
+check(
+  'concepts panel: Staging & Commits offers Un-mark once marked',
+  await page
+    .getByRole('button', { name: 'Un-mark Staging & Commits' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+check(
+  'concepts panel: both rows show a completion date',
+  (await body()).match(/Done \w+ \d{1,2}, \d{4}/g)?.length === 2,
+)
+
+await go('/roadmap')
+const road3 = await body()
+check('concepts panel: stage 1 counts the routeless concept — 1 OF 3', road3.includes('1 OF 3'))
+check(
+  'concepts panel: stage 2 counts the routeless concept — 1 of 4',
+  road3.includes('1 of 4 concepts down in this stage'),
+)
+check('concepts panel: the path total counts both — 2 of 25 concepts', road3.includes('2 of 25 concepts'))
+
+// The other half of item 29: un-marking a *routed* concept from the dashboard, never visiting its
+// page for either the completion or the undo.
+await go('/cli-basics')
+for (const option of [
+  'pwd',
+  'It failed — 2 identifies the kind of error',
+  'Lists files, then filters to ones matching ".java"',
+]) {
+  await page.getByRole('button', { name: option, exact: true }).click()
+}
+check('concepts panel setup: CLI Basics records from its own page', await completed('CLI Basics'))
+await go('/progress-dashboard')
+check(
+  'concepts panel: a routed concept can be un-marked without visiting its page',
+  await page
+    .getByRole('button', { name: 'Un-mark CLI Basics' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await page.getByRole('button', { name: 'Un-mark CLI Basics' }).click()
+check(
+  'concepts panel: CLI Basics offers Go to lesson again',
+  await page
+    .getByRole('link', { name: 'Go to the CLI Basics lesson' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await go('/cli-basics')
+check(
+  "concepts panel: the un-mark reached CLI Basics's own panel too",
+  await notCompleted('CLI Basics'),
+)
+
+// Clean up the two routeless concepts so this section leaves no state behind.
+await go('/progress-dashboard')
+await page.getByRole('button', { name: 'Un-mark Environment Variables' }).click()
+await page.getByRole('button', { name: 'Un-mark Staging & Commits' }).click()
+check(
+  'concepts panel: un-marking both restores the two Mark complete buttons',
+  await page
+    .getByRole('button', { name: /^Mark .+ complete$/ })
+    .nth(1)
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await go('/roadmap')
+check('concepts panel: the path total is back to 0', (await body()).includes('0 of 25 concepts'))
 await resetProgress()
 
 const failed = results.filter((r) => !r.pass)

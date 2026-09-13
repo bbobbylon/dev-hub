@@ -39,7 +39,7 @@
  */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useProgress } from '../lib/progress'
+import { formatDay, useProgress } from '../lib/progress'
 import { CONCEPT_BY_SLUG } from '../data/concepts'
 import { Icon } from './Icon'
 
@@ -169,12 +169,4 @@ export function ConceptComplete({
       )}
     </section>
   )
-}
-
-/** Renders the stored ISO timestamp as a plain local date, falling back to it verbatim if unparseable. */
-function formatDay(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? iso
-    : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }

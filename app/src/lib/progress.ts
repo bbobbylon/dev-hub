@@ -23,6 +23,13 @@ export interface QuizRecord {
   total: number
   attempts: number
   lastAt: string
+  /**
+   * Correct/total per question topic, from the *most recent* attempt only (not accumulated
+   * across attempts) — a topic you've since nailed shouldn't stay "weakest" forever because of
+   * one early miss. Optional: records from before this field existed, or restored from an older
+   * backup file, simply carry no topic breakdown. See `weakestTopic()`.
+   */
+  topics?: Record<string, { correct: number; total: number }>
 }
 
 export interface CardRecord {
@@ -101,6 +108,18 @@ export const dayKey = (d: Date = new Date()) =>
 const addDays = (d: Date, n: number) => new Date(d.getTime() + n * 86_400_000)
 
 /**
+ * Renders a stored ISO timestamp as a plain local date ("Sep 12, 2026"), falling back to it
+ * verbatim if unparseable. Shared by `<ConceptComplete>` and the dashboard's per-concept list —
+ * the two places a concept's completion date is ever shown to a learner.
+ */
+export function formatDay(iso: string): string {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+/**
  * Consecutive days with activity, counting back from today. Yesterday still
  * counts as alive so the streak doesn't die before the day is over.
  */
@@ -158,6 +177,39 @@ export function schedule(prev: CardRecord | undefined, rating: Rating, now = new
 export const isDue = (card: CardRecord | undefined, now = new Date()) =>
   !card || new Date(card.dueAt) <= now
 
+/* ── quiz topics ───────────────────────────────────────────────────────── */
+
+/**
+ * The topic with the lowest accuracy across every quiz's recorded `topics`, or `null` if no
+ * attempt has ever recorded one (no checkpoint taken yet, or every stored attempt predates the
+ * field). Topics of the same name from different quizzes are summed together, though today there
+ * is exactly one checkpoint. Ties break to whichever topic was recorded first — for the one quiz
+ * that exists, that's question order — rather than an arbitrary object-iteration accident.
+ */
+export function weakestTopic(
+  quizzes: Record<string, QuizRecord>,
+): { topic: string; correct: number; total: number } | null {
+  const merged: Record<string, { correct: number; total: number }> = {}
+  for (const q of Object.values(quizzes)) {
+    if (!q.topics) continue
+    for (const [topic, t] of Object.entries(q.topics)) {
+      const prev = merged[topic] ?? { correct: 0, total: 0 }
+      merged[topic] = { correct: prev.correct + t.correct, total: prev.total + t.total }
+    }
+  }
+  let worst: { topic: string; correct: number; total: number } | null = null
+  let worstAccuracy = Infinity
+  for (const [topic, t] of Object.entries(merged)) {
+    if (t.total <= 0) continue
+    const accuracy = t.correct / t.total
+    if (accuracy < worstAccuracy) {
+      worstAccuracy = accuracy
+      worst = { topic, ...t }
+    }
+  }
+  return worst
+}
+
 /* ── the hook ──────────────────────────────────────────────────────────── */
 
 /**
@@ -207,24 +259,37 @@ export function useProgress() {
     })
   }, [])
 
-  /** Records one quiz attempt, keeping the personal-best score. */
-  const recordQuiz = useCallback((id: string, score: number, total: number) => {
-    update((s) => {
-      const prev = s.quizzes[id]
-      return {
-        ...s,
-        quizzes: {
-          ...s.quizzes,
-          [id]: {
-            best: Math.max(prev?.best ?? 0, score),
-            total,
-            attempts: (prev?.attempts ?? 0) + 1,
-            lastAt: new Date().toISOString(),
+  /**
+   * Records one quiz attempt, keeping the personal-best score. `topics`, when given, replaces
+   * the record's per-topic breakdown outright (this attempt's view of where the learner stands
+   * now), independent of whether `score` beat the personal best.
+   */
+  const recordQuiz = useCallback(
+    (
+      id: string,
+      score: number,
+      total: number,
+      topics?: Record<string, { correct: number; total: number }>,
+    ) => {
+      update((s) => {
+        const prev = s.quizzes[id]
+        return {
+          ...s,
+          quizzes: {
+            ...s.quizzes,
+            [id]: {
+              best: Math.max(prev?.best ?? 0, score),
+              total,
+              attempts: (prev?.attempts ?? 0) + 1,
+              lastAt: new Date().toISOString(),
+              topics: topics ?? prev?.topics,
+            },
           },
-        },
-      }
-    })
-  }, [])
+        }
+      })
+    },
+    [],
+  )
 
   /** Rates a flashcard and reschedules it via SM-2 (see `schedule`). */
   const rateCard = useCallback((id: string, rating: Rating) => {

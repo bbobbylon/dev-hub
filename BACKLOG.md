@@ -4,10 +4,15 @@ _Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** item 22 — a completed concept can now be
-un-marked, one concept at a time, instead of a mis-click costing the whole progress blob. Earlier
-sessions closed items 6, 14, 16, 17, 18 and 19; each is struck through in place below with what
-was actually done, rather than summarised here.
+**Shipped since the last update (2026-09-12):** items 29 and 24 — the Progress Dashboard's new
+"Your concepts" panel un-marks any concept without returning to its page, and is the only place
+"Environment Variables" and "Staging & Commits" can be marked at all, since neither has a lesson
+page. Earlier the same day: items 15 and 7 — the Progress Dashboard's badges, weakest-topic
+callout, and "up next" queue, plus the Course Complete certificate, now read real state instead of
+fixed placeholder content. Earlier still: item 22, a completed concept can now be un-marked, one
+concept at a time, instead of a mis-click costing the whole progress blob. Earlier sessions closed
+items 6, 14, 16, 17, 18 and 19; each is struck through in place below with what was actually done,
+rather than summarised here.
 
 ## Backend / account
 
@@ -54,8 +59,17 @@ was actually done, rather than summarised here.
    Deliberately *not* wired: `Glossary` and `CheatSheet` are look-it-up references you never
    "finish", and `Flashcards` already has its own SM-2 state in `state.cards`. See items 24-26 for
    what this exposed.
-7. **`CourseComplete.tsx`'s certificate stats are hardcoded**, not read from `useProgress()` — per
-   `docs/ARCHITECTURE.md` §7, this was already known and never fixed.
+7. ~~**`CourseComplete.tsx`'s certificate stats are hardcoded**~~ — **done 2026-09-12.** The name,
+   date, and capstone count are now real: a signed-in learner's name from `useAuth()` (or "You" —
+   most deployments run with no backend at all, so that's the common case, not a fallback edge
+   case), today's date, and whether `project-build-along` is actually recorded in `state.concepts`
+   rather than a fixed "Ada Moreno" / "August 30, 2026" / "1 capstone shipped". Deliberately left
+   static: the path title ("Terminal & Shell") and the certificate's shareable id. This page isn't
+   gated behind actually finishing a path — items 24-25 record why stage 1 can't reach COMPLETE at
+   all yet — so there's no real multi-path state for the title to read from, and the id reads as a
+   serial-number prop on the template rather than a claim about anyone's progress. Worth revisiting
+   once (if) a path can actually be completed: at that point this page probably wants a real gate
+   and a title that names *which* path, not just Stage 1's.
 8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
    nothing behind the other 25 letters.
 9. **`CodePlayground`'s "running tests" is fully simulated** — a canned pass output, no real
@@ -84,13 +98,35 @@ was actually done, rather than summarised here.
 Noticed in passing while gating the account UI and adding the backup file — none of it blocked that
 work, all of it is real. Numbered from 15 so the references above stay valid.
 
-15. **Half the Progress Dashboard is still hardcoded**, which is item 7's problem on a bigger page.
-    `BADGES` always shows "Terminal Tamer" and "7-Day Flame" as earned and "Bug Hunter · 2 of 5
-    cases" / "First Path · 34%" as fixed text; "Weakest topic by quiz score" is pinned to "Exit
-    codes" regardless of the actual scores in `state.quizzes`; and `UP_NEXT_TEMPLATE`'s labels and
-    "4 min"/"5 min"/"6 min" estimates are fixed, with only the flashcard due count swapped in live.
-    The stat tiles, chart and donut around them are all real, which makes the fake parts *more*
-    conspicuous, not less.
+15. ~~**Half the Progress Dashboard is still hardcoded**~~ — **done 2026-09-12.** All four badges now
+    carry a real `earned` condition, computed in-component rather than typed as fixed `true`/
+    `false`: Terminal Tamer off every routed Stage-1 concept (`cli-basics`, `shell-scripting` —
+    `environment-variables` has no page, so it's excluded rather than blocking the badge forever),
+    7-Day Flame off the real `streakOf()` value, Bug Hunter off `debugging-challenge`'s completion,
+    First Path off the path percentage reaching 100. The two that used to print an invented stat
+    ("2 of 5 cases" — the Debugging Challenge page has exactly one case, never five; "34%") now
+    print a real one, and Bug Hunter's icon swaps from a lock to the actual bug icon once earned,
+    since a lock reads oddly on something no longer locked.
+
+    "Weakest topic by quiz score" needed a schema change to answer honestly: `QuizRecord` gained
+    an optional `topics` field (correct/total per question topic, from the *most recent* attempt,
+    not accumulated — a topic you've since nailed shouldn't stay "weakest" forever over one early
+    miss), `QuizMode` tallies it from the same `results` array it already had and hands it to
+    `recordQuiz`, and a new `weakestTopic()` in `lib/progress.ts` picks the lowest-accuracy one
+    (ties break to whichever was recorded first, i.e. question order). `lib/progressFile.ts`'s
+    paranoid field-by-field validation covers the new field the same way as everything else —
+    drop a malformed topic entry, not the whole quiz record. Before any checkpoint is taken the
+    panel says so ("No checkpoints yet" / "Take one →") rather than showing something invented.
+
+    The "up next" queue's other two slots were re-derived rather than patched: the checkpoint slot
+    now reads real `Take`/`Retry`/`Review` off `state.quizzes[QUIZ_ID]` against `PASS_MARK` (both
+    moved to a new `data/gitBasicsQuiz.ts`, alongside the question bank itself, so the dashboard
+    and `QuizMode` share one literal instead of two), and the third slot names the actual next
+    not-yet-complete lesson from `data/concepts.ts` (path concepts first, off-path as a fallback,
+    skipping `git-basics` since the checkpoint slot already covers it). The per-item minute
+    estimates and the panel's "up next — 15 minutes total" header are gone rather than replaced
+    with a better guess — no page in the app records how long it takes, so there was nothing
+    honest to put there.
 16. ~~**`TOTAL_CONCEPTS = 23` is a hardcoded denominator**~~ — **done 2026-09-11.** It turned out to
     be written three times, not once: `ProgressDashboard.tsx`, `Roadmap.tsx`, and as the string
     `'23 concepts'` in `CourseComplete.tsx`'s certificate. All three now read `data/curriculum.ts`,
@@ -164,15 +200,18 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
     rather than restating it (`UPCOMING_STAGES` in `data/curriculum.ts`), so the two can't disagree
     again — but worth recording that a hand-written total was wrong by two for as long as it was
     hand-written, which is the argument for item 16's whole approach.
-24. **Two path concepts have no page to earn them on.** "Environment Variables" (stage 1) and
-    "Staging & Commits" (stage 2) are named by the design and taught nowhere, so they now render as
-    permanently grey unlinked chips — honest, but it means stage 1 can never reach COMPLETE. Either
-    build the two lessons or drop them from the path.
-25. **Completing everything the app has tops out at 5 of 25 (20%).** Only 5 of the 7 path concepts
-    have pages (item 24) and stages 3-5 are placeholders, so the Roadmap's bar is capped at a fifth
-    even for a learner who finishes every lesson. The other 13 concepts the app teaches sit off the
-    path and are counted separately ("+N off-path" under the dashboard tile) rather than inflating
-    it. Not wrong, but the path bar is a weak reward until stages 3-5 exist.
+24. ~~**Two path concepts have no page to earn them on.**~~ — **done 2026-09-12.** "Environment
+    Variables" (stage 1) and "Staging & Commits" (stage 2) are still named by the design and taught
+    nowhere, so their Roadmap chips still render as a plain unlinked `<span>` rather than a `Link` —
+    honest, since no page exists to send a click to. But either can now be marked (and un-marked)
+    directly from the Progress Dashboard's new "Your concepts" panel (item 29), so stage 1 can reach
+    COMPLETE; building the two lessons for real, or dropping them from the path, is still open.
+25. **Completing everything the app has now tops out at 7 of 25 (28%), not 5.** Item 24 means all 7
+    path concepts can be marked, not just the 5 with pages, so the Roadmap's bar can now clear a
+    quarter — but stages 3-5 are still placeholders, so it's still nowhere near 100% for a learner
+    who's genuinely finished every lesson. The other 13 concepts the app teaches sit off the path
+    and are counted separately ("+N off-path" under the dashboard tile) rather than inflating it.
+    Not wrong, but the path bar is a weak reward until stages 3-5 exist.
 26. **`audit:a11y` can never pass in an API-enabled build.** `a11y-baseline.json` was recorded over
     the 26-route configuration, so `/sign-in` and `/sign-up`'s own contrast pairs are absent from
     it and report as `NEW` every time — a guaranteed FAIL whenever `VITE_API_BASE_URL` is set. The
@@ -186,10 +225,10 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
 
 27. **The interaction-check count is hand-written in `docs/SRS.md` and had already drifted.** §6 read
     "All 95 interaction checks pass" while the suite was on 113 — the count moved twice without the
-    prose following, which is item 16's problem in a document instead of a component. It reads 132
-    now, and will be wrong again the next time a check is added. Either drop the number ("every
-    check in `verify-interactions.mjs` passes" needs no maintenance) or have the script write it
-    somewhere the docs can cite.
+    prose following, which is item 16's problem in a document instead of a component. It's read 132,
+    then 155, and reads 170 now, updated by hand each time — proving the point rather than fixing it.
+    Either drop the number ("every check in `verify-interactions.mjs` passes" needs no maintenance)
+    or have the script write it somewhere the docs can cite.
 28. **A stale `vite preview` can silently take the port the suites verify against.** Eleven orphaned
     preview servers from earlier sessions were holding 4173-4182; `npm run preview` reports "Port
     4173 is in use, trying another one..." and happily starts on 4183, while `scripts/browser.mjs`
@@ -197,9 +236,11 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
     whatever *that* server is serving. `vite preview --strictPort` would turn it into a loud failure
     at the point the mistake is made; a `verify` that started and owned its own preview would be
     better still.
-29. **Un-marking a concept means going back to its page.** `<ConceptComplete>` is the only place
-    `clearConcept()` is wired, so tidying up a wrongly-recorded concept means navigating to the page
-    that recorded it — fine for a mis-click you notice immediately, awkward for cleaning up several.
-    The Progress Dashboard has the whole record in hand and no per-concept view; a list there, next
-    to "Your data", would be the natural home (and would cover `environment-variables` and
-    `staging-commits`, which no page can reach at all — see item 24).
+29. ~~**Un-marking a concept means going back to its page.**~~ — **done 2026-09-12.** The Progress
+    Dashboard now has a "Your concepts" panel, grouped by stage the way the Roadmap is, listing all
+    20 registered concepts. A done row offers only "Un-mark" (never "Undo" — `DecoratorPattern`
+    already has one, and `verify-interactions.mjs` clicks by name); a not-done row with a `route`
+    links to the lesson that earns it, and the two without one (item 24) get a "Mark complete"
+    button instead, since there's no page to put one on. 15 new checks (155 → 170), including
+    marking and un-marking both routeless concepts (item 24) and un-marking a routed one without
+    ever visiting its page.

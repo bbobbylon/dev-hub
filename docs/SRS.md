@@ -68,14 +68,24 @@ follow them across devices can optionally create an account.
   A completion survives a reload, and rewinding a page's own walkthrough does not undo it. A
   completed panel offers the inverse — "Un-mark complete" — which removes that one concept and
   nothing else; before it existed the only way back from a mis-click was resetting all progress.
-  The Roadmap derives every chip, stage badge, "next up" marker and total from that record;
-  concepts taught off the five-stage path are counted separately so they can't inflate a figure
-  labelled "Backend path".
+  Two path concepts ("Environment Variables", "Staging & Commits") have no lesson page at all, so
+  they can only ever be marked or un-marked from the Progress Dashboard's "Your concepts" panel,
+  which also lets any other concept be un-marked without returning to its page. The Roadmap derives
+  every chip, stage badge, "next up" marker and total from that record; concepts taught off the
+  five-stage path are counted separately so they can't inflate a figure labelled "Backend path".
 - **Progress Dashboard** — reads and displays, without any hardcoded numbers: current streak,
   hours studied this week, concepts completed, quiz accuracy, a 14-day minutes-per-day chart, a
   completion donut, and cards due for review; includes a "Your data" panel that tells the learner
   where their progress actually lives (this browser / this browser plus their account) and lets
   them act on all of it at once — see backup/restore below, plus a reset control that wipes it.
+  Its four badges each carry a real earned condition (a routed Stage-1 sweep, a 7-day streak, the
+  Debugging Challenge, a 100% path) rather than two fixed "earned" and two fixed "not earned";
+  "weakest topic by quiz score" names the real lowest-accuracy topic from a checkpoint's most
+  recent attempt (or says none has been taken yet); and the "up next" queue recommends the real
+  flashcards-due count, the checkpoint's actual take/retry/review state, and the next incomplete
+  lesson, with no invented time estimates. A "Your concepts" panel lists every concept, grouped like
+  the Roadmap, so any of them can be marked or un-marked from one place — the only way to do either
+  for the two concepts with no lesson page.
 - **Progress backup and restore (`lib/progressFile.ts`)** — a learner can download their whole
   progress state as a dated JSON file and later load that file back, from any browser, with no
   account and no backend involved. A restore states what it found before replacing anything, and
@@ -146,7 +156,7 @@ follow them across devices can optionally create an account.
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
   a backend has 28: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
-- All 132 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
+- All 170 interaction checks in `scripts/verify-interactions.mjs` pass, covering every stateful
   page's actual behavior (quiz flow, flashcard scheduling, milestone persistence, step-through
   gating, search, the backup round trip and the files it refuses, concept completion and its
   inverse, and more).

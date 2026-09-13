@@ -13,7 +13,7 @@
  * progress every other page in the app reads from.
  */
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { isDue, recentMinutes, streakOf, useProgress } from '../lib/progress'
+import { formatDay, isDue, recentMinutes, streakOf, useProgress, weakestTopic } from '../lib/progress'
 import { downloadProgress, parseProgressFile, summarize } from '../lib/progressFile'
 import { apiEnabled } from '../lib/api'
 import { useAuth } from '../lib/auth'
@@ -23,8 +23,17 @@ import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { TOTAL_CONCEPTS } from '../data/curriculum'
-import { offPathDone, pathDone } from '../data/concepts'
+import {
+  CONCEPTS,
+  CONCEPT_BY_SLUG,
+  conceptsInStage,
+  offPathDone,
+  PATH_CONCEPTS,
+  pathDone,
+  type Concept,
+} from '../data/concepts'
 import { DECK_NAME, DECK_TAGS } from '../data/httpDeck'
+import { PASS_MARK, QUIZ_ID } from '../data/gitBasicsQuiz'
 
 /* ── data ──────────────────────────────────────────────────────────────── */
 
@@ -50,153 +59,137 @@ interface Badge {
   tone: 'accent' | 'accent-2' | 'neutral'
 }
 
-// Badge tiles rendered in the "Badges" panel
-const BADGES: Badge[] = [
-  {
-    name: 'Terminal Tamer',
-    earned: true,
-    tone: 'accent',
-    icon: <Icon name="terminal" size={26} color="var(--color-accent-700)" />,
-  },
-  {
-    name: '7-Day Flame',
-    earned: true,
-    tone: 'accent-2',
-    icon: (
-      <svg
-        width="26"
-        height="26"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--color-accent-2-700)"
-        strokeWidth={2.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M12 2v4" />
-        <path d="M12 18v4" />
-        <path d="m4.9 4.9 2.9 2.9" />
-        <path d="m16.2 16.2 2.9 2.9" />
-        <path d="M2 12h4" />
-        <path d="M18 12h4" />
-        <path d="m4.9 19.1 2.9-2.9" />
-        <path d="m16.2 7.8 2.9-2.9" />
-      </svg>
-    ),
-  },
-  {
-    name: (
-      <>
-        Bug Hunter
-        <br />2 of 5 cases
-      </>
-    ),
-    earned: false,
-    tone: 'neutral',
-    icon: <Icon name="lock" size={24} color="var(--color-neutral-500)" />,
-  },
-  {
-    name: (
-      <>
-        First Path
-        <br />
-        34%
-      </>
-    ),
-    earned: false,
-    tone: 'neutral',
-    icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--color-neutral-500)"
-        strokeWidth={2.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="8" r="6" />
-        <path d="M15.5 13 17 22l-5-3-5 3 1.5-9" />
-      </svg>
-    ),
-  },
-]
+// Badge icon shapes are fixed (the original design's art); only the stroke color follows real
+// `earned` state, matching the ring around it — accent-colored and solid when earned, neutral and
+// dashed when not. Bug Hunter's icon also swaps shape outright: a lock reads oddly once the thing
+// it's "locking" has actually been done.
+function terminalTamerIcon(earned: boolean) {
+  return <Icon name="terminal" size={26} color={earned ? 'var(--color-accent-700)' : 'var(--color-neutral-500)'} />
+}
 
-// "Up next" queue links; the flashcards entry's label is rewritten with the live due count before render
-const UP_NEXT_TEMPLATE = [
-  {
-    to: '/flashcards',
-    label: `5 flashcards due (${DECK_NAME})`,
-    time: '4 min',
-    accented: true,
-    icon: (
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--color-accent-700)"
-        strokeWidth={2.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="2" y="6" width="16" height="12" rx="3" />
-        <path d="M22 8v10a2 2 0 0 1-2 2H8" />
-      </svg>
-    ),
-  },
-  {
-    to: '/quiz-mode',
-    label: 'Retry: exit codes checkpoint',
-    time: '5 min',
-    accented: false,
-    icon: (
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--color-neutral-700)"
-        strokeWidth={2.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M9 11l3 3L22 4" />
-        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-      </svg>
-    ),
-  },
-  {
-    to: '/git-branching',
-    label: 'Continue: Branching & Merging',
-    time: '6 min',
-    accented: false,
-    icon: (
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--color-neutral-700)"
-        strokeWidth={2.75}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="6" cy="6" r="3" />
-        <circle cx="18" cy="18" r="3" />
-        <path d="M6 9v3a3 3 0 0 0 3 3h6" />
-      </svg>
-    ),
-  },
+function flameIcon(earned: boolean) {
+  const color = earned ? 'var(--color-accent-2-700)' : 'var(--color-neutral-500)'
+  return (
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 2v4" />
+      <path d="M12 18v4" />
+      <path d="m4.9 4.9 2.9 2.9" />
+      <path d="m16.2 16.2 2.9 2.9" />
+      <path d="M2 12h4" />
+      <path d="M18 12h4" />
+      <path d="m4.9 19.1 2.9-2.9" />
+      <path d="m16.2 7.8 2.9-2.9" />
+    </svg>
+  )
+}
+
+function bugHunterIcon(earned: boolean) {
+  return earned ? (
+    <Icon name="bug" size={24} color="var(--color-accent-700)" />
+  ) : (
+    <Icon name="lock" size={24} color="var(--color-neutral-500)" />
+  )
+}
+
+function firstPathIcon(earned: boolean) {
+  const color = earned ? 'var(--color-accent-2-700)' : 'var(--color-neutral-500)'
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.5 13 17 22l-5-3-5 3 1.5-9" />
+    </svg>
+  )
+}
+
+// "Up next" queue icons — unlike the icons above, these don't change with state: they name the
+// slot (flashcards / checkpoint / next lesson), not an earned/unearned status.
+const FLASHCARDS_ICON = (
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="var(--color-accent-700)"
+    strokeWidth={2.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="2" y="6" width="16" height="12" rx="3" />
+    <path d="M22 8v10a2 2 0 0 1-2 2H8" />
+  </svg>
+)
+
+const QUIZ_ICON = (
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="var(--color-neutral-700)"
+    strokeWidth={2.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M9 11l3 3L22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </svg>
+)
+
+const CONTINUE_ICON = (
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="var(--color-neutral-700)"
+    strokeWidth={2.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="18" cy="18" r="3" />
+    <path d="M6 9v3a3 3 0 0 0 3 3h6" />
+  </svg>
+)
+
+// Every concept, grouped the way the Roadmap groups them, for the "Your concepts" panel below.
+// A flat 23-row list would bury the two path concepts a learner most needs to find (BACKLOG item
+// 24: `environment-variables` and `staging-commits` have no page, so this panel is the only place
+// they can ever be marked), so the same stage grouping the Roadmap uses keeps them findable.
+const CONCEPT_GROUPS: { title: string; concepts: Concept[] }[] = [
+  { title: 'Stage 1 · Terminal & Shell', concepts: conceptsInStage(1) },
+  { title: 'Stage 2 · Version Control', concepts: conceptsInStage(2) },
+  { title: 'Off the path', concepts: CONCEPTS.filter((c) => c.stage === null) },
 ]
 
 /* ── small pieces ──────────────────────────────────────────────────────── */
+
+/** `QuizMode`'s question topics are shouty constants ("MENTAL MODEL") for the palette tags; this
+ *  page shows one in prose, so it reads as a label instead. */
+const titleCase = (s: string) => s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
 
 /** Small uppercase label heading a dashboard panel. */
 function PanelLabel({ children }: { children: ReactNode }) {
@@ -216,12 +209,111 @@ function PanelLabel({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * One row of the "Your concepts" panel. A done concept only ever offers Un-mark — BACKLOG item 29
+ * was that the only way to undo one was navigating back to its page. A not-done concept with a
+ * `route` links to the page that actually earns it rather than faking a shortcut; the two without
+ * one (BACKLOG item 24) get a Mark complete button here instead, since no page exists to put it on.
+ * Every row's action carries an `aria-label` naming the concept — with up to 23 rows on one page,
+ * a screen reader hearing "Mark complete" repeated with no way to tell which row it's on would be
+ * its own accessibility regression.
+ */
+function ConceptRow({
+  concept,
+  completedAt,
+  onComplete,
+  onClear,
+}: {
+  concept: Concept
+  completedAt?: string
+  onComplete: () => void
+  onClear: () => void
+}) {
+  const done = Boolean(completedAt)
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: '10px 0',
+        borderBottom: '1px solid var(--color-divider)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <span
+          style={{
+            width: 20,
+            height: 20,
+            flex: 'none',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: done ? 'var(--color-accent-2)' : 'var(--color-neutral-300)',
+          }}
+        >
+          {done ? <Icon name="check" size={11} color="var(--color-bg)" /> : null}
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text)' }}>
+            {concept.label}
+          </div>
+          <div style={{ fontSize: 11.5, color: 'var(--color-neutral-700)' }}>
+            {done
+              ? `Done ${formatDay(completedAt as string)}`
+              : concept.route
+                ? 'Not done yet'
+                : 'No lesson page — mark it yourself'}
+          </div>
+        </div>
+      </div>
+      {done ? (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          aria-label={`Un-mark ${concept.label}`}
+          style={{ fontSize: 11.5, padding: '6px 12px', flex: 'none' }}
+          onClick={onClear}
+        >
+          Un-mark
+        </button>
+      ) : concept.route ? (
+        <Link
+          to={concept.route}
+          aria-label={`Go to the ${concept.label} lesson`}
+          style={{
+            fontSize: 12,
+            color: 'var(--color-accent-700)',
+            fontWeight: 600,
+            textDecoration: 'none',
+            flex: 'none',
+          }}
+        >
+          Go to lesson →
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          aria-label={`Mark ${concept.label} complete`}
+          style={{ fontSize: 11.5, padding: '6px 12px', flex: 'none' }}
+          onClick={onComplete}
+        >
+          Mark complete
+        </button>
+      )}
+    </div>
+  )
+}
+
 /* ── page ──────────────────────────────────────────────────────────────── */
 
 /** Stats dashboard: streak, weekly minutes, path completion, badges, and next actions, all derived from real `useProgress()` state. */
 export default function ProgressDashboard() {
   useDocumentTitle('Progress Dashboard')
-  const { state, reset, importState } = useProgress()
+  const { state, reset, importState, completeConcept, clearConcept } = useProgress()
   const { user } = useAuth()
 
   // The file picker behind the "Import backup" button, and the one-line result shown under it.
@@ -318,12 +410,114 @@ export default function ProgressDashboard() {
 
   const DONUT_FILLED = Math.round((pathPct / 100) * DONUT_CIRCUMFERENCE) // arc length, in stroke-dasharray units, for the completed slice
 
-  // UP_NEXT_TEMPLATE with the flashcards row's label swapped in for the live due count
-  const upNext = UP_NEXT_TEMPLATE.map((item) =>
-    item.to === '/flashcards'
-      ? { ...item, label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (${DECK_NAME})` }
-      : item,
-  )
+  // The topic that most needs review, across every checkpoint's most-recent attempt. `null` until
+  // a checkpoint has actually been taken — there's no real answer to "weakest topic" before then.
+  const weakTopic = weakestTopic(state.quizzes)
+
+  // Real badge conditions, derived from the same state the rest of the page reads. Each replaces
+  // a badge the design shipped with a fixed earned/unearned value and, for two of the four, a
+  // fixed stat line ("2 of 5 cases", "34%") with no data behind it. All four now carry a second
+  // line of real progress rather than just the two that used to fake one — earned is otherwise
+  // only a border style (dashed → solid), which a screen reader and a script reading page text
+  // can't see, so leaving two badges with no textual difference at all would just move the
+  // "hardcoded" problem into an accessibility one.
+  const stage1Routed = conceptsInStage(1).filter((c) => c.route)
+  const stage1Done = stage1Routed.filter((c) => state.concepts[c.slug]).length
+  const terminalTamerEarned = stage1Routed.length > 0 && stage1Done === stage1Routed.length
+  const flameEarned = streak >= 7
+  const debuggingConcept = CONCEPT_BY_SLUG['debugging-challenge']
+  const bugHunterEarned = Boolean(debuggingConcept && state.concepts[debuggingConcept.slug])
+  const firstPathEarned = pathPct >= 100
+
+  const BADGES: Badge[] = [
+    {
+      name: (
+        <>
+          Terminal Tamer
+          <br />
+          {stage1Done} of {stage1Routed.length} lessons
+        </>
+      ),
+      earned: terminalTamerEarned,
+      tone: 'accent',
+      icon: terminalTamerIcon(terminalTamerEarned),
+    },
+    {
+      name: (
+        <>
+          7-Day Flame
+          <br />
+          {flameEarned ? `${streak}-day streak` : `${streak} of 7 days`}
+        </>
+      ),
+      earned: flameEarned,
+      tone: 'accent-2',
+      icon: flameIcon(flameEarned),
+    },
+    {
+      name: (
+        <>
+          Bug Hunter
+          <br />
+          {bugHunterEarned ? 'Case closed' : (debuggingConcept?.label ?? 'Debugging Challenge')}
+        </>
+      ),
+      earned: bugHunterEarned,
+      tone: bugHunterEarned ? 'accent' : 'neutral',
+      icon: bugHunterIcon(bugHunterEarned),
+    },
+    {
+      name: (
+        <>
+          First Path
+          <br />
+          {firstPathEarned ? 'Complete' : `${pathPct}%`}
+        </>
+      ),
+      earned: firstPathEarned,
+      tone: firstPathEarned ? 'accent-2' : 'neutral',
+      icon: firstPathIcon(firstPathEarned),
+    },
+  ]
+
+  // "Up next" queue: three real recommendations instead of a fixed template. Each entry used to
+  // carry an invented minute estimate ("4 min", summing to a fake "15 minutes total" header) —
+  // dropped rather than replaced, since no page anywhere in the app records how long it takes.
+  const quizRecord = state.quizzes[QUIZ_ID]
+  const quizVerb = !quizRecord ? 'Take' : quizRecord.best < PASS_MARK ? 'Retry' : 'Review'
+  // The next not-yet-complete lesson with a page: path concepts first (Roadmap order), skipping
+  // `git-basics` since the checkpoint above already covers it, then off-path concepts.
+  const nextConcept =
+    PATH_CONCEPTS.find((c) => c.route && c.slug !== QUIZ_ID && !state.concepts[c.slug]) ??
+    CONCEPTS.find((c) => c.stage === null && c.route && !state.concepts[c.slug])
+
+  const upNext = [
+    {
+      to: '/flashcards',
+      label: `${cardsDue} flashcard${cardsDue === 1 ? '' : 's'} due (${DECK_NAME})`,
+      accented: true,
+      icon: FLASHCARDS_ICON,
+    },
+    {
+      to: '/quiz-mode',
+      label: `${quizVerb}: Git Basics checkpoint`,
+      accented: false,
+      icon: QUIZ_ICON,
+    },
+    nextConcept
+      ? {
+          to: nextConcept.route as string,
+          label: `Continue: ${nextConcept.label}`,
+          accented: false,
+          icon: CONTINUE_ICON,
+        }
+      : {
+          to: '/roadmap',
+          label: 'Every lesson with a page is done — nice work',
+          accented: false,
+          icon: CONTINUE_ICON,
+        },
+  ]
 
   return (
     <div className="page">
@@ -522,7 +716,9 @@ export default function ProgressDashboard() {
               <div
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
               >
-                <span style={{ fontSize: 14, fontWeight: 700 }}>Exit codes</span>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>
+                  {weakTopic ? titleCase(weakTopic.topic) : 'No checkpoints yet'}
+                </span>
                 <Link
                   to="/quiz-mode"
                   style={{
@@ -532,7 +728,7 @@ export default function ProgressDashboard() {
                     textDecoration: 'none',
                   }}
                 >
-                  Review →
+                  {weakTopic ? 'Review →' : 'Take one →'}
                 </Link>
               </div>
             </div>
@@ -585,7 +781,7 @@ export default function ProgressDashboard() {
             className="card elev-sm"
             style={{ borderRadius: 'var(--radius-lg)', padding: '22px 24px' }}
           >
-            <PanelLabel>Up next — 15 minutes total</PanelLabel>
+            <PanelLabel>Up next</PanelLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {upNext.map((item) => (
                 <Link
@@ -616,21 +812,50 @@ export default function ProgressDashboard() {
                   >
                     {item.label}
                   </span>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: item.accented
-                        ? 'var(--color-accent-700)'
-                        : 'var(--color-neutral-700)',
-                    }}
-                  >
-                    {item.time}
-                  </span>
                 </Link>
               ))}
             </div>
           </div>
         </div>
+        {/* per-concept list: un-mark anything without leaving the dashboard, and the only place to
+            mark the two path concepts with no lesson page at all (BACKLOG items 29 & 24) */}
+        <div
+          className="card elev-sm"
+          style={{ borderRadius: 'var(--radius-lg)', padding: '22px 24px', marginTop: 22 }}
+        >
+          <PanelLabel>Your concepts</PanelLabel>
+          <p style={{ fontSize: 12, color: 'var(--color-neutral-700)', margin: '-8px 0 14px', maxWidth: 640 }}>
+            Every concept the app tracks. Un-mark a mis-click here instead of finding its page again
+            — and mark Environment Variables or Staging &amp; Commits here, since neither has a
+            lesson page yet.
+          </p>
+          {CONCEPT_GROUPS.map((group) => (
+            <div key={group.title} style={{ marginBottom: 16 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: 'var(--color-neutral-700)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 2,
+                }}
+              >
+                {group.title}
+              </div>
+              {group.concepts.map((c) => (
+                <ConceptRow
+                  key={c.slug}
+                  concept={c}
+                  completedAt={state.concepts[c.slug]}
+                  onComplete={() => completeConcept(c.slug)}
+                  onClear={() => clearConcept(c.slug)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+
         {/* backup, restore, reset — everything that acts on the whole progress blob at once */}
         <div
           className="card elev-sm"
