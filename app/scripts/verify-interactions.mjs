@@ -264,6 +264,30 @@ const galleryPath = new URL(BASE + '/').pathname
 await page.waitForURL((u) => new URL(u).pathname === galleryPath)
 check('nav: brand mark returns to the gallery', new URL(page.url()).pathname === galleryPath)
 
+/* ── Command palette: Ctrl+K opens it from anywhere, filters, navigates ── */
+await go('/quiz-mode')
+await page.keyboard.press('Control+k')
+const paletteInput = page.getByPlaceholder('Jump to a page…')
+check('palette: Ctrl+K opens it from any page', await paletteInput.isVisible())
+await paletteInput.fill('glossary')
+let paletteText = await body()
+check(
+  'palette: filtering narrows to the matching page',
+  paletteText.includes('Glossary') && !paletteText.includes('CLI Basics'),
+)
+await page.keyboard.press('Enter')
+await page.waitForURL('**/glossary')
+check('palette: Enter navigates to the highlighted result', page.url().endsWith('/glossary'))
+check('palette: navigating closes it', !(await paletteInput.isVisible()))
+
+await page.keyboard.press('Control+k')
+check('palette: reopening starts from a blank query', (await paletteInput.inputValue()) === '')
+await paletteInput.fill('zzz-not-a-real-page')
+paletteText = await body()
+check('palette: an unmatched query shows the honest empty state', paletteText.includes('No page matches'))
+await page.keyboard.press('Escape')
+check('palette: Escape closes it', !(await paletteInput.isVisible()))
+
 /* ── Boundaries: the paths the happy-path checks never reach ─────────── */
 
 // Quiz, all correct. Answers are B,B,B,A,A — this exercises the pass branch
