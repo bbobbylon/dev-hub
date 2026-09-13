@@ -4,7 +4,10 @@ _Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-13):** item 9 — Code Playground's "run tests" now
+**Shipped since the last update (2026-09-13):** item 8 — the Glossary went from 3 mocked-up "A"
+terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored terms with a genuinely
+working search box and A–Z group filter; see its entry below for what stayed faithful to the
+prototype and what's new content. Same day: item 9 — Code Playground's "run tests" now
 executes the real solution source in a sandboxed Web Worker and grades the checklist off actual
 captured output, instead of a scripted pass; see its entry below for the Python→JavaScript
 translation this required. Same day: item 26 — the two contrast pairs that made `audit:a11y` fail
@@ -88,8 +91,17 @@ rather than summarised here.
    serial-number prop on the template rather than a claim about anyone's progress. Worth revisiting
    once (if) a path can actually be completed: at that point this page probably wants a real gate
    and a title that names *which* path, not just Stage 1's.
-8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
-   nothing behind the other 25 letters.
+8. ~~**`Glossary.tsx` only renders "A" terms**~~ — **done 2026-09-13.** The prototype
+   (`project/Glossary.dc.html`) itself only ever mocked up 3 term cards behind a "142 TERMS" badge
+   and a "Show 11 more" button — both decorative chrome, not un-ported content — so this was a real
+   content-authoring pass, not a code fix: 36 genuine terms now span the alphabet (kept API/Argument/
+   Async's original copy verbatim), grouped into the same 9 jump-strip chips the prototype drew
+   (A/B/C/D individually, E–H/I–L/M–P/Q–T/U–Z grouped), each backed by a real filter over the
+   `letters` it covers. The search box filters live across term name, definition, category and
+   pronunciation. The term-count badge and the "N of 36 terms" line both read `TERMS.length` — no
+   more "142 TERMS", and the fake "Show 11 more" button is gone rather than wired to a lie. 9 new
+   checks in `verify-interactions.mjs` (171 → 180) cover the default group, switching groups,
+   searching, the honest no-match state, and clearing a search by picking a group.
 9. ~~**`CodePlayground`'s "running tests" is fully simulated**~~ — **done 2026-09-13.** "Run tests"
    now executes the solution's exact source for real, in a Web Worker (`lib/sandboxRun.ts`, its own
    realm, no DOM, timeout-guarded against infinite loops), and grades all 4 checklist items off the

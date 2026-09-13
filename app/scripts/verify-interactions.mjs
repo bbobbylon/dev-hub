@@ -249,6 +249,35 @@ check('playground: all 4 checks individually graded true', ran.includes('✓ Pri
 await page.getByRole('button', { name: 'Clear output' }).click()
 check('playground: clear resets', (await body()).includes('Output appears here'))
 
+/* ── Glossary: real search + letter-group filtering, honest term count ──── */
+await go('/glossary')
+let g = await body()
+check('glossary: honest term count badge', g.includes('36 TERMS') && !g.includes('142 TERMS'))
+check(
+  'glossary: opens on group A',
+  g.includes('API') && g.includes('Argument') && g.includes('Async') && g.includes('4 of 36 terms'),
+)
+check('glossary: does not show a term from another group', !g.includes('Backend'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+g = await body()
+check(
+  'glossary: switching group filters the list',
+  g.includes('Backend') && g.includes('Boolean') && g.includes('Branch') && !g.includes('Argument'),
+)
+check('glossary: group B count is real', g.includes('3 of 36 terms'))
+await page.getByLabel('Search terms').fill('JWT')
+g = await body()
+check(
+  'glossary: search filters across all groups',
+  g.includes('Search results') && g.includes('1 of 36 terms') && g.includes('JSON Web Token'),
+)
+check('glossary: search hides non-matching terms', !g.includes('Backend'))
+await page.getByLabel('Search terms').fill('zzzzznotaterm')
+check('glossary: no-match state is honest, not empty', (await body()).includes('No terms match'))
+await page.getByRole('button', { name: 'A', exact: true }).click()
+g = await body()
+check('glossary: clicking a group clears the search', g.includes('4 of 36 terms') && g.includes('API'))
+
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so
 // each step waits for the render — not just the address — before asserting.
