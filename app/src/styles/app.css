@@ -42,6 +42,10 @@ body { margin: 0; }
 .topnav-dark {
   background: var(--color-neutral-900);
   border-bottom-color: color-mix(in srgb, var(--color-neutral-100) 14%, transparent);
+  /* Base color for anything that doesn't set its own (the "Sign in" link, the signed-in
+     user's name/"Sign out"): without this they inherit .topnav's light-background text
+     color, nearly invisible on this dark background. */
+  color: var(--color-neutral-100);
 }
 .topnav-dark .topnav-brand { color: var(--color-neutral-100); }
 .topnav-dark .topnav-brand:hover { color: var(--color-accent-400); }

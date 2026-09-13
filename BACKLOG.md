@@ -1,10 +1,19 @@
 # Backlog — Dev Hub
 
-_Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
+_Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothing here is scheduled
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** item 27 — `docs/SRS.md` §6 no longer states a fixed
+**Shipped since the last update (2026-09-13):** item 26 — the two contrast pairs that made
+`audit:a11y` fail on any API-enabled build were real bugs, not inherited ones, and are fixed rather
+than baselined: `TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up
+cross-links use the design system's deep accent ramp step for paragraph-size text. Same day: item
+21 — both account pages' subtitle now explains what an account gets you, which incidentally cleared
+`verify-routes.mjs`'s general render floor, so their special-cased lower one is gone. Investigated
+and corrected rather than shipped: item 20's suggested fix (a conditional dynamic import) was tried
+and doesn't actually work — see its entry below for why, and what would.
+
+**Shipped 2026-09-12:** item 27 — `docs/SRS.md` §6 no longer states a fixed
 interaction-check count (it had already drifted twice, 95 → 132 → 155 → 170 by hand); it now says
 "every check ... passes," which can't go stale. Earlier the same day: item 28 — `npm run verify` now
 starts and owns its own preview server (`scripts/run-verify.mjs`, via Vite's JS API with
@@ -164,12 +173,21 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     `include-hidden-files: true`.
 20. **`SignIn`/`SignUp` chunks still ship in a backend-free build.** They're `lazy()`-declared in
     `App.tsx` whether or not the routes are registered, so Rollup emits both chunks and nothing ever
-    fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy — a conditional dynamic import
-    would drop them.
-21. **The sign-in and sign-up pages barely say anything.** They're the two routes that trip
-    `verify-routes.mjs`'s render floor (144 and 177 chars) — a heading, two fields, a button, and no
-    explanation of what an account actually gets you, which is the one question someone on that page
-    has. Fixing the copy would also remove the need for their special-cased floor.
+    fetches them. Tiny (~2 kB gzipped each) and harmless, just untidy. **Tried and corrected
+    (2026-09-13):** the suggested fix ("a conditional dynamic import would drop them") doesn't work —
+    tested by actually building both ways. Rollup creates a chunk for any `import()` expression it
+    finds anywhere in the module graph, regardless of a runtime/build-time condition wrapped around
+    it (`apiEnabled ? lazy(() => import('./pages/SignIn')) : null` still emitted `SignIn-*.js`).
+    Actually dropping the chunk would need a Vite plugin that rewrites the source before Rollup ever
+    parses it, or splitting these two routes out of the main entry's module graph entirely — more
+    machinery than ~4 kB gzip combined is worth. Leaving as-is; not attempting again without a
+    different approach in mind.
+21. ~~**The sign-in and sign-up pages barely say anything.**~~ — **done 2026-09-13.** Both pages'
+    subtitle now says what an account actually gets you — progress synced across devices, and that
+    it's optional since everything already works from one browser alone — instead of one generic
+    line. That was enough to clear `verify-routes.mjs`'s general 200-char floor honestly, so the
+    special-cased 100-char floor for these two routes is gone; they're checked like every other
+    route now.
 
 ## Found while working (2026-09-11, second pass)
 
@@ -218,12 +236,21 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
     who's genuinely finished every lesson. The other 13 concepts the app teaches sit off the path
     and are counted separately ("+N off-path" under the dashboard tile) rather than inflating it.
     Not wrong, but the path bar is a weak reward until stages 3-5 exist.
-26. **`audit:a11y` can never pass in an API-enabled build.** `a11y-baseline.json` was recorded over
-    the 26-route configuration, so `/sign-in` and `/sign-up`'s own contrast pairs are absent from
-    it and report as `NEW` every time — a guaranteed FAIL whenever `VITE_API_BASE_URL` is set. The
-    script already declines to compare *totals* across differing route counts; it needs the same
-    treatment for pairs (a second baseline, or recording the auth pages' pairs unconditionally).
-    Same shape as item 18: a check that can't pass in one configuration is one nobody runs there.
+26. ~~**`audit:a11y` can never pass in an API-enabled build.**~~ — **done 2026-09-13, differently than
+    proposed.** The diagnosis was right that `/sign-in`/`/sign-up` reported `NEW` pairs every
+    API-enabled run; the proposed fix (patch the script to accept them) was wrong, because both were
+    real bugs, not inherited-and-accepted ones: (1) `TopNav`'s `dark` variant (used only by
+    `TerminalSimulator`) never set a base text color, so the "Sign in" link and the signed-in user's
+    name/"Sign out" inherited the *light-background* body color onto a dark background — 1.18:1,
+    effectively invisible. `.topnav-dark` now sets `color: var(--color-neutral-100)`. (2) The plain
+    `<Link>` cross-references ("Sign up" / "Sign in" at the bottom of each form) used the bare
+    `a { color: var(--color-accent) }` default — 3.03:1 — instead of the deep ramp step the design
+    system already documents for paragraph-size accent text (`app/README.md`'s Accessibility
+    section); both now use `--color-accent-700`, matching the `<h1>` on the same pages. Fixed for
+    real rather than baselined: `npm run audit:a11y` now passes clean with `VITE_API_BASE_URL` set
+    (28/28 routes) exactly as it did without it (26/26), no script changes needed. Same shape as
+    item 18 in reverse — that one turned out to be a check that could never pass; this one turned
+    out to be two real bugs a baselining fix would have quietly buried instead of catching.
 
 ## Found while working (2026-09-12)
 

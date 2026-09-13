@@ -46,7 +46,10 @@ export default function SignIn() {
           Sign in
         </h1>
         <p style={{ fontSize: 14, color: 'var(--color-neutral-700)', margin: '0 0 28px' }}>
-          Sign in to sync your progress across devices.
+          Sign in to sync your progress — quiz scores, flashcard scheduling, streaks, and completed
+          concepts — across every device you study on. It's entirely optional: everything already
+          works from this browser alone; an account just adds a copy on the server so a second
+          device can pick up where the first left off.
         </p>
         <form onSubmit={submit} className="card elev-sm" style={{ padding: 24 }}>
           <div className="field">
@@ -79,7 +82,10 @@ export default function SignIn() {
           </button>
         </form>
         <p style={{ fontSize: 13, color: 'var(--color-neutral-700)', marginTop: 18 }}>
-          Don't have an account? <Link to="/sign-up">Sign up</Link>
+          Don't have an account?{' '}
+          <Link to="/sign-up" style={{ color: 'var(--color-accent-700)' }}>
+            Sign up
+          </Link>
         </p>
       </main>
     </div>

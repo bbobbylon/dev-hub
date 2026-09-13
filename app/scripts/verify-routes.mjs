@@ -9,13 +9,12 @@ import { BASE, openPage } from './browser.mjs'
 import { ROUTES } from './routes.mjs'
 
 // Floor for "did this route actually render?", in characters of body text. Every
-// lesson page clears it several times over; a blank or crashed one is ~30 (the
-// nav alone). The two account forms are the honest exception — a heading, two
-// fields and a button is all they are, ~144 and ~177 chars, so they get a lower
-// floor that a broken render still can't reach rather than a blanket exemption.
+// route clears it several times over; a blank or crashed one is ~30 (the nav alone).
+// The two account forms used to need a lower special-cased floor (a heading, two
+// fields and a button, ~144/~177 chars) until their copy explained what an account
+// actually gets you (BACKLOG item 21) — they clear this floor honestly now.
 const MIN_TEXT = 200
-const SPARSE = { '/sign-in': 100, '/sign-up': 100 }
-const minTextFor = (route) => SPARSE[route] ?? MIN_TEXT
+const minTextFor = () => MIN_TEXT
 
 const { browser, page } = await openPage()
 
