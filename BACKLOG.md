@@ -4,13 +4,18 @@ _Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-13):** item 8 — the Glossary went from 3 mocked-up "A"
-terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored terms with a genuinely
-working search box and A–Z group filter; see its entry below for what stayed faithful to the
-prototype and what's new content. Same day: item 9 — Code Playground's "run tests" now
-executes the real solution source in a sandboxed Web Worker and grades the checklist off actual
-captured output, instead of a scripted pass; see its entry below for the Python→JavaScript
-translation this required. Same day: item 26 — the two contrast pairs that made `audit:a11y` fail
+**Shipped since the last update (2026-09-13):** item 10 (partial) — Stage 3 of the Roadmap has its
+first real concept, Variables (`/python-variables`, four graded predict-the-value questions), and
+Stages 3–5's remaining eighteen concepts now read as honest "not yet built" chips or point at
+real, already-shipped lessons that genuinely cover that syllabus, instead of a blank "locked"; see
+its entry below for exactly what's built versus what's still open. Same day: item 8 — the Glossary
+went from 3 mocked-up "A" terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored
+terms with a genuinely working search box and A–Z group filter; see its entry below for what
+stayed faithful to the prototype and what's new content. Same day: item 9 — Code Playground's
+"run tests" now executes the real solution source in a sandboxed Web Worker and grades the
+checklist off actual captured output, instead of a scripted pass; see its entry below for the
+Python→JavaScript translation this required. Same day: item 26 — the two contrast pairs that made
+`audit:a11y` fail
 on any API-enabled build were real bugs, not inherited ones, and are fixed rather than baselined:
 `TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up cross-links use the
 design system's deep accent ramp step for paragraph-size text. Same day: item 21 — both account
@@ -111,8 +116,38 @@ rather than summarised here.
    listing still shows exactly what's executed. This adds a 5th known `audit:content` extractor
    artifact (the expected-output string is now computed at runtime, not a static literal) —
    documented in `app/README.md`, verified byte-identical to the prototype's output by hand.
-10. **`Roadmap.tsx` stages 3–5 are locked placeholders** with no content behind them yet — the
-    five-stage journey only has two real stages.
+10. ~~**`Roadmap.tsx` stages 3–5 are locked placeholders**~~ — **partially done 2026-09-13.**
+    A full 18-concept build across Python, data structures/algorithms, and APIs/databases was out
+    of scope for one pass, so this shipped a bounded, honest slice rather than either skipping it
+    or faking completeness: Stage 3 has its first real concept, and Stages 3–5's remaining concepts
+    are labelled for exactly what they are instead of a blank "locked."
+
+    **Variables** (`/python-variables`, `data/concepts.ts`'s `python-variables`, `stage: 3`) is a
+    real graded lesson: four predict-the-value questions (reassignment/`type()`, value-copy vs.
+    aliasing, tuple-swap, augmented assignment), each locking on first pick with a real correct/
+    incorrect explanation. Scoring 3 of 4 earns the concept via `<ConceptComplete>`, same as every
+    other checkpoint. `stage: 1 | 2 | null` widened to `1 | 2 | 3 | null` in `data/concepts.ts` —
+    the only path-affecting change — and `data/curriculum.ts`'s `UPCOMING_STAGES[2].concepts`
+    dropped "Variables" so `TOTAL_CONCEPTS` stays exactly 25 (one item moved from the placeholder
+    list into the real registry, not added on top of it).
+
+    Stage 3's other five concepts (Control flow, Functions, Collections, Errors, Files) still show
+    as dashed "not built yet" chips, not real pages — `Roadmap.tsx`'s new `NotBuiltChip`. Stages 4
+    and 5 are still fully locked and unbuilt, but each now points at real, already-shipped off-path
+    lessons whose content genuinely overlaps that stage's syllabus (verified by reading each page,
+    not guessed from its title): Stage 4 → Data Structures Visual, Big-O Performance, Algorithm
+    Visualizer; Stage 5 → API Anatomy. These are `related` pointers in `data/curriculum.ts`, listed
+    not counted — following one doesn't move `TOTAL_CONCEPTS` or any stage's progress count, since
+    none of those four pages were reclassified onto the path (an earlier plan to do exactly that
+    was worked through and abandoned once it turned out to break the 25-concept invariant via a
+    many-to-one collapse of syllabus names into single existing pages).
+
+    Added `/python-variables` to `App.tsx`, `scripts/routes.mjs`, and `data/pages.ts` (26th
+    lesson/tool page, 27th route counting the gallery); 13 new checks in `verify-interactions.mjs`
+    (181 → 194) cover the lesson's scoring/reset and the Roadmap's stage-3 count, its real links,
+    and the two "not yet built" stages. Doc counts swept across `docs/SRS.md`, `docs/UI-DESIGN.md`,
+    `docs/ARCHITECTURE.md`, and `app/README.md`. **Still open:** Stage 3's other five concepts, and
+    all of Stages 4 and 5 (twelve concepts total) remain unbuilt.
 
 ## Nice-to-haves (not gaps, just ideas)
 

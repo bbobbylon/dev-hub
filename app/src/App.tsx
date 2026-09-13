@@ -18,11 +18,12 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import PageGallery from './pages/PageGallery'
 import NotFound from './pages/NotFound'
 
-// Lazy: the 25 page-sized lessons/tools. A visit only ever needs a handful of
+// Lazy: the 26 page-sized lessons/tools. A visit only ever needs a handful of
 // these, so there's no reason to ship all of them in the initial bundle.
 const DevHub = lazy(() => import('./pages/DevHub'))
 const CliBasics = lazy(() => import('./pages/CliBasics'))
 const ShellScripting = lazy(() => import('./pages/ShellScripting'))
+const PythonVariables = lazy(() => import('./pages/PythonVariables'))
 const DecoratorPattern = lazy(() => import('./pages/DecoratorPattern'))
 const VideoLesson = lazy(() => import('./pages/VideoLesson'))
 const ArchitectureDeepDive = lazy(() => import('./pages/ArchitectureDeepDive'))
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/dev-hub" element={<DevHub />} />
             <Route path="/cli-basics" element={<CliBasics />} />
             <Route path="/shell-scripting" element={<ShellScripting />} />
+            <Route path="/python-variables" element={<PythonVariables />} />
             <Route path="/decorator-pattern" element={<DecoratorPattern />} />
             <Route path="/video-lesson" element={<VideoLesson />} />
             <Route path="/architecture-deep-dive" element={<ArchitectureDeepDive />} />

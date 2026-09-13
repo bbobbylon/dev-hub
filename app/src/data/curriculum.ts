@@ -25,29 +25,43 @@
 import { PATH_CONCEPTS } from './concepts'
 
 /**
- * Roadmap stages 3-5: locked placeholders with no pages behind them. Their concepts are listed
- * rather than counted so that the count can't drift from the list the page renders — the syllabus
- * line under each stage heading is built from `concepts` below, not written out by hand.
+ * Roadmap stages 3-5's *not-yet-built* concepts — named in the design but with no page behind
+ * them. Listed rather than counted so the count can't drift from the list the page renders — the
+ * syllabus line under each stage heading is built from `concepts` below, not written out by hand.
+ *
+ * **Stage 3 has one real concept now** (`Variables` → `python-variables` in `data/concepts.ts`,
+ * BACKLOG item 10), so it isn't purely a placeholder anymore — `concepts` here lists only what's
+ * *left* to build in that stage, five of the original six. Stages 4 and 5 remain fully unbuilt.
+ * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
+ * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
+ * nothing real to do — verified by reading each page, not guessed from its title. They are
+ * pointers, not path concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
  */
 export const UPCOMING_STAGES = [
   {
     n: 3,
     title: '3 · A First Language: Python',
-    lock: 'UNLOCKS AT STAGE 2',
-    concepts: ['Variables', 'Control flow', 'Functions', 'Collections', 'Errors', 'Files'],
+    lock: 'IN PROGRESS',
+    concepts: ['Control flow', 'Functions', 'Collections', 'Errors', 'Files'],
   },
   {
     n: 4,
     title: '4 · Data Structures & Algorithms',
-    lock: 'LOCKED',
+    lock: 'NOT YET BUILT',
     concepts: ['Arrays', 'Hash maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting'],
+    related: [
+      { label: 'Data Structures Visual', route: '/data-structures-visual' },
+      { label: 'Big-O Performance', route: '/big-o-performance' },
+      { label: 'Algorithm Visualizer', route: '/algorithm-visualizer' },
+    ],
   },
   {
     n: 5,
     title: '5 · APIs & Databases',
-    lock: 'LOCKED',
+    lock: 'NOT YET BUILT',
     concepts: ['HTTP', 'REST', 'SQL basics', 'Joins', 'Auth', 'Deploy'],
     tail: '. Ends with the capstone project.',
+    related: [{ label: 'API Anatomy', route: '/api-anatomy' }],
   },
 ] as const
 

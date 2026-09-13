@@ -42,7 +42,7 @@ Lucide.
 
 Defined in `app/src/components/` (full API in `docs/ARCHITECTURE.md` §4) and composed directly
 into each page — there is no shared page-shell/layout component; that was tried and dropped
-because each of the 25 pages wants a meaningfully different nav/hero/column arrangement, and a
+because each of the 26 pages wants a meaningfully different nav/hero/column arrangement, and a
 shared shell ended up hiding more than it saved.
 
 | Component | Role |

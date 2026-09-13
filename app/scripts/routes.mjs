@@ -20,6 +20,7 @@ export const ROUTES = [
   '/dev-hub',
   '/cli-basics',
   '/shell-scripting',
+  '/python-variables',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

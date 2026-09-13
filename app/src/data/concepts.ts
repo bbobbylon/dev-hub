@@ -36,8 +36,9 @@ export interface Concept {
   label: string
   /** Route that teaches it, or `undefined` when the path names a concept this app has no page for. */
   route?: string
-  /** Roadmap stage (1-2 are built; 3-5 are locked placeholders), or `null` when off the path. */
-  stage: 1 | 2 | null
+  /** Roadmap stage (1-3 have at least one built concept; 4-5 are still locked placeholders), or
+   *  `null` when off the path. */
+  stage: 1 | 2 | 3 | null
   /** What records it — prose for the next reader, kept in step with the page's `<ConceptComplete>`. */
   earnedBy: string
 }
@@ -97,6 +98,15 @@ export const CONCEPTS: Concept[] = [
     route: '/rebase-history',
     stage: 2,
     earnedBy: 'stepping the rebase walkthrough to its last frame',
+  },
+
+  // ── Stage 3 · A First Language: Python (one concept built so far) ──────
+  {
+    slug: 'python-variables',
+    label: 'Variables',
+    route: '/python-variables',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
   // ── Off the five-stage path ─────────────────────────────────────────────
@@ -202,7 +212,7 @@ export const CONCEPT_BY_SLUG: Record<string, Concept> = Object.fromEntries(
 export const PATH_CONCEPTS = CONCEPTS.filter((c) => c.stage !== null)
 
 /** The concepts a given built Roadmap stage lists, in chip order. */
-export function conceptsInStage(stage: 1 | 2): Concept[] {
+export function conceptsInStage(stage: 1 | 2 | 3): Concept[] {
   return CONCEPTS.filter((c) => c.stage === stage)
 }
 
