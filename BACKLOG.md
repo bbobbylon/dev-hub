@@ -4,10 +4,12 @@ _Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** item 22 — a completed concept can now be
-un-marked, one concept at a time, instead of a mis-click costing the whole progress blob. Earlier
-sessions closed items 6, 14, 16, 17, 18 and 19; each is struck through in place below with what
-was actually done, rather than summarised here.
+**Shipped since the last update (2026-09-12):** items 15 and 7 — the Progress Dashboard's badges,
+weakest-topic callout, and "up next" queue, plus the Course Complete certificate, now read real
+state instead of fixed placeholder content. Earlier the same day: item 22, a completed concept can
+now be un-marked, one concept at a time, instead of a mis-click costing the whole progress blob.
+Earlier sessions closed items 6, 14, 16, 17, 18 and 19; each is struck through in place below with
+what was actually done, rather than summarised here.
 
 ## Backend / account
 
@@ -54,8 +56,17 @@ was actually done, rather than summarised here.
    Deliberately *not* wired: `Glossary` and `CheatSheet` are look-it-up references you never
    "finish", and `Flashcards` already has its own SM-2 state in `state.cards`. See items 24-26 for
    what this exposed.
-7. **`CourseComplete.tsx`'s certificate stats are hardcoded**, not read from `useProgress()` — per
-   `docs/ARCHITECTURE.md` §7, this was already known and never fixed.
+7. ~~**`CourseComplete.tsx`'s certificate stats are hardcoded**~~ — **done 2026-09-12.** The name,
+   date, and capstone count are now real: a signed-in learner's name from `useAuth()` (or "You" —
+   most deployments run with no backend at all, so that's the common case, not a fallback edge
+   case), today's date, and whether `project-build-along` is actually recorded in `state.concepts`
+   rather than a fixed "Ada Moreno" / "August 30, 2026" / "1 capstone shipped". Deliberately left
+   static: the path title ("Terminal & Shell") and the certificate's shareable id. This page isn't
+   gated behind actually finishing a path — items 24-25 record why stage 1 can't reach COMPLETE at
+   all yet — so there's no real multi-path state for the title to read from, and the id reads as a
+   serial-number prop on the template rather than a claim about anyone's progress. Worth revisiting
+   once (if) a path can actually be completed: at that point this page probably wants a real gate
+   and a title that names *which* path, not just Stage 1's.
 8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
    nothing behind the other 25 letters.
 9. **`CodePlayground`'s "running tests" is fully simulated** — a canned pass output, no real
@@ -84,13 +95,35 @@ was actually done, rather than summarised here.
 Noticed in passing while gating the account UI and adding the backup file — none of it blocked that
 work, all of it is real. Numbered from 15 so the references above stay valid.
 
-15. **Half the Progress Dashboard is still hardcoded**, which is item 7's problem on a bigger page.
-    `BADGES` always shows "Terminal Tamer" and "7-Day Flame" as earned and "Bug Hunter · 2 of 5
-    cases" / "First Path · 34%" as fixed text; "Weakest topic by quiz score" is pinned to "Exit
-    codes" regardless of the actual scores in `state.quizzes`; and `UP_NEXT_TEMPLATE`'s labels and
-    "4 min"/"5 min"/"6 min" estimates are fixed, with only the flashcard due count swapped in live.
-    The stat tiles, chart and donut around them are all real, which makes the fake parts *more*
-    conspicuous, not less.
+15. ~~**Half the Progress Dashboard is still hardcoded**~~ — **done 2026-09-12.** All four badges now
+    carry a real `earned` condition, computed in-component rather than typed as fixed `true`/
+    `false`: Terminal Tamer off every routed Stage-1 concept (`cli-basics`, `shell-scripting` —
+    `environment-variables` has no page, so it's excluded rather than blocking the badge forever),
+    7-Day Flame off the real `streakOf()` value, Bug Hunter off `debugging-challenge`'s completion,
+    First Path off the path percentage reaching 100. The two that used to print an invented stat
+    ("2 of 5 cases" — the Debugging Challenge page has exactly one case, never five; "34%") now
+    print a real one, and Bug Hunter's icon swaps from a lock to the actual bug icon once earned,
+    since a lock reads oddly on something no longer locked.
+
+    "Weakest topic by quiz score" needed a schema change to answer honestly: `QuizRecord` gained
+    an optional `topics` field (correct/total per question topic, from the *most recent* attempt,
+    not accumulated — a topic you've since nailed shouldn't stay "weakest" forever over one early
+    miss), `QuizMode` tallies it from the same `results` array it already had and hands it to
+    `recordQuiz`, and a new `weakestTopic()` in `lib/progress.ts` picks the lowest-accuracy one
+    (ties break to whichever was recorded first, i.e. question order). `lib/progressFile.ts`'s
+    paranoid field-by-field validation covers the new field the same way as everything else —
+    drop a malformed topic entry, not the whole quiz record. Before any checkpoint is taken the
+    panel says so ("No checkpoints yet" / "Take one →") rather than showing something invented.
+
+    The "up next" queue's other two slots were re-derived rather than patched: the checkpoint slot
+    now reads real `Take`/`Retry`/`Review` off `state.quizzes[QUIZ_ID]` against `PASS_MARK` (both
+    moved to a new `data/gitBasicsQuiz.ts`, alongside the question bank itself, so the dashboard
+    and `QuizMode` share one literal instead of two), and the third slot names the actual next
+    not-yet-complete lesson from `data/concepts.ts` (path concepts first, off-path as a fallback,
+    skipping `git-basics` since the checkpoint slot already covers it). The per-item minute
+    estimates and the panel's "up next — 15 minutes total" header are gone rather than replaced
+    with a better guess — no page in the app records how long it takes, so there was nothing
+    honest to put there.
 16. ~~**`TOTAL_CONCEPTS = 23` is a hardcoded denominator**~~ — **done 2026-09-11.** It turned out to
     be written three times, not once: `ProgressDashboard.tsx`, `Roadmap.tsx`, and as the string
     `'23 concepts'` in `CourseComplete.tsx`'s certificate. All three now read `data/curriculum.ts`,

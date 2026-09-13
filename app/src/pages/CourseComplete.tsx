@@ -1,9 +1,15 @@
 /**
  * Route `/course-complete` — "CELEBRATION" screen shown after finishing a learning path: a
- * confetti-framed headline, a certificate card, and "where to next" recommendation cards. All
- * of `CERT`, `NEXT_PATHS`, and `CONFETTI` below are static placeholder content — this page does
- * not currently call `useProgress()`, so the stats and name on the certificate are not yet
- * pulled from real progress state. The "where to next" cards both link to `/roadmap`.
+ * confetti-framed headline, a certificate card, and "where to next" recommendation cards.
+ * `NEXT_PATHS` and `CONFETTI` are static flavor content — recommendation copy and decoration, not
+ * facts about the learner — but the certificate's name, date, and capstone count now come from
+ * `useAuth()`/`useProgress()` rather than a fixed "Ada Moreno" / "August 30, 2026" / "1 capstone
+ * shipped" (BACKLOG item 7). The path title ("Terminal & Shell") and the shareable id stay static
+ * copy on the certificate template itself: this page isn't gated behind actually finishing a path
+ * (items 24-25 record why stage 1 can't yet reach COMPLETE at all), so there is no real multi-path
+ * state to swap the title from, and the id is a serial-number prop rather than a claim about
+ * progress. The two curriculum sizes in `stats` describe the designed path's scope, which is real
+ * regardless of who's looking at this page — only the personal stats needed a signed-in learner.
  */
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
@@ -11,15 +17,8 @@ import { Icon } from '../components/Icon'
 import { Tag, type TagTone } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { TOTAL_CHECKPOINTS, TOTAL_CONCEPTS } from '../data/curriculum'
-
-// Placeholder certificate data (name, path, date, stats) shown on the completion card.
-const CERT = {
-  name: 'Ada Moreno',
-  path: 'Terminal & Shell',
-  date: 'August 30, 2026',
-  id: 'cert #TS-0231',
-  stats: [`${TOTAL_CONCEPTS} concepts`, `${TOTAL_CHECKPOINTS} checkpoints`, '1 capstone shipped'],
-}
+import { useAuth } from '../lib/auth'
+import { useProgress } from '../lib/progress'
 
 // The "where to next" recommendation cards below the certificate.
 const NEXT_PATHS: { tone: TagTone; label: string; title: string; body: string }[] = [
@@ -47,6 +46,25 @@ const CONFETTI = [
 /** The Course Complete celebration page — certificate recap plus "where to next" cards. */
 export default function CourseComplete() {
   useDocumentTitle('Course Complete')
+  const { user } = useAuth()
+  const { state } = useProgress()
+
+  // "1 capstone shipped" used to be typed out regardless of whether anyone had shipped one.
+  // `project-build-along` is the app's one capstone-shaped concept (`data/concepts.ts`).
+  const capstoneDone = Boolean(state.concepts['project-build-along'])
+  const cert = {
+    // No fictional name once a real one is available; "You" rather than a placeholder person when
+    // it isn't — most deployments run with no backend at all, so this is the common case today.
+    name: user ? `${user.firstName} ${user.lastName}` : 'You',
+    path: 'Terminal & Shell',
+    date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    id: 'cert #TS-0231',
+    stats: [
+      `${TOTAL_CONCEPTS} concepts`,
+      `${TOTAL_CHECKPOINTS} checkpoints`,
+      `${capstoneDone ? 1 : 0} capstone${capstoneDone ? '' : 's'} shipped`,
+    ],
+  }
 
   return (
     <div className="page">
@@ -142,7 +160,7 @@ export default function CourseComplete() {
               marginBottom: 6,
             }}
           >
-            {CERT.name}
+            {cert.name}
           </div>
           <div
             style={{ fontSize: 14.5, color: 'var(--color-neutral-700)', marginBottom: 22 }}
@@ -168,7 +186,7 @@ export default function CourseComplete() {
                 color: 'var(--color-accent-800)',
               }}
             >
-              {CERT.path}
+              {cert.path}
             </span>
           </div>
           <div
@@ -181,7 +199,7 @@ export default function CourseComplete() {
               flexWrap: 'wrap',
             }}
           >
-            {CERT.stats.map((s, i) => (
+            {cert.stats.map((s, i) => (
               <span key={s} style={{ display: 'contents' }}>
                 {i > 0 ? <span>·</span> : null}
                 <span>{s}</span>
@@ -206,7 +224,7 @@ export default function CourseComplete() {
                   color: 'var(--color-neutral-800)',
                 }}
               >
-                {CERT.date}
+                {cert.date}
               </div>
               <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 2 }}>
                 date
@@ -249,7 +267,7 @@ export default function CourseComplete() {
                   color: 'var(--color-neutral-800)',
                 }}
               >
-                {CERT.id}
+                {cert.id}
               </div>
               <div style={{ fontSize: 11, color: 'var(--color-neutral-700)', marginTop: 2 }}>
                 shareable id

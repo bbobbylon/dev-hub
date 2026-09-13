@@ -37,7 +37,7 @@ const MAP = {
   'Data Structures Visual': ['pages/DataStructuresVisual.tsx'],
   'API Anatomy': ['pages/ApiAnatomy.tsx'],
   'Framework Comparison': ['pages/FrameworkComparison.tsx'],
-  'Quiz Mode': ['pages/QuizMode.tsx'],
+  'Quiz Mode': ['pages/QuizMode.tsx', 'data/gitBasicsQuiz.ts'],
   Flashcards: ['pages/Flashcards.tsx', 'data/httpDeck.ts'],
   'Algorithm Visualizer': ['pages/AlgorithmVisualizer.tsx'],
   'Code Playground': ['pages/CodePlayground.tsx'],

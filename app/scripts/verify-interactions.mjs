@@ -569,6 +569,101 @@ check(
   'un-mark: the quiz attempt itself survived',
   (await body()).includes('Best score, per checkpoint'),
 )
+
+/* ── Dashboard: real badges, weakest topic, up next (BACKLOG items 15 & 7) ─ */
+// Before this, all four badges were fixed true/false, "weakest topic" was pinned to "Exit codes"
+// (not even a real question topic), and "up next" was a fixed template with only the flashcard
+// count swapped in live. Every value below now comes from state a step earlier drove for real.
+await resetProgress()
+await go('/progress-dashboard')
+const dashStart = await body()
+check('dashboard: no checkpoint yet reads honestly', dashStart.includes('No checkpoints yet'))
+check('dashboard: weakest-topic link offers to take one, not review', dashStart.includes('Take one →'))
+check('dashboard: checkpoint slot offers to take it', dashStart.includes('Take: Git Basics checkpoint'))
+check('dashboard: concept slot recommends the first lesson', dashStart.includes('Continue: CLI Basics'))
+check('dashboard: Terminal Tamer starts at 0 of 2 lessons', dashStart.includes('0 of 2 lessons'))
+check('dashboard: 7-Day Flame starts at 0 of 7 days', dashStart.includes('0 of 7 days'))
+check('dashboard: Bug Hunter names what earns it', dashStart.includes('Debugging Challenge'))
+check(
+  'dashboard: First Path shows the real (capped) percentage, not 34%',
+  dashStart.includes('0%') && !dashStart.includes('34%'),
+)
+
+// Solving the one real "case" earns Bug Hunter — a lock reads oddly on something just solved, so
+// the icon swaps too, but that's not visible to body(); the subtitle change is what's checked.
+await go('/debugging-challenge')
+await page.getByRole('button', { name: 'Give me a hint' }).click()
+await page.getByRole('button', { name: 'One more hint' }).click()
+await page.getByRole('button', { name: /show the fix/ }).click()
+check('dashboard-setup: solving it records the concept', await completed('Debugging Challenge'))
+await go('/progress-dashboard')
+check('dashboard: Bug Hunter earns on solving the case', (await body()).includes('Case closed'))
+
+// A sub-pass attempt (same "always B" run used above): correct on MENTAL MODEL/STAGING/BRANCHES,
+// wrong on UNDO/COLLABORATION — a real tie at 0% accuracy, broken to whichever topic the question
+// bank asks first.
+await go('/quiz-mode')
+for (let q = 0; q < 5; q++) {
+  await page.getByRole('button', { name: /^B\s/ }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('dashboard-setup: the sub-pass attempt scores 3/5', (await body()).includes('3/5'))
+await go('/progress-dashboard')
+const dashSubPass = await body()
+check('weakest topic: names Undo, not the fake Exit codes', dashSubPass.includes('Undo'))
+check('weakest topic: review link appears once a checkpoint exists', dashSubPass.includes('Review →'))
+check(
+  'up next: checkpoint offers a retry below the pass mark',
+  dashSubPass.includes('Retry: Git Basics checkpoint'),
+)
+
+// CLI Basics done: Terminal Tamer's count moves and the concept slot advances past it.
+await go('/cli-basics')
+for (const option of [
+  'pwd',
+  'It failed — 2 identifies the kind of error',
+  'Lists files, then filters to ones matching ".java"',
+]) {
+  await page.getByRole('button', { name: option, exact: true }).click()
+}
+check('dashboard-setup: CLI Basics records', await completed('CLI Basics'))
+await go('/progress-dashboard')
+const dashCli = await body()
+check('dashboard: Terminal Tamer counts the first lesson', dashCli.includes('1 of 2 lessons'))
+check('dashboard: concept slot advances to Shell Scripting', dashCli.includes('Continue: Shell Scripting'))
+
+// Shell Scripting done too: both routed Stage-1 lessons complete, so Terminal Tamer earns, and
+// the concept slot skips past the un-taught Environment Variables, the checkpoint (its own slot),
+// and the un-taught Staging & Commits to land on Branching & Merging.
+await go('/shell-scripting')
+for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Step →' }).click()
+check('dashboard-setup: Shell Scripting records', await completed('Shell Scripting'))
+await go('/progress-dashboard')
+const dashShell = await body()
+check('dashboard: Terminal Tamer earns at 2 of 2 lessons', dashShell.includes('2 of 2 lessons'))
+check(
+  'dashboard: concept slot skips page-less concepts and the checkpoint',
+  dashShell.includes('Continue: Branching & Merging'),
+)
+
+// A perfect retake overwrites the topic breakdown: every topic now reads 100%, so there is no
+// real "weakest" one left — the tie-break (first topic in question order) is what decides it, not
+// an arbitrary object-iteration accident, and the checkpoint slot moves from Retry to Review.
+await go('/quiz-mode')
+for (const letter of ['B', 'B', 'B', 'A', 'A']) {
+  await page.getByRole('button', { name: new RegExp(`^${letter}\\s`) }).first().click()
+  await page.getByRole('button', { name: 'Check answer' }).click()
+  await page.getByRole('button', { name: /Next question|See results/ }).click()
+}
+check('dashboard-setup: the retake is a perfect 5/5', (await body()).includes('Checkpoint passed!'))
+await go('/progress-dashboard')
+const dashPerfect = await body()
+check('weakest topic: an all-correct attempt still names one topic', dashPerfect.includes('Mental Model'))
+check(
+  'up next: a passed checkpoint offers Review, not Retry',
+  dashPerfect.includes('Review: Git Basics checkpoint'),
+)
 await resetProgress()
 
 const failed = results.filter((r) => !r.pass)

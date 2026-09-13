@@ -76,6 +76,12 @@ follow them across devices can optionally create an account.
   completion donut, and cards due for review; includes a "Your data" panel that tells the learner
   where their progress actually lives (this browser / this browser plus their account) and lets
   them act on all of it at once — see backup/restore below, plus a reset control that wipes it.
+  Its four badges each carry a real earned condition (a routed Stage-1 sweep, a 7-day streak, the
+  Debugging Challenge, a 100% path) rather than two fixed "earned" and two fixed "not earned";
+  "weakest topic by quiz score" names the real lowest-accuracy topic from a checkpoint's most
+  recent attempt (or says none has been taken yet); and the "up next" queue recommends the real
+  flashcards-due count, the checkpoint's actual take/retry/review state, and the next incomplete
+  lesson, with no invented time estimates.
 - **Progress backup and restore (`lib/progressFile.ts`)** — a learner can download their whole
   progress state as a dated JSON file and later load that file back, from any browser, with no
   account and no backend involved. A restore states what it found before replacing anything, and

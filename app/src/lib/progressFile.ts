@@ -81,17 +81,34 @@ function pickEntries<T>(
   return out
 }
 
+/** Per-topic correct/total, dropping any entry that doesn't type-check rather than the whole map. */
+const pickTopics = (v: unknown): Record<string, { correct: number; total: number }> | undefined => {
+  if (!isRecord(v)) return undefined
+  const out: Record<string, { correct: number; total: number }> = {}
+  for (const [topic, tv] of Object.entries(v)) {
+    if (!isRecord(tv)) continue
+    const { correct, total } = tv
+    if (!isFiniteNumber(correct) || !isFiniteNumber(total) || total <= 0) continue
+    if (correct < 0 || correct > total) continue
+    out[topic] = { correct, total }
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
 const pickQuiz = (v: unknown): QuizRecord | undefined => {
   if (!isRecord(v)) return undefined
-  const { best, total, attempts, lastAt } = v
+  const { best, total, attempts, lastAt, topics } = v
   // `total` guards the dashboard's `best / total` accuracy average against a divide-by-zero NaN.
   if (!isFiniteNumber(best) || !isFiniteNumber(total) || total <= 0) return undefined
-  return {
+  const record: QuizRecord = {
     best,
     total,
     attempts: isFiniteNumber(attempts) ? attempts : 1,
     lastAt: isDateString(lastAt) ? lastAt : new Date().toISOString(),
   }
+  const pickedTopics = pickTopics(topics)
+  if (pickedTopics) record.topics = pickedTopics
+  return record
 }
 
 const pickCard = (v: unknown): CardRecord | undefined => {

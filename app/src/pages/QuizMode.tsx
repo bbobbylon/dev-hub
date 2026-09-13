@@ -5,8 +5,11 @@
  * persisted, via `useProgress().recordQuiz` keyed by `QUIZ_ID`, and a passing score records the
  * `git-basics` concept — through the shared `<ConceptComplete>` panel below the score card rather
  * than a bare `completeConcept()` call, so this checkpoint can be un-marked like any other concept
- * (BACKLOG item 22). The question bank (`QUESTIONS`) is local to this page and not shared with any
- * other quiz.
+ * (BACKLOG item 22). The question bank and its `QUIZ_ID`/`PASS_MARK` live in `data/gitBasicsQuiz.ts`
+ * rather than here, since `ProgressDashboard`'s "up next" queue needs those same two constants to
+ * say whether the checkpoint still wants taking, retaking, or is just worth a revisit. Each
+ * finished attempt also tallies correct/total per question `topic` and hands it to `recordQuiz`
+ * alongside the score, so the dashboard's "weakest topic" panel has something real to read.
  */
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
@@ -15,87 +18,10 @@ import { TopNav } from '../components/TopNav'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { ConceptComplete } from '../components/ConceptComplete'
-
-/** One multiple-choice quiz question, its options, and the explanation shown after checking. */
-interface Question {
-  topic: string
-  text: string
-  options: string[]
-  correct: number
-  why: string
-}
-
-// The Git Basics question bank, rendered one at a time in the question card.
-const QUESTIONS: Question[] = [
-  {
-    topic: 'MENTAL MODEL',
-    text: 'What does a git commit actually store?',
-    options: [
-      'A diff of the lines you changed',
-      'A full snapshot of the tracked files at that moment',
-      'Only the files you staged, forever detached from history',
-      'A zip of your working directory',
-    ],
-    correct: 1,
-    why: 'Git stores snapshots, not diffs. Each commit points to a complete tree; diffs are computed on demand.',
-  },
-  {
-    topic: 'STAGING',
-    text: 'You edited a file but git commit ignores it. Most likely cause?',
-    options: [
-      'The file is corrupt',
-      'You never ran git add to stage the change',
-      'The branch is locked',
-      'Git only commits once per day',
-    ],
-    correct: 1,
-    why: 'Commits record the staging area, not the working directory. Unstaged edits stay behind.',
-  },
-  {
-    topic: 'BRANCHES',
-    text: 'A branch in git is best described as…',
-    options: [
-      'A copy of the whole repository',
-      'A movable pointer to a commit',
-      'A separate folder on disk',
-      'A backup created by GitHub',
-    ],
-    correct: 1,
-    why: 'A branch is just a 41-byte pointer file. Creating one is instant because nothing is copied.',
-  },
-  {
-    topic: 'UNDO',
-    text: 'Which command un-stages a file without losing your edits?',
-    options: [
-      'git restore --staged file.txt',
-      'git reset --hard',
-      'git rm file.txt',
-      'git checkout -- file.txt',
-    ],
-    correct: 0,
-    why: 'restore --staged only pulls the file out of the index. reset --hard would destroy the edits.',
-  },
-  {
-    topic: 'COLLABORATION',
-    text: 'git pull is equivalent to…',
-    options: [
-      'git fetch then git merge',
-      'git clone but faster',
-      'git push in reverse, deleting remote commits',
-      'git stash then git pop',
-    ],
-    correct: 0,
-    why: 'pull = fetch (download new commits) + merge (weave them into your branch).',
-  },
-]
+import { PASS_MARK, QUESTIONS, QUIZ_ID } from '../data/gitBasicsQuiz'
 
 // Option-badge letters, indexed by option position.
 const LETTERS = ['A', 'B', 'C', 'D']
-// Minimum correct answers (out of QUESTIONS.length) to pass the checkpoint.
-const PASS_MARK = 4
-
-// Key this attempt is recorded and looked up under in progress state.
-const QUIZ_ID = 'git-basics'
 
 /** The Quiz Mode checkpoint page — steps through `QUESTIONS`, then shows the score screen. */
 export default function QuizMode() {
@@ -118,7 +44,15 @@ export default function QuizMode() {
   // by the <ConceptComplete> panel further down, from the same `passed`.
   useEffect(() => {
     if (!done) return
-    recordQuiz(QUIZ_ID, score, QUESTIONS.length)
+    // One question per topic in this bank today, but tallied as correct/total (not a bare
+    // boolean) so a future quiz with several questions per topic works without changing the shape
+    // `recordQuiz` stores or `weakestTopic()` reads.
+    const topics: Record<string, { correct: number; total: number }> = {}
+    QUESTIONS.forEach((q, i) => {
+      const prev = topics[q.topic] ?? { correct: 0, total: 0 }
+      topics[q.topic] = { correct: prev.correct + (results[i] ? 1 : 0), total: prev.total + 1 }
+    })
+    recordQuiz(QUIZ_ID, score, QUESTIONS.length, topics)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done])
 
