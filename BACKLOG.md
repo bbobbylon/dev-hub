@@ -4,7 +4,11 @@ _Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** items 29 and 24 — the Progress Dashboard's new
+**Shipped since the last update (2026-09-12):** item 28 — `npm run verify` now starts and owns its
+own preview server (`scripts/run-verify.mjs`, via Vite's JS API with `strictPort: true`) instead of
+assuming one is already up on 4173, so a stale server from an earlier session fails loudly instead
+of silently taking a different port while the suites keep checking the wrong one. Earlier the same
+day: items 29 and 24 — the Progress Dashboard's new
 "Your concepts" panel un-marks any concept without returning to its page, and is the only place
 "Environment Variables" and "Staging & Commits" can be marked at all, since neither has a lesson
 page. Earlier the same day: items 15 and 7 — the Progress Dashboard's badges, weakest-topic
@@ -229,13 +233,22 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
     then 155, and reads 170 now, updated by hand each time — proving the point rather than fixing it.
     Either drop the number ("every check in `verify-interactions.mjs` passes" needs no maintenance)
     or have the script write it somewhere the docs can cite.
-28. **A stale `vite preview` can silently take the port the suites verify against.** Eleven orphaned
-    preview servers from earlier sessions were holding 4173-4182; `npm run preview` reports "Port
-    4173 is in use, trying another one..." and happily starts on 4183, while `scripts/browser.mjs`
-    still points `BASE` at 4173 — so a verify run either can't connect or, worse, passes against
-    whatever *that* server is serving. `vite preview --strictPort` would turn it into a loud failure
-    at the point the mistake is made; a `verify` that started and owned its own preview would be
-    better still.
+28. ~~**A stale `vite preview` can silently take the port the suites verify against.**~~ — **done
+    2026-09-12.** Eleven orphaned preview servers from earlier sessions were holding 4173-4182;
+    `npm run preview` reports "Port 4173 is in use, trying another one..." and happily starts on
+    4183, while `scripts/browser.mjs` still points `BASE` at 4173 — so a verify run either couldn't
+    connect or, worse, passed against whatever *that* server was serving. Took the "better still"
+    option over the minimal `--strictPort` one: a new `scripts/run-verify.mjs` (`npm run verify` now
+    runs that instead of chaining the four suites directly) starts its own `vite preview` through
+    Vite's JS API with `strictPort: true`, runs the suites against it, and always closes it after —
+    so a stale port fails loudly at the point the mistake is made, and the README's old two-step
+    (`npm run preview &` then `npm run verify`) is down to one. `VERIFY_BASE_URL` still opts out
+    entirely for anyone pointing verify at a server they're managing themselves. One trap along the
+    way, worth recording: the suites first hung forever rather than erroring, because running them
+    with `spawnSync` blocked this script's own event loop — which is what was serving the preview
+    server it had just started in the same process — so the child's browser could never get a
+    response. Async `spawn` fixed it. Individual suites (`verify:routes` alone, etc.) are unchanged
+    and still need a manually-started preview.
 29. ~~**Un-marking a concept means going back to its page.**~~ — **done 2026-09-12.** The Progress
     Dashboard now has a "Your concepts" panel, grouped by stage the way the Roadmap is, listing all
     20 registered concepts. A done row offers only "Un-mark" (never "Undo" — `DecoratorPattern`

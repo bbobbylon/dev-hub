@@ -77,12 +77,18 @@ npm run preview    # serve the build on :4173
 
 ## Verifying it
 
-Four Playwright suites, all run against `npm run preview` on port 4173:
+Four Playwright suites, all run against a preview server on port 4173:
 
 ```bash
-npm run preview &        # must be up first
+npm run build            # verify runs against dist/, not npm run dev
 npm run verify           # routes + responsive + interactions + a11y
 ```
+
+`npm run verify` starts and owns its own preview server (`--strictPort`, so a
+stale one left over from an earlier session fails loudly instead of silently
+serving from the wrong port) and tears it down when the suites finish. Run an
+individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
+and you're back to starting `npm run preview &` yourself first.
 
 - `verify:routes` — loads all 25 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
