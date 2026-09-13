@@ -81,6 +81,9 @@ export default function PageGallery() {
           onChange={(e) => setQuery(e.target.value)}
           style={{ maxWidth: 420, marginTop: 18 }}
         />
+        <p style={{ fontSize: 12.5, color: 'var(--color-neutral-700)', marginTop: 8 }}>
+          Or press <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>K</kbd> from any page to jump straight there.
+        </p>
       </header>
 
       <main className="wrap page-main">

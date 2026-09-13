@@ -13,6 +13,7 @@ import { useProgressSync } from './lib/progressSync'
 import { apiEnabled } from './lib/api'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { CommandPalette } from './components/CommandPalette'
 
 // Eager: the two entry points most navigations land on first.
 import PageGallery from './pages/PageGallery'
@@ -75,6 +76,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <CommandPalette />
       <ErrorBoundary resetKey={pathname}>
         <Suspense fallback={null}>
           <Routes>

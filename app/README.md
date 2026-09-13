@@ -45,6 +45,9 @@ no backend at all.
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
   gallery gained a filter across all 24 archetypes. Both have empty states.
+- **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
+  any page from anywhere — the gallery's own filter only ever helped once you were already there.
+  Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
 - **Unknown URLs get a 404 page** instead of silently redirecting to the gallery.
 - **Progress can be exported, restored, or reset** from the dashboard's "Your data" panel. Export
   hands you a dated `dev-hub-progress-YYYY-MM-DD.json`; import reads one back, validating it field

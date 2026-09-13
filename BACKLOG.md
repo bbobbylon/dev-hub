@@ -4,18 +4,21 @@ _Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-13):** item 10 (partial) — Stage 3 of the Roadmap has its
-first real concept, Variables (`/python-variables`, four graded predict-the-value questions), and
-Stages 3–5's remaining eighteen concepts now read as honest "not yet built" chips or point at
-real, already-shipped lessons that genuinely cover that syllabus, instead of a blank "locked"; see
-its entry below for exactly what's built versus what's still open. Same day: item 8 — the Glossary
-went from 3 mocked-up "A" terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored
-terms with a genuinely working search box and A–Z group filter; see its entry below for what
-stayed faithful to the prototype and what's new content. Same day: item 9 — Code Playground's
-"run tests" now executes the real solution source in a sandboxed Web Worker and grades the
-checklist off actual captured output, instead of a scripted pass; see its entry below for the
-Python→JavaScript translation this required. Same day: item 26 — the two contrast pairs that made
-`audit:a11y` fail
+**Shipped since the last update (2026-09-13):** item 12 — a global Cmd/Ctrl+K command palette
+(`src/components/CommandPalette.tsx`) now jumps straight to any page from anywhere in the app,
+filtering the same `data/pages.ts` catalog the gallery's own search box does; see its entry below
+for the one real bug (a one-frame stale-query flash on reopen) caught and fixed before it shipped.
+Same day: item 10 (partial) — Stage 3 of the Roadmap has its first real concept, Variables
+(`/python-variables`, four graded predict-the-value questions), and Stages 3–5's remaining
+eighteen concepts now read as honest "not yet built" chips or point at real, already-shipped
+lessons that genuinely cover that syllabus, instead of a blank "locked"; see its entry below for
+exactly what's built versus what's still open. Same day: item 8 — the Glossary went from 3
+mocked-up "A" terms and fake "142 TERMS"/"Show 11 more" chrome to 36 real, authored terms with a
+genuinely working search box and A–Z group filter; see its entry below for what stayed faithful to
+the prototype and what's new content. Same day: item 9 — Code Playground's "run tests" now
+executes the real solution source in a sandboxed Web Worker and grades the checklist off actual
+captured output, instead of a scripted pass; see its entry below for the Python→JavaScript
+translation this required. Same day: item 26 — the two contrast pairs that made `audit:a11y` fail
 on any API-enabled build were real bugs, not inherited ones, and are fixed rather than baselined:
 `TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up cross-links use the
 design system's deep accent ramp step for paragraph-size text. Same day: item 21 — both account
@@ -152,8 +155,20 @@ rather than summarised here.
 ## Nice-to-haves (not gaps, just ideas)
 
 11. **Dark mode / theme toggle** — no theming beyond the one "Organic" light palette today.
-12. **A command palette** (Cmd/Ctrl+K) for jumping to any page — today's only navigation aid is the
-    gallery's own search box.
+12. ~~**A command palette** (Cmd/Ctrl+K) for jumping to any page~~ — **done 2026-09-13.**
+    `src/components/CommandPalette.tsx`, mounted once in `App.tsx` alongside the route tree rather
+    than composed into any one page, so the shortcut works from every route. Filters
+    `data/pages.ts`'s `PAGES` catalog by title/kind/blurb/slug (same idea as the gallery's own
+    filter, generalized to work before you're on the gallery), arrow keys move the highlighted
+    result, Enter navigates, Escape or a backdrop click closes. Renders nothing at all while
+    closed, so it adds no new element to any route's own a11y surface — `npm run audit:a11y`
+    stayed at its exact baseline (39 failures across 20 pairs). Built on the handoff's own
+    `.dialog`/`.dialog-backdrop` classes in `organic.css`, which no page had used until now. One
+    real bug caught before it shipped: the first version cleared the search query in a `useEffect`
+    keyed on `open`, which left a one-frame flash of the *previous* session's query visible on
+    reopen (caught by a Playwright check asserting the palette starts blank, not by eye) — fixed by
+    resetting query/selection synchronously in the same keydown handler that opens it, so React
+    batches both into one render. 7 new checks in `verify-interactions.mjs` (170 → 177).
 13. **Unit tests for the pure logic** — `lib/progress.ts`'s `schedule()` (SM-2) and `streakOf()` are
     both pure functions with real edge cases (ease floor, day boundaries) and no test coverage;
     today's verification is all Playwright e2e, nothing at the function level.
