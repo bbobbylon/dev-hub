@@ -237,13 +237,15 @@ check('build: checking a milestone → 60%', (await body()).includes('60% BUILT'
 await page.getByRole('button', { name: /Print the last 10 lines/ }).click()
 check('build: unchecking → 40%', (await body()).includes('40% BUILT'))
 
-/* ── Code Playground: run tests flips the checklist ───────────────────── */
+/* ── Code Playground: run tests really executes the solution in a worker ──── */
 await go('/code-playground')
 check('playground: idle before running', (await body()).includes('Output appears here'))
 await page.getByRole('button', { name: '▶ Run tests' }).click()
+await page.getByText('ALL 4 TESTS PASSED').waitFor({ timeout: 5_000 })
 const ran = await body()
 check('playground: tests pass', ran.includes('ALL 4 TESTS PASSED'))
-check('playground: output printed', ran.includes('FizzBuzz'))
+check('playground: real output printed', ran.includes('FizzBuzz'))
+check('playground: all 4 checks individually graded true', ran.includes('✓ Prints 15 lines') && ran.includes('✓ 15 → FizzBuzz'))
 await page.getByRole('button', { name: 'Clear output' }).click()
 check('playground: clear resets', (await body()).includes('Output appears here'))
 

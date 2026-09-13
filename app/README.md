@@ -113,7 +113,7 @@ npm run audit:content    # needs no server
 ```
 
 It pulls every substantial run of prose out of each `.dc.html` prototype and checks it survived
-into the corresponding React source. It currently reports **4 phrases to review, all known
+into the corresponding React source. It currently reports **5 phrases to review, all known
 extractor artifacts**, not omissions:
 
 - Two CLI Basics entries are the prototype's flat clipboard payload strings. Here those are derived
@@ -126,6 +126,11 @@ extractor artifacts**, not omissions:
   archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 now that
   Shell Scripting has too) — see `PAGES.length` in `data/pages.ts` for the number that's actually
   true.
+- One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
+  the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
+  item 9), not a copied string — it happens to compute to the exact same text, but a static text
+  search can't see that. Asserted byte-for-byte against the prototype in `verify:interactions`,
+  same as the CLI Basics entries above.
 
 If that count rises *beyond* this, something was dropped — go read what it flags.
 
