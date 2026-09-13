@@ -108,6 +108,18 @@ export const dayKey = (d: Date = new Date()) =>
 const addDays = (d: Date, n: number) => new Date(d.getTime() + n * 86_400_000)
 
 /**
+ * Renders a stored ISO timestamp as a plain local date ("Sep 12, 2026"), falling back to it
+ * verbatim if unparseable. Shared by `<ConceptComplete>` and the dashboard's per-concept list —
+ * the two places a concept's completion date is ever shown to a learner.
+ */
+export function formatDay(iso: string): string {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+/**
  * Consecutive days with activity, counting back from today. Yesterday still
  * counts as alive so the streak doesn't die before the day is over.
  */

@@ -12,8 +12,10 @@
  * count was floored at a `BASELINE_DONE = 8` that existed purely because
  * `completeConcept()` had one call site in the whole app and the real number
  * was almost always 0. Two of stage 1 and 2's seven concepts still have no
- * page to earn them on (`data/concepts.ts`, entries with no `route`), so they
- * render as unlinked chips that stay grey — which is the honest picture.
+ * page to earn them on (`data/concepts.ts`, entries with no `route`), so
+ * `Chip` renders them as a plain `<span>` rather than a `Link` even once
+ * marked done — that marking happens from the Progress Dashboard's concept
+ * list instead, since there is nowhere on this page to click through to.
  */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'

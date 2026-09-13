@@ -13,7 +13,7 @@
  * progress every other page in the app reads from.
  */
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { isDue, recentMinutes, streakOf, useProgress, weakestTopic } from '../lib/progress'
+import { formatDay, isDue, recentMinutes, streakOf, useProgress, weakestTopic } from '../lib/progress'
 import { downloadProgress, parseProgressFile, summarize } from '../lib/progressFile'
 import { apiEnabled } from '../lib/api'
 import { useAuth } from '../lib/auth'
@@ -23,7 +23,15 @@ import { Icon } from '../components/Icon'
 import { Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
 import { TOTAL_CONCEPTS } from '../data/curriculum'
-import { CONCEPTS, CONCEPT_BY_SLUG, conceptsInStage, offPathDone, PATH_CONCEPTS, pathDone } from '../data/concepts'
+import {
+  CONCEPTS,
+  CONCEPT_BY_SLUG,
+  conceptsInStage,
+  offPathDone,
+  PATH_CONCEPTS,
+  pathDone,
+  type Concept,
+} from '../data/concepts'
 import { DECK_NAME, DECK_TAGS } from '../data/httpDeck'
 import { PASS_MARK, QUIZ_ID } from '../data/gitBasicsQuiz'
 
@@ -167,6 +175,16 @@ const CONTINUE_ICON = (
   </svg>
 )
 
+// Every concept, grouped the way the Roadmap groups them, for the "Your concepts" panel below.
+// A flat 23-row list would bury the two path concepts a learner most needs to find (BACKLOG item
+// 24: `environment-variables` and `staging-commits` have no page, so this panel is the only place
+// they can ever be marked), so the same stage grouping the Roadmap uses keeps them findable.
+const CONCEPT_GROUPS: { title: string; concepts: Concept[] }[] = [
+  { title: 'Stage 1 · Terminal & Shell', concepts: conceptsInStage(1) },
+  { title: 'Stage 2 · Version Control', concepts: conceptsInStage(2) },
+  { title: 'Off the path', concepts: CONCEPTS.filter((c) => c.stage === null) },
+]
+
 /* ── small pieces ──────────────────────────────────────────────────────── */
 
 /** `QuizMode`'s question topics are shouty constants ("MENTAL MODEL") for the palette tags; this
@@ -191,12 +209,111 @@ function PanelLabel({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * One row of the "Your concepts" panel. A done concept only ever offers Un-mark — BACKLOG item 29
+ * was that the only way to undo one was navigating back to its page. A not-done concept with a
+ * `route` links to the page that actually earns it rather than faking a shortcut; the two without
+ * one (BACKLOG item 24) get a Mark complete button here instead, since no page exists to put it on.
+ * Every row's action carries an `aria-label` naming the concept — with up to 23 rows on one page,
+ * a screen reader hearing "Mark complete" repeated with no way to tell which row it's on would be
+ * its own accessibility regression.
+ */
+function ConceptRow({
+  concept,
+  completedAt,
+  onComplete,
+  onClear,
+}: {
+  concept: Concept
+  completedAt?: string
+  onComplete: () => void
+  onClear: () => void
+}) {
+  const done = Boolean(completedAt)
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: '10px 0',
+        borderBottom: '1px solid var(--color-divider)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <span
+          style={{
+            width: 20,
+            height: 20,
+            flex: 'none',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: done ? 'var(--color-accent-2)' : 'var(--color-neutral-300)',
+          }}
+        >
+          {done ? <Icon name="check" size={11} color="var(--color-bg)" /> : null}
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text)' }}>
+            {concept.label}
+          </div>
+          <div style={{ fontSize: 11.5, color: 'var(--color-neutral-700)' }}>
+            {done
+              ? `Done ${formatDay(completedAt as string)}`
+              : concept.route
+                ? 'Not done yet'
+                : 'No lesson page — mark it yourself'}
+          </div>
+        </div>
+      </div>
+      {done ? (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          aria-label={`Un-mark ${concept.label}`}
+          style={{ fontSize: 11.5, padding: '6px 12px', flex: 'none' }}
+          onClick={onClear}
+        >
+          Un-mark
+        </button>
+      ) : concept.route ? (
+        <Link
+          to={concept.route}
+          aria-label={`Go to the ${concept.label} lesson`}
+          style={{
+            fontSize: 12,
+            color: 'var(--color-accent-700)',
+            fontWeight: 600,
+            textDecoration: 'none',
+            flex: 'none',
+          }}
+        >
+          Go to lesson →
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          aria-label={`Mark ${concept.label} complete`}
+          style={{ fontSize: 11.5, padding: '6px 12px', flex: 'none' }}
+          onClick={onComplete}
+        >
+          Mark complete
+        </button>
+      )}
+    </div>
+  )
+}
+
 /* ── page ──────────────────────────────────────────────────────────────── */
 
 /** Stats dashboard: streak, weekly minutes, path completion, badges, and next actions, all derived from real `useProgress()` state. */
 export default function ProgressDashboard() {
   useDocumentTitle('Progress Dashboard')
-  const { state, reset, importState } = useProgress()
+  const { state, reset, importState, completeConcept, clearConcept } = useProgress()
   const { user } = useAuth()
 
   // The file picker behind the "Import backup" button, and the one-line result shown under it.
@@ -700,6 +817,45 @@ export default function ProgressDashboard() {
             </div>
           </div>
         </div>
+        {/* per-concept list: un-mark anything without leaving the dashboard, and the only place to
+            mark the two path concepts with no lesson page at all (BACKLOG items 29 & 24) */}
+        <div
+          className="card elev-sm"
+          style={{ borderRadius: 'var(--radius-lg)', padding: '22px 24px', marginTop: 22 }}
+        >
+          <PanelLabel>Your concepts</PanelLabel>
+          <p style={{ fontSize: 12, color: 'var(--color-neutral-700)', margin: '-8px 0 14px', maxWidth: 640 }}>
+            Every concept the app tracks. Un-mark a mis-click here instead of finding its page again
+            — and mark Environment Variables or Staging &amp; Commits here, since neither has a
+            lesson page yet.
+          </p>
+          {CONCEPT_GROUPS.map((group) => (
+            <div key={group.title} style={{ marginBottom: 16 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: 'var(--color-neutral-700)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 2,
+                }}
+              >
+                {group.title}
+              </div>
+              {group.concepts.map((c) => (
+                <ConceptRow
+                  key={c.slug}
+                  concept={c}
+                  completedAt={state.concepts[c.slug]}
+                  onComplete={() => completeConcept(c.slug)}
+                  onClear={() => clearConcept(c.slug)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+
         {/* backup, restore, reset — everything that acts on the whole progress blob at once */}
         <div
           className="card elev-sm"

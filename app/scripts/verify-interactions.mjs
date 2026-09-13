@@ -664,6 +664,115 @@ check(
   'up next: a passed checkpoint offers Review, not Retry',
   dashPerfect.includes('Review: Git Basics checkpoint'),
 )
+/* ── Dashboard: per-concept list (BACKLOG items 29 & 24) ──────────────── */
+// Before this, `clearConcept()` was only ever wired behind a concept's own <ConceptComplete>
+// panel, so un-marking meant finding that page again — and `environment-variables`/
+// `staging-commits`, which the path names but no page teaches, could never be marked at all. The
+// dashboard's "Your concepts" list fixes both from one place.
+await resetProgress()
+await go('/progress-dashboard')
+const concepts0 = await body()
+// Group headings render through the same uppercase-transform PanelLabel style as "BADGES" and "UP
+// NEXT" above, so `innerText` — which reflects computed CSS, not the DOM's literal text — reads
+// them shouting too.
+check(
+  'concepts panel: groups the way the Roadmap does',
+  concepts0.includes('STAGE 1 · TERMINAL & SHELL') &&
+    concepts0.includes('STAGE 2 · VERSION CONTROL') &&
+    concepts0.includes('OFF THE PATH'),
+)
+check(
+  'concepts panel: only the two routeless concepts read as unreachable',
+  (concepts0.match(/No lesson page — mark it yourself/g) ?? []).length === 2,
+)
+check(
+  'concepts panel: exactly two Mark complete buttons exist',
+  (await page.getByRole('button', { name: /^Mark .+ complete$/ }).count()) === 2,
+)
+
+// Marking the two routeless path concepts directly — the only way either can ever be earned.
+await page.getByRole('button', { name: 'Mark Environment Variables complete' }).click()
+check(
+  'concepts panel: Environment Variables offers Un-mark once marked',
+  await page
+    .getByRole('button', { name: 'Un-mark Environment Variables' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await page.getByRole('button', { name: 'Mark Staging & Commits complete' }).click()
+check(
+  'concepts panel: Staging & Commits offers Un-mark once marked',
+  await page
+    .getByRole('button', { name: 'Un-mark Staging & Commits' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+check(
+  'concepts panel: both rows show a completion date',
+  (await body()).match(/Done \w+ \d{1,2}, \d{4}/g)?.length === 2,
+)
+
+await go('/roadmap')
+const road3 = await body()
+check('concepts panel: stage 1 counts the routeless concept — 1 OF 3', road3.includes('1 OF 3'))
+check(
+  'concepts panel: stage 2 counts the routeless concept — 1 of 4',
+  road3.includes('1 of 4 concepts down in this stage'),
+)
+check('concepts panel: the path total counts both — 2 of 25 concepts', road3.includes('2 of 25 concepts'))
+
+// The other half of item 29: un-marking a *routed* concept from the dashboard, never visiting its
+// page for either the completion or the undo.
+await go('/cli-basics')
+for (const option of [
+  'pwd',
+  'It failed — 2 identifies the kind of error',
+  'Lists files, then filters to ones matching ".java"',
+]) {
+  await page.getByRole('button', { name: option, exact: true }).click()
+}
+check('concepts panel setup: CLI Basics records from its own page', await completed('CLI Basics'))
+await go('/progress-dashboard')
+check(
+  'concepts panel: a routed concept can be un-marked without visiting its page',
+  await page
+    .getByRole('button', { name: 'Un-mark CLI Basics' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await page.getByRole('button', { name: 'Un-mark CLI Basics' }).click()
+check(
+  'concepts panel: CLI Basics offers Go to lesson again',
+  await page
+    .getByRole('link', { name: 'Go to the CLI Basics lesson' })
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await go('/cli-basics')
+check(
+  "concepts panel: the un-mark reached CLI Basics's own panel too",
+  await notCompleted('CLI Basics'),
+)
+
+// Clean up the two routeless concepts so this section leaves no state behind.
+await go('/progress-dashboard')
+await page.getByRole('button', { name: 'Un-mark Environment Variables' }).click()
+await page.getByRole('button', { name: 'Un-mark Staging & Commits' }).click()
+check(
+  'concepts panel: un-marking both restores the two Mark complete buttons',
+  await page
+    .getByRole('button', { name: /^Mark .+ complete$/ })
+    .nth(1)
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false),
+)
+await go('/roadmap')
+check('concepts panel: the path total is back to 0', (await body()).includes('0 of 25 concepts'))
 await resetProgress()
 
 const failed = results.filter((r) => !r.pass)

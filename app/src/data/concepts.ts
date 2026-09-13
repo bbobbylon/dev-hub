@@ -20,8 +20,9 @@
  * `/flashcards` has its own SM-2 state in `state.cards`; `/quiz-mode` is a checkpoint that
  * completes `git-basics` rather than being a concept itself; and the meta pages (Dev Hub, Roadmap,
  * the dashboard, the gallery, 404, sign-in) teach nothing. Two path concepts have no page at all
- * yet — they are listed with no `route` so the Roadmap can show them honestly as unreachable
- * rather than pretending they are done.
+ * yet — they are listed with no `route`, so the Roadmap shows them as unlinked chips even once
+ * done; a learner marks (and un-marks) them from the Progress Dashboard's concept list instead,
+ * since there is no lesson page to put a `<ConceptComplete>` on (BACKLOG item 24).
  *
  * Adding a concept means: an entry here, a `<ConceptComplete slug="…">` on its page, and — if it
  * is on the path — a Roadmap chip, which reads its state from `conceptsInStage()` automatically.
@@ -66,7 +67,7 @@ export const CONCEPTS: Concept[] = [
     slug: 'environment-variables',
     label: 'Environment Variables',
     stage: 1,
-    earnedBy: 'nothing yet — the path names this concept but no page teaches it',
+    earnedBy: "marking it on the Progress Dashboard's concept list — no lesson page exists for it yet",
   },
 
   // ── Stage 2 · Version Control ───────────────────────────────────────────
@@ -81,7 +82,7 @@ export const CONCEPTS: Concept[] = [
     slug: 'staging-commits',
     label: 'Staging & Commits',
     stage: 2,
-    earnedBy: 'nothing yet — the path names this concept but no page teaches it',
+    earnedBy: "marking it on the Progress Dashboard's concept list — no lesson page exists for it yet",
   },
   {
     slug: 'git-branching',

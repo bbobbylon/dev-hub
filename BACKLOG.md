@@ -4,12 +4,15 @@ _Last updated: 2026-09-12._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-12):** items 15 and 7 — the Progress Dashboard's badges,
-weakest-topic callout, and "up next" queue, plus the Course Complete certificate, now read real
-state instead of fixed placeholder content. Earlier the same day: item 22, a completed concept can
-now be un-marked, one concept at a time, instead of a mis-click costing the whole progress blob.
-Earlier sessions closed items 6, 14, 16, 17, 18 and 19; each is struck through in place below with
-what was actually done, rather than summarised here.
+**Shipped since the last update (2026-09-12):** items 29 and 24 — the Progress Dashboard's new
+"Your concepts" panel un-marks any concept without returning to its page, and is the only place
+"Environment Variables" and "Staging & Commits" can be marked at all, since neither has a lesson
+page. Earlier the same day: items 15 and 7 — the Progress Dashboard's badges, weakest-topic
+callout, and "up next" queue, plus the Course Complete certificate, now read real state instead of
+fixed placeholder content. Earlier still: item 22, a completed concept can now be un-marked, one
+concept at a time, instead of a mis-click costing the whole progress blob. Earlier sessions closed
+items 6, 14, 16, 17, 18 and 19; each is struck through in place below with what was actually done,
+rather than summarised here.
 
 ## Backend / account
 
@@ -197,15 +200,18 @@ Turned up while wiring concept completion (item 6). Numbered from 22 so earlier 
     rather than restating it (`UPCOMING_STAGES` in `data/curriculum.ts`), so the two can't disagree
     again — but worth recording that a hand-written total was wrong by two for as long as it was
     hand-written, which is the argument for item 16's whole approach.
-24. **Two path concepts have no page to earn them on.** "Environment Variables" (stage 1) and
-    "Staging & Commits" (stage 2) are named by the design and taught nowhere, so they now render as
-    permanently grey unlinked chips — honest, but it means stage 1 can never reach COMPLETE. Either
-    build the two lessons or drop them from the path.
-25. **Completing everything the app has tops out at 5 of 25 (20%).** Only 5 of the 7 path concepts
-    have pages (item 24) and stages 3-5 are placeholders, so the Roadmap's bar is capped at a fifth
-    even for a learner who finishes every lesson. The other 13 concepts the app teaches sit off the
-    path and are counted separately ("+N off-path" under the dashboard tile) rather than inflating
-    it. Not wrong, but the path bar is a weak reward until stages 3-5 exist.
+24. ~~**Two path concepts have no page to earn them on.**~~ — **done 2026-09-12.** "Environment
+    Variables" (stage 1) and "Staging & Commits" (stage 2) are still named by the design and taught
+    nowhere, so their Roadmap chips still render as a plain unlinked `<span>` rather than a `Link` —
+    honest, since no page exists to send a click to. But either can now be marked (and un-marked)
+    directly from the Progress Dashboard's new "Your concepts" panel (item 29), so stage 1 can reach
+    COMPLETE; building the two lessons for real, or dropping them from the path, is still open.
+25. **Completing everything the app has now tops out at 7 of 25 (28%), not 5.** Item 24 means all 7
+    path concepts can be marked, not just the 5 with pages, so the Roadmap's bar can now clear a
+    quarter — but stages 3-5 are still placeholders, so it's still nowhere near 100% for a learner
+    who's genuinely finished every lesson. The other 13 concepts the app teaches sit off the path
+    and are counted separately ("+N off-path" under the dashboard tile) rather than inflating it.
+    Not wrong, but the path bar is a weak reward until stages 3-5 exist.
 26. **`audit:a11y` can never pass in an API-enabled build.** `a11y-baseline.json` was recorded over
     the 26-route configuration, so `/sign-in` and `/sign-up`'s own contrast pairs are absent from
     it and report as `NEW` every time — a guaranteed FAIL whenever `VITE_API_BASE_URL` is set. The
@@ -219,10 +225,10 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
 
 27. **The interaction-check count is hand-written in `docs/SRS.md` and had already drifted.** §6 read
     "All 95 interaction checks pass" while the suite was on 113 — the count moved twice without the
-    prose following, which is item 16's problem in a document instead of a component. It reads 132
-    now, and will be wrong again the next time a check is added. Either drop the number ("every
-    check in `verify-interactions.mjs` passes" needs no maintenance) or have the script write it
-    somewhere the docs can cite.
+    prose following, which is item 16's problem in a document instead of a component. It's read 132,
+    then 155, and reads 170 now, updated by hand each time — proving the point rather than fixing it.
+    Either drop the number ("every check in `verify-interactions.mjs` passes" needs no maintenance)
+    or have the script write it somewhere the docs can cite.
 28. **A stale `vite preview` can silently take the port the suites verify against.** Eleven orphaned
     preview servers from earlier sessions were holding 4173-4182; `npm run preview` reports "Port
     4173 is in use, trying another one..." and happily starts on 4183, while `scripts/browser.mjs`
@@ -230,9 +236,11 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
     whatever *that* server is serving. `vite preview --strictPort` would turn it into a loud failure
     at the point the mistake is made; a `verify` that started and owned its own preview would be
     better still.
-29. **Un-marking a concept means going back to its page.** `<ConceptComplete>` is the only place
-    `clearConcept()` is wired, so tidying up a wrongly-recorded concept means navigating to the page
-    that recorded it — fine for a mis-click you notice immediately, awkward for cleaning up several.
-    The Progress Dashboard has the whole record in hand and no per-concept view; a list there, next
-    to "Your data", would be the natural home (and would cover `environment-variables` and
-    `staging-commits`, which no page can reach at all — see item 24).
+29. ~~**Un-marking a concept means going back to its page.**~~ — **done 2026-09-12.** The Progress
+    Dashboard now has a "Your concepts" panel, grouped by stage the way the Roadmap is, listing all
+    20 registered concepts. A done row offers only "Un-mark" (never "Undo" — `DecoratorPattern`
+    already has one, and `verify-interactions.mjs` clicks by name); a not-done row with a `route`
+    links to the lesson that earns it, and the two without one (item 24) get a "Mark complete"
+    button instead, since there's no page to put one on. 15 new checks (155 → 170), including
+    marking and un-marking both routeless concepts (item 24) and un-marking a routed one without
+    ever visiting its page.
