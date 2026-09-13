@@ -4,11 +4,14 @@ _Last updated: 2026-09-13._ Feature ideas and known gaps, roughly ranked. Nothin
 — this is a scan of the codebase plus the natural follow-ups from adding the optional account/sync
 layer (`docs/ARCHITECTURE.md` §11), for the next time work picks back up.
 
-**Shipped since the last update (2026-09-13):** item 26 — the two contrast pairs that made
-`audit:a11y` fail on any API-enabled build were real bugs, not inherited ones, and are fixed rather
-than baselined: `TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up
-cross-links use the design system's deep accent ramp step for paragraph-size text. Same day: item
-21 — both account pages' subtitle now explains what an account gets you, which incidentally cleared
+**Shipped since the last update (2026-09-13):** item 9 — Code Playground's "run tests" now
+executes the real solution source in a sandboxed Web Worker and grades the checklist off actual
+captured output, instead of a scripted pass; see its entry below for the Python→JavaScript
+translation this required. Same day: item 26 — the two contrast pairs that made `audit:a11y` fail
+on any API-enabled build were real bugs, not inherited ones, and are fixed rather than baselined:
+`TopNav`'s dark variant now sets a base text color, and the sign-in/sign-up cross-links use the
+design system's deep accent ramp step for paragraph-size text. Same day: item 21 — both account
+pages' subtitle now explains what an account gets you, which incidentally cleared
 `verify-routes.mjs`'s general render floor, so their special-cased lower one is gone. Investigated
 and corrected rather than shipped: item 20's suggested fix (a conditional dynamic import) was tried
 and doesn't actually work — see its entry below for why, and what would.
@@ -87,9 +90,15 @@ rather than summarised here.
    and a title that names *which* path, not just Stage 1's.
 8. **`Glossary.tsx` only renders "A" terms** — the alphabet strip is otherwise decorative chrome with
    nothing behind the other 25 letters.
-9. **`CodePlayground`'s "running tests" is fully simulated** — a canned pass output, no real
-   execution. Real in-browser execution (a sandboxed `Function`/Web Worker) would make the pass/fail
-   state honest instead of scripted.
+9. ~~**`CodePlayground`'s "running tests" is fully simulated**~~ — **done 2026-09-13.** "Run tests"
+   now executes the solution's exact source for real, in a Web Worker (`lib/sandboxRun.ts`, its own
+   realm, no DOM, timeout-guarded against infinite loops), and grades all 4 checklist items off the
+   `console.log` output that run actually produced — a broken solution genuinely fails here now.
+   Translated the exercise from the prototype's Python to JavaScript, since a Worker can only run JS
+   without pulling in a WASM runtime (Pyodide) disproportionate to one exercise; the read-only
+   listing still shows exactly what's executed. This adds a 5th known `audit:content` extractor
+   artifact (the expected-output string is now computed at runtime, not a static literal) —
+   documented in `app/README.md`, verified byte-identical to the prototype's output by hand.
 10. **`Roadmap.tsx` stages 3–5 are locked placeholders** with no content behind them yet — the
     five-stage journey only has two real stages.
 
