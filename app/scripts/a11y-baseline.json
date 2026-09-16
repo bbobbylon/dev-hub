@@ -1,11 +1,11 @@
 {
   "note": "Accepted contrast failures inherited from the design prototypes. Regenerate with `npm run audit:a11y -- --update-baseline` (with the preview server up) only as a deliberate, reviewed change. See app/README.md, \"Accessibility\".",
-  "routes": 26,
-  "contrastTotal": 39,
+  "routes": 27,
+  "contrastTotal": 35,
   "pairs": {
     "a.btn|3.03|14": {
       "el": "a.btn",
-      "text": "Continue — Branching & Merging",
+      "text": "Continue — CLI Basics",
       "ratio": 3.03,
       "required": 4.5,
       "size": 14
@@ -107,13 +107,6 @@
       "ratio": 3.29,
       "required": 4.5,
       "size": 11.5
-    },
-    "span|3.29|13": {
-      "el": "span",
-      "text": "10",
-      "ratio": 3.29,
-      "required": 4.5,
-      "size": 13
     },
     "span|3.46|11.5": {
       "el": "span",

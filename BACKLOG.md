@@ -235,6 +235,35 @@ work, all of it is real. Numbered from 15 so the references above stay valid.
     injecting each. **Still open:** put the newer pages (Shell Scripting is the worst at 7 lines)
     through the same `-700` ramp treatment the original pass applied, and shrink the baseline as
     that lands.
+
+    **Investigated 2026-09-16 — the premise didn't hold, same shape as item 26's own correction of
+    this item.** Every one of Shell Scripting's contrast failures (and every other newer page's) was
+    checked individually against `app/README.md`'s "what remains, and why it wasn't changed" list,
+    not assumed. All but one turned out to already be the accepted accent-fill chrome category —
+    cream-on-terracotta `.btn-primary`, terracotta `.btn-ghost` text, accent-tinted badges, dark-on-
+    `accent-2` chips — tuned to ~3:1 on purpose; running the `-700` treatment on those would only
+    silence a real, documented, brand-level tradeoff, not fix anything. Applying it anyway would have
+    been guessing at a new fix instead of reproducing the real one.
+
+    The one genuine bug was a different shape entirely: `CodeListing`'s line-number gutter (shared by
+    Shell Scripting, Code Playground, Debugging Challenge, Python Variables) set
+    `color: var(--color-neutral-600)` on the pane's `--color-neutral-900` background — 3.29:1, needs
+    4.5. This is the *dark-ground* case item 26 fixed for `.topnav-dark`, not the *light-ground* case
+    the original `-700` pass fixed: darkening a token further on a dark background only fails harder
+    (the original pass tried exactly that in five places and reverted all five — see the
+    `34bc710` commit), so the fix is a *lighter* explicit step, same idea as `.topnav-dark`'s override.
+    Moved to `--color-neutral-500` (4.90:1) — the least-lightened step that clears the bar, matching
+    the same chrome bar's "note" text one row up. It only ever showed up in the audit on Shell
+    Scripting because that page's 13-line script is the only one whose gutter reaches a two-digit
+    line number — the audit's own contrast check skips text under 2 characters, so single-digit
+    gutter numbers on the other three pages were failing the exact same way, invisibly. Fixing the
+    shared component fixes all four pages at once, not just the one the audit could see.
+
+    Re-recorded the baseline deliberately (`npm run audit:a11y -- --update-baseline`, reviewed diff):
+    **39 → 35 failures, 20 → 19 pairs** (removed `span|3.29|13`; also corrected the baseline's stale
+    `routes: 26` to `27` — `/python-variables` was added after the baseline was last recorded and had
+    gone unreflected there since). `npm run verify` green after: 27/27 routes, no overflow at any
+    width, 201/201 interaction checks, a11y clean with zero regression.
 19. ~~**The workflow's actions all target deprecated Node 20.**~~ — **done 2026-09-11.** Bumped to
     `checkout@v7`, `configure-pages@v6`, `setup-node@v7`, `upload-pages-artifact@v5` and
     `deploy-pages@v5`, and the build's own `node-version` from 22 to 24 to match what development
