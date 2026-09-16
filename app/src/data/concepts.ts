@@ -100,7 +100,7 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'stepping the rebase walkthrough to its last frame',
   },
 
-  // ── Stage 3 · A First Language: Python (two concepts built so far) ─────
+  // ── Stage 3 · A First Language: Python (three concepts built so far) ───
   {
     slug: 'python-variables',
     label: 'Variables',
@@ -112,6 +112,13 @@ export const CONCEPTS: Concept[] = [
     slug: 'control-flow',
     label: 'Control Flow',
     route: '/control-flow',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'functions',
+    label: 'Functions',
+    route: '/functions',
     stage: 3,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },

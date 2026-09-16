@@ -320,14 +320,37 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('control flow: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap stage 3: two real concepts, the rest honestly not-yet-built (items 10, 30) ── */
+/* ── Functions: 4 graded predict-the-value questions, Stage 3's 3rd lesson (item 31) ── */
+await resetProgress()
+await go('/functions')
+let fn = await body()
+check('functions: starts unanswered', fn.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: "['apple', 'banana']", exact: true }).click()
+await page.getByRole('button', { name: 'Hi, Ana!', exact: true }).click()
+await page.getByRole('button', { name: 'None', exact: true }).click()
+fn = await body()
+check('functions: three correct reaches the pass mark', fn.includes('Score: 3 of 4 correct'))
+check('functions: earns completion at the pass mark', await completed('Functions'))
+await page.getByRole('button', { name: '0', exact: true }).click()
+fn = await body()
+check(
+  'functions: a wrong pick still shows the real explanation',
+  fn.includes('the loop has already finished'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('functions: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap stage 3: three real concepts, the rest honestly not-yet-built (items 10, 30, 31) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
-check('roadmap: stage 3 shows its two real concepts', rm.includes('Variables') && rm.includes('Control Flow'))
+check(
+  'roadmap: stage 3 shows its three real concepts',
+  rm.includes('Variables') && rm.includes('Control Flow') && rm.includes('Functions'),
+)
 check(
   'roadmap: stage 3 lists the rest as not built yet',
-  rm.includes('Functions') && rm.includes('not built yet'),
+  rm.includes('Collections') && rm.includes('not built yet'),
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -359,6 +382,17 @@ await go('/roadmap')
 rm = await body()
 check('roadmap: completing both moves the stage-3 count again', rm.includes('2 OF 6'))
 check('roadmap: it also moves the path total again', rm.includes('2 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Functions' }).click()
+await page.waitForURL('**/functions')
+check('roadmap: the Functions chip really links to the lesson', page.url().endsWith('/functions'))
+await page.getByRole('button', { name: "['apple', 'banana']", exact: true }).click()
+await page.getByRole('button', { name: 'Hi, Ana!', exact: true }).click()
+await page.getByRole('button', { name: 'None', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all three moves the stage-3 count a third time', rm.includes('3 OF 6'))
+check('roadmap: it also moves the path total a third time', rm.includes('3 of 25 concepts'))
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so
@@ -499,7 +533,7 @@ check('search: non-matches are hidden', !searched.includes('Shell Scripting'))
 await page.getByLabel('Search concepts').fill('zzzz')
 check('search: empty state explains itself', (await body()).includes('Nothing matches'))
 
-// Gallery filter across all 24 archetypes.
+// Gallery filter across all 25 archetypes.
 await go('/')
 await page.getByLabel('Filter pages').fill('dark')
 const gallery = await body()

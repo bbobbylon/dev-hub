@@ -446,3 +446,44 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
 
     `npm run verify` green after: 28/28 routes, no overflow at any width, 209/209 interaction
     checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean.
+31. ~~**Stage 3 had two real concepts; the other four were still honest placeholders.**~~ — **done
+    2026-09-16.** Re-checked `curriculum.ts`/`concepts.ts` before starting rather than assuming:
+    Stage 3's `UPCOMING_STAGES` list was still `['Functions', 'Collections', 'Errors', 'Files']`,
+    nothing had shifted since item 30. Added `/functions` ("Functions"), Stage 3's third lesson,
+    continuing straight on from Control Flow — the same four-question predict-the-value archetype
+    again, no new page shape invented: a mutable default argument (`cart=[]` is created once, at
+    def time, and every call that skips its own cart shares that same list — the single most common
+    "gotcha" question in a Python interview), keyword-argument reordering (matched by name, not
+    position, so `greet(name="Ana", greeting="Hi")` and `greet("Hi", "Ana")` call identically), a
+    missing `return` (the function computes a value, forgets to hand it back, and the caller gets
+    `None` with no error at all — "a quietly wrong answer, which is exactly why this bug survives to
+    production"), and a closure over a loop variable (`funcs.append(lambda: i)` doesn't capture
+    `i`'s *value* at each iteration, only the variable itself — all three lambdas share it, and by
+    the time any one is called the loop has already finished with `i` at its last value, 2, not the
+    0/1/2 a learner expects). Wired in everywhere the last two lessons were: `App.tsx`'s lazy
+    import + route, `concepts.ts` (`stage: 3`), `curriculum.ts`'s `UPCOMING_STAGES` (`'Functions'`
+    dropped — three of the original six left now), `data/pages.ts`'s gallery card,
+    `scripts/routes.mjs`. `Roadmap.tsx` again needed zero changes — its chips, stage badges and
+    `TOTAL_CONCEPTS` (still 25) are fully derived, which is the entire point of items 6 and 30.
+
+    `verify-interactions.mjs` gained a dedicated block mirroring the other two lessons' own (starts
+    unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still shows the
+    real explanation, try-again resets), plus a third Roadmap-block completion flow (the Functions
+    chip really links to the lesson, and completing all three concepts moves the stage-3 count and
+    the path total a third time — `"3 OF 6"`, `"3 of 25 concepts"`). 209 → 217 interaction checks.
+    Every control carries real visible text; the a11y baseline (35 failures / 19 pairs, from item
+    18) did not move — confirmed by re-running `npm run audit:a11y` clean before and after.
+
+    Checked the same two things item 30 flagged, since both are the kind of drift that repeats
+    silently otherwise: `audit:content` stayed at its baseline 5 known artifacts (`"Functions"` was
+    already spelled the same way in both the design's placeholder array and the built page's label,
+    so no new case-sensitivity MISS this time — Control Flow's mismatch was the exception, not the
+    rule). The Page Gallery's hand-written archetype count, though, needed bumping again on the
+    same schedule as before — `PageGallery.tsx`'s lede and its matching `README.md` bullet both
+    moved 24 → 25 for this lesson shipping, and `docs/SRS.md`, `docs/ARCHITECTURE.md`, and
+    `app/README.md`'s route/page/concept counts (29 routes, 28 lesson/tool pages, 23 registered
+    concepts) were swept in the same commit, same precedent as items 10 and 30.
+
+    `npm run verify` green after: 29/29 routes, no overflow at any width, 217/217 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline.

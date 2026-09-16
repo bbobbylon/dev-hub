@@ -29,12 +29,13 @@ import { PATH_CONCEPTS } from './concepts'
  * them. Listed rather than counted so the count can't drift from the list the page renders — the
  * syllabus line under each stage heading is built from `concepts` below, not written out by hand.
  *
- * **Stage 3 has two real concepts now** (`Variables` → `python-variables`, BACKLOG item 10, then
- * `Control Flow` → `control-flow`, BACKLOG item 30 — the design's own syllabus wrote it lower-case,
- * "Control flow", as one of six items in a single placeholder string; the built page titles it
- * "Control Flow" like every other multi-word built label on the site) in `data/concepts.ts`, so it
- * isn't purely a placeholder anymore — `concepts` here lists only what's *left* to build in that
- * stage, four of the original six. Stages 4 and 5 remain fully unbuilt.
+ * **Stage 3 has three real concepts now** — `Variables` → `python-variables` (BACKLOG item 10),
+ * `Control Flow` → `control-flow` (item 30; the design's own syllabus wrote it lower-case,
+ * "Control flow", as one of six items in a single placeholder string, while the built page titles
+ * it "Control Flow" like every other multi-word built label on the site), and `Functions` →
+ * `functions` (item 31) — all in `data/concepts.ts`, so it isn't purely a placeholder anymore.
+ * `concepts` here lists only what's *left* to build in that stage, three of the original six.
+ * Stages 4 and 5 remain fully unbuilt.
  * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
  * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
  * nothing real to do — verified by reading each page, not guessed from its title. They are
@@ -45,7 +46,7 @@ export const UPCOMING_STAGES = [
     n: 3,
     title: '3 · A First Language: Python',
     lock: 'IN PROGRESS',
-    concepts: ['Functions', 'Collections', 'Errors', 'Files'],
+    concepts: ['Collections', 'Errors', 'Files'],
   },
   {
     n: 4,

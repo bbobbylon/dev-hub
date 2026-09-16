@@ -73,6 +73,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'functions',
+    title: 'Functions',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Mutable defaults, kwargs, missing returns, and closures — predict what prints, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
