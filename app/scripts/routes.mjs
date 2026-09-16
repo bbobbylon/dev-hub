@@ -21,6 +21,7 @@ export const ROUTES = [
   '/cli-basics',
   '/shell-scripting',
   '/python-variables',
+  '/control-flow',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

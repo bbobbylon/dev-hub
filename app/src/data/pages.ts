@@ -65,6 +65,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'control-flow',
+    title: 'Control Flow',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'If/elif, range(), while/break, and truthiness — predict what prints, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

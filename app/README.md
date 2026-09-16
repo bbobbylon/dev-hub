@@ -17,6 +17,10 @@ than ported from a prototype:
 - **Variables** (`/python-variables`) — the Roadmap named Stage 3's first concept but the stage was
   entirely locked; it's now four graded predict-the-value questions, the first real page on the
   Python stage, with the other five concepts still honestly labelled "not built yet."
+- **Control Flow** (`/control-flow`) — Stage 3's second real page, continuing straight on from
+  Variables: the same four-question predict-the-value archetype, now on if/elif exclusivity,
+  `range()`'s exclusive stop, `while`/`break`, and the truthiness of an empty list. Four of the
+  original six Python concepts are still honestly labelled "not built yet."
 
 ## Beyond the mockups
 
@@ -33,7 +37,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 21 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 22 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -96,7 +100,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 27 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 28 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -129,9 +133,10 @@ extractor artifacts**, not omissions:
   ${QUESTIONS.length}`). The rendered wording is asserted in `verify:interactions`.
 - One Page Gallery entry is the prototype's original archetype count. The prototype is a frozen
   snapshot that will always say "20"; the gallery's own lede is deliberately kept current as
-  archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 now that
-  Shell Scripting has too) — see `PAGES.length` in `data/pages.ts` for the number that's actually
-  true.
+  archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 once Shell
+  Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
+  adding Control Flow — 24 now) — see `PAGES.length` in `data/pages.ts` for the number that's
+  actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

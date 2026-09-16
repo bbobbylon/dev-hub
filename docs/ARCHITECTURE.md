@@ -14,7 +14,7 @@ For how the app gets from a laptop to `https://bbobbylon.github.io/dev-hub/`, se
 
 Dev Hub is a React 19 + TypeScript + Vite 8 single-page app: a coding-fundamentals learning
 tool built from a Claude Design HTML/CSS/JS handoff (`project/`, `chats/` at the repo root —
-see that root `README.md`). It ships ~26 standalone interactive lesson/tool pages behind one
+see that root `README.md`). It ships ~27 standalone interactive lesson/tool pages behind one
 router, plus a gallery that indexes them, plus a real localStorage-backed progress system the
 original design mockups only depicted with hardcoded numbers.
 

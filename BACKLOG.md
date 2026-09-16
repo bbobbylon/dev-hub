@@ -387,3 +387,62 @@ Turned up while adding the un-mark control (item 22). Numbered from 27 so earlie
     button instead, since there's no page to put one on. 15 new checks (155 → 170), including
     marking and un-marking both routeless concepts (item 24) and un-marking a routed one without
     ever visiting its page.
+
+## Found while working (2026-09-16)
+
+Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier references hold.
+
+30. ~~**Stage 3 had only one real concept; the other five were still honest placeholders.**~~ —
+    **done 2026-09-16.** Added `/control-flow` ("Control Flow"), continuing straight on from
+    `/python-variables` — the same four-question predict-the-value archetype (`CodeListing`
+    snippets, three answer choices, a real explanation on reveal, a running score, a "try again"
+    reset), reused rather than reinvented: if/elif exclusivity (an `elif` chain stops at the first
+    true branch even when a later one would also match), `range()`'s exclusive stop (the single
+    most common off-by-one in a beginner's first loop), `while True` + `break` (the loop doesn't
+    wait to "check" anything — `break` exits the instant it runs), and the truthiness of an empty
+    list (`if items` asks "is this truthy?", not "is this a bool?"). `data/concepts.ts` gained a
+    `control-flow` entry (`stage: 3`); `data/curriculum.ts`'s `UPCOMING_STAGES` lost `'Control
+    flow'` from Stage 3's not-yet-built list — four of the original six now, not five — so
+    `TOTAL_CONCEPTS` (still 25, derived, never hand-edited) and the Roadmap's stage-3 chips/counts
+    moved without touching `Roadmap.tsx` at all, which was the point of building those off a
+    registry in the first place (item 6). Registered the same way every other page is (`App.tsx`'s
+    lazy import + route, `data/pages.ts`'s gallery card, `scripts/routes.mjs`), and
+    `verify-interactions.mjs` gained a dedicated block mirroring Python Variables' own (starts
+    unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still shows the
+    real explanation, try-again resets) plus three more checks in the Roadmap block (the chip
+    really links to the lesson, and completing both concepts moves the stage-3 count and the path
+    total a second time). 201 → 209 interaction checks. Every control has real accessible text (no
+    icon-only buttons), so the a11y baseline this session's earlier fix (item 18) shrank to
+    35 failures / 19 pairs did not move: still 35/19 after the new page, confirmed by re-running
+    `npm run audit:a11y` clean both before and after.
+
+    One real bug surfaced writing the interaction checks, not the lesson itself: Q2's plausible
+    wrong answer ("3" — the loop's final `i`, not the accumulated `total`) and Q3's correct answer
+    ("3" — the value `break` catches `n` at) are the same bare string, so
+    `getByRole('button', { name: '3', exact: true })` matches both cards at once once Q2 is
+    answered and disabled but still rendered. Fixed with `.nth(1)` (Q2's card renders first), not by
+    watering down either answer choice — both are the more useful wrong/right answer for what they
+    teach.
+
+    `audit:content` (not part of `npm run verify`, but read after every content change per its own
+    instructions) flagged one new MISS: the Roadmap's composed placeholder-syllabus check
+    (`COMPOSED` in `scripts/audit-content.mjs`) matches each `·`-separated piece case-sensitively,
+    and the prototype's original six-item Stage 3 line spelled it lower-case, `"Control flow"` — the
+    built page titles it `"Control Flow"`, Title Case like every other multi-word built label on the
+    site (`"Branching & Merging"`, `"Big-O Performance"`, …), so the exact-case match broke. Not a
+    content gap — resolved by naming both casings explicitly in `curriculum.ts`'s own doc comment
+    (the design's placeholder wrote it lower-case; the built page's label is Title Case on purpose)
+    rather than either lower-casing the real page's title or adding a permanent excuse to
+    `app/README.md`'s "known extractor artifacts" list. Also caught, one door down: the Page
+    Gallery's hand-written lede (`"N archetypes plus the three originals"`) had already been stale
+    since `/python-variables` shipped — its own bump from 22 to 23 was skipped at the time, which
+    `README.md`'s matching explanation bullet had been silently carrying ever since. Fixed both:
+    `PageGallery.tsx` now reads 24 (22, plus the missed Variables bump, plus this session's Control
+    Flow), and the README bullet names the gap rather than quietly absorbing it. `docs/SRS.md`,
+    `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page counts (28 routes, 27 lesson/tool
+    pages) and `app/README.md`'s registered-concept count (22) were swept in the same commit, same
+    as item 10's precedent. `docs/SRS.md`'s interaction-check line was already non-numeric (item 27)
+    and needed no change.
+
+    `npm run verify` green after: 28/28 routes, no overflow at any width, 209/209 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean.

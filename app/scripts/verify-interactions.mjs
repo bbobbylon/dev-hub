@@ -298,14 +298,36 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('python variables: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap stage 3: one real concept, the rest honestly not-yet-built (item 10) ── */
+/* ── Control Flow: 4 graded predict-the-value questions, Stage 3's 2nd lesson (item 30) ── */
+await resetProgress()
+await go('/control-flow')
+let cf = await body()
+check('control flow: starts unanswered', cf.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+await page.getByRole('button', { name: '6', exact: true }).click()
+// Q2's wrong option and Q3's correct option are both the bare text "3" — Q2's card renders
+// first, so the second match is Q3's.
+await page.getByRole('button', { name: '3', exact: true }).nth(1).click()
+cf = await body()
+check('control flow: three correct reaches the pass mark', cf.includes('Score: 3 of 4 correct'))
+check('control flow: earns completion at the pass mark', await completed('Control Flow'))
+await page.getByRole('button', { name: 'has items', exact: true }).click()
+cf = await body()
+check(
+  'control flow: a wrong pick still shows the real explanation',
+  cf.includes('always falsy'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('control flow: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap stage 3: two real concepts, the rest honestly not-yet-built (items 10, 30) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
-check('roadmap: stage 3 shows its one real concept', rm.includes('Variables'))
+check('roadmap: stage 3 shows its two real concepts', rm.includes('Variables') && rm.includes('Control Flow'))
 check(
   'roadmap: stage 3 lists the rest as not built yet',
-  rm.includes('Control flow') && rm.includes('not built yet'),
+  rm.includes('Functions') && rm.includes('not built yet'),
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -325,6 +347,18 @@ await go('/roadmap')
 rm = await body()
 check('roadmap: completing it moves the stage-3 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total', rm.includes('1 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Control Flow' }).click()
+await page.waitForURL('**/control-flow')
+check('roadmap: the Control Flow chip really links to the lesson', page.url().endsWith('/control-flow'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+await page.getByRole('button', { name: '6', exact: true }).click()
+// Same "3"/"3" collision as the dedicated block above — Q3's is the second match.
+await page.getByRole('button', { name: '3', exact: true }).nth(1).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing both moves the stage-3 count again', rm.includes('2 OF 6'))
+check('roadmap: it also moves the path total again', rm.includes('2 of 25 concepts'))
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so
@@ -465,7 +499,7 @@ check('search: non-matches are hidden', !searched.includes('Shell Scripting'))
 await page.getByLabel('Search concepts').fill('zzzz')
 check('search: empty state explains itself', (await body()).includes('Nothing matches'))
 
-// Gallery filter across all 23 archetypes.
+// Gallery filter across all 24 archetypes.
 await go('/')
 await page.getByLabel('Filter pages').fill('dark')
 const gallery = await body()
