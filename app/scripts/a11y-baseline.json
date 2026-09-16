@@ -1,6 +1,6 @@
 {
   "note": "Accepted contrast failures inherited from the design prototypes. Regenerate with `npm run audit:a11y -- --update-baseline` (with the preview server up) only as a deliberate, reviewed change. See app/README.md, \"Accessibility\".",
-  "routes": 29,
+  "routes": 30,
   "contrastTotal": 35,
   "pairs": {
     "a.btn|3.03|14": {

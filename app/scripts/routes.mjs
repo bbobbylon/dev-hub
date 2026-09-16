@@ -23,6 +23,7 @@ export const ROUTES = [
   '/python-variables',
   '/control-flow',
   '/functions',
+  '/collections',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

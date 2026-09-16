@@ -487,3 +487,45 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     `npm run verify` green after: 29/29 routes, no overflow at any width, 217/217 interaction
     checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
     `audit:content` at its 5-artifact baseline.
+32. ~~**Stage 3 had three real concepts; the other three were still honest placeholders.**~~ —
+    **done 2026-09-16.** Re-checked `curriculum.ts`/`concepts.ts` first, per the standing rule:
+    Stage 3's `UPCOMING_STAGES` was still `['Collections', 'Errors', 'Files']`, nothing had
+    shifted since item 31. Added `/collections` ("Collections"), Stage 3's fourth lesson,
+    continuing straight on from Functions — same archetype, no new page shape, four gotchas picked
+    to cover distinct collection behaviors with no overlap against the three lessons before it:
+    `b = a` **aliasing** a list instead of copying it (the direct, deliberate contrast with the
+    Variables lesson's own `b = a` question — that one used an immutable int, where reassigning
+    couldn't touch the alias; this one uses a mutable list, where a method call through either name
+    changes what both see), a **tuple's immutability** enforced as a real `TypeError` where a list
+    would have silently allowed the same assignment, a **dict literal's repeated key** silently
+    keeping only the last value written (not a `SyntaxError` — Python builds the pairs left to
+    right and the second write simply overwrites the first), and a **slice tolerating out-of-range
+    bounds** that plain indexing never would (`nums[1:10]` on a 3-item list just clamps, `nums[10]`
+    raises `IndexError`). Deliberately did *not* reach for `*args`/`**kwargs` or `in` on a list vs.
+    a set from the coordinator's candidate list — both are real gotchas, but neither is a
+    *collection* gotcha specifically (the first is a function-call-signature feature, the second a
+    performance property with identical correctness either way), and the four chosen already cover
+    reference semantics, type-level mutability enforcement, dict key uniqueness, and slice-vs-index
+    bounds — four genuinely different behaviors, not four flavors of one.
+
+    Wired in everywhere the last three lessons were: `App.tsx`'s lazy import + route,
+    `concepts.ts` (`stage: 3`), `curriculum.ts`'s `UPCOMING_STAGES` (`'Collections'` dropped — two
+    of the original six left now: `Errors`, `Files`), `data/pages.ts`'s gallery card,
+    `scripts/routes.mjs`. `Roadmap.tsx` again needed zero changes.
+
+    `verify-interactions.mjs` gained a dedicated block mirroring the other three lessons, plus a
+    fourth Roadmap-block completion flow (`"4 OF 6"`, `"4 of 25 concepts"`). Checked for option-text
+    collisions across all four questions before writing the clicks (none this time — no `.nth()`
+    needed). 217 → 225 interaction checks. A11y baseline (35/19, item 18) did not move.
+
+    Same two drift checks as the last two rounds: `audit:content` stayed at its 5-artifact
+    baseline (no case-sensitivity mismatch — "Collections" is one word, spelled the same in the
+    design's placeholder and the built label, same as "Functions" and unlike "Control Flow"). The
+    Page Gallery's hand-written archetype count moved 25 → 26 on schedule (`PageGallery.tsx`'s lede
+    + its `README.md` bullet), and `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s
+    route/page/concept counts (30 routes, 29 lesson/tool pages, 24 registered concepts) were swept
+    in the same commit.
+
+    `npm run verify` green after: 30/30 routes, no overflow at any width, 225/225 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline.

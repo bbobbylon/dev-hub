@@ -340,17 +340,42 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('functions: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap stage 3: three real concepts, the rest honestly not-yet-built (items 10, 30, 31) ── */
+/* ── Collections: 4 graded predict-the-value questions, Stage 3's 4th lesson (item 32) ── */
+await resetProgress()
+await go('/collections')
+let co = await body()
+check('collections: starts unanswered', co.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: '[1, 2, 3, 4]', exact: true }).click()
+await page
+  .getByRole('button', { name: "TypeError — a tuple can't be changed after it's created", exact: true })
+  .click()
+await page.getByRole('button', { name: "{'a': 3, 'b': 2}", exact: true }).click()
+co = await body()
+check('collections: three correct reaches the pass mark', co.includes('Score: 3 of 4 correct'))
+check('collections: earns completion at the pass mark', await completed('Collections'))
+await page.getByRole('button', { name: 'IndexError — 10 is out of range', exact: true }).click()
+co = await body()
+check(
+  'collections: a wrong pick still shows the real explanation',
+  co.includes('Slicing is forgiving'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('collections: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap stage 3: four real concepts, the rest honestly not-yet-built (items 10, 30-32) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
 check(
-  'roadmap: stage 3 shows its three real concepts',
-  rm.includes('Variables') && rm.includes('Control Flow') && rm.includes('Functions'),
+  'roadmap: stage 3 shows its four real concepts',
+  rm.includes('Variables') &&
+    rm.includes('Control Flow') &&
+    rm.includes('Functions') &&
+    rm.includes('Collections'),
 )
 check(
   'roadmap: stage 3 lists the rest as not built yet',
-  rm.includes('Collections') && rm.includes('not built yet'),
+  rm.includes('Errors') && rm.includes('not built yet'),
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -393,6 +418,19 @@ await go('/roadmap')
 rm = await body()
 check('roadmap: completing all three moves the stage-3 count a third time', rm.includes('3 OF 6'))
 check('roadmap: it also moves the path total a third time', rm.includes('3 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Collections' }).click()
+await page.waitForURL('**/collections')
+check('roadmap: the Collections chip really links to the lesson', page.url().endsWith('/collections'))
+await page.getByRole('button', { name: '[1, 2, 3, 4]', exact: true }).click()
+await page
+  .getByRole('button', { name: "TypeError — a tuple can't be changed after it's created", exact: true })
+  .click()
+await page.getByRole('button', { name: "{'a': 3, 'b': 2}", exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all four moves the stage-3 count a fourth time', rm.includes('4 OF 6'))
+check('roadmap: it also moves the path total a fourth time', rm.includes('4 of 25 concepts'))
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so
@@ -533,7 +571,7 @@ check('search: non-matches are hidden', !searched.includes('Shell Scripting'))
 await page.getByLabel('Search concepts').fill('zzzz')
 check('search: empty state explains itself', (await body()).includes('Nothing matches'))
 
-// Gallery filter across all 25 archetypes.
+// Gallery filter across all 26 archetypes.
 await go('/')
 await page.getByLabel('Filter pages').fill('dark')
 const gallery = await body()

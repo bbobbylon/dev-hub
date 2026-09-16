@@ -81,6 +81,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'collections',
+    title: 'Collections',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'List aliasing, tuple immutability, dict key collisions, and slice edges — predict what prints, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
