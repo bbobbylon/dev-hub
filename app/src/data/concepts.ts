@@ -36,9 +36,9 @@ export interface Concept {
   label: string
   /** Route that teaches it, or `undefined` when the path names a concept this app has no page for. */
   route?: string
-  /** Roadmap stage (1-3 have at least one built concept; 4-5 are still locked placeholders), or
-   *  `null` when off the path. */
-  stage: 1 | 2 | 3 | null
+  /** Roadmap stage (1-4 have at least one built concept; 5 is still a fully locked placeholder),
+   *  or `null` when off the path. */
+  stage: 1 | 2 | 3 | 4 | null
   /** What records it — prose for the next reader, kept in step with the page's `<ConceptComplete>`. */
   earnedBy: string
 }
@@ -141,6 +141,15 @@ export const CONCEPTS: Concept[] = [
     label: 'Files',
     route: '/files',
     stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+
+  // ── Stage 4 · Data Structures & Algorithms (first concept built) ───────
+  {
+    slug: 'arrays',
+    label: 'Arrays',
+    route: '/arrays',
+    stage: 4,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
@@ -247,7 +256,7 @@ export const CONCEPT_BY_SLUG: Record<string, Concept> = Object.fromEntries(
 export const PATH_CONCEPTS = CONCEPTS.filter((c) => c.stage !== null)
 
 /** The concepts a given built Roadmap stage lists, in chip order. */
-export function conceptsInStage(stage: 1 | 2 | 3): Concept[] {
+export function conceptsInStage(stage: 1 | 2 | 3 | 4): Concept[] {
   return CONCEPTS.filter((c) => c.stage === stage)
 }
 

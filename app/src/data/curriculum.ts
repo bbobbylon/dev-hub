@@ -45,6 +45,16 @@ import { PATH_CONCEPTS } from './concepts'
  * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
  * nothing real to do — verified by reading each page, not guessed from its title. They are
  * pointers, not path concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
+ *
+ * **Stage 4 has its first real concept: `Arrays` → `arrays` (item 35),** the same way Stage 3
+ * started (item 10). Unlike every Stage 3 round, this one needed a real `Roadmap.tsx` change, not
+ * just a data change — Stage 4 had never had a dedicated "some built, some not" block the way
+ * Stage 3 did; it was still rendered through the fully-locked `laterStages` path (opacity-dimmed,
+ * a `LockedTag`, a syllabus sentence, no chip grid, no click-through). Stage 4 now gets that same
+ * dedicated block Stage 3 had, and `laterStages` covers only Stage 5 from here on. `related` stays
+ * on the `n: 4` entry below even though it now has a real concept — the three linked pages
+ * (`Data Structures Visual`, `Big-O Performance`, `Algorithm Visualizer`) are still genuinely
+ * useful supplementary reading for the rest of the stage's still-unbuilt syllabus.
  */
 export const UPCOMING_STAGES = [
   {
@@ -52,15 +62,18 @@ export const UPCOMING_STAGES = [
     title: '3 · A First Language: Python',
     // `lock` is never rendered for stage 3 — `Roadmap.tsx`'s stage-3 block is hardcoded to show a
     // "N OF 6" `Tag` instead of `<LockedTag>{stage.lock}</LockedTag>` (that's `laterStages`' job,
-    // stages 4-5 only) — but the field is kept honest anyway, now that all six concepts are real.
+    // stage 5 only, now that stage 4 has its own dedicated block too) — but the field is kept
+    // honest anyway, now that all six concepts are real.
     lock: 'BUILT',
     concepts: [],
   },
   {
     n: 4,
     title: '4 · Data Structures & Algorithms',
-    lock: 'NOT YET BUILT',
-    concepts: ['Arrays', 'Hash maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting'],
+    // Same story as stage 3's `lock` above, one round earlier in its own lifecycle: never rendered
+    // once a stage has its own dedicated block, kept honest anyway.
+    lock: 'IN PROGRESS',
+    concepts: ['Hash maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting'],
     related: [
       { label: 'Data Structures Visual', route: '/data-structures-visual' },
       { label: 'Big-O Performance', route: '/big-o-performance' },
@@ -84,8 +97,11 @@ export function syllabusOf(stage: (typeof UPCOMING_STAGES)[number]): string {
 }
 
 /**
- * Concepts in the designed backend-developer path, across all five Roadmap stages: the two built
- * stages' registry entries plus the three locked stages' listed placeholders.
+ * Concepts in the designed backend-developer path, across all five Roadmap stages: every built
+ * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
+ * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
+ * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
+ * built, stage 3 fully built, stage 4 one concept in, stage 5 not started, as of item 35).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

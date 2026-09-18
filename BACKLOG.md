@@ -707,3 +707,111 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     remaining) for the first time. Stage 4 (Data Structures & Algorithms) and Stage 5 (APIs &
     Databases) remain fully unbuilt, twelve concepts between them — the next real work on the
     Roadmap, whenever it's picked up, starts there.
+
+35. ~~**Stage 4 (Data Structures & Algorithms) had no real concepts at all — everything in it was
+    still an honest placeholder.**~~ — **done 2026-09-18.** Re-checked `curriculum.ts` first
+    rather than guessing a starting point: Stage 4's `n: 4` entry listed
+    `['Arrays', 'Hash maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting']`, in that order —
+    `Arrays` is both the coordinator's guess and the list's own first item, so no judgment call was
+    actually needed here. Added `/arrays` ("Arrays"), Stage 4's first lesson, on a new stage rather
+    than a Stage 3 continuation — same predict-the-value/predict-the-behavior archetype (the
+    coordinator explicitly named both; this page uses the second half of that pairing more than
+    Stage 3 ever did, since "what actually happens" fits a data-structure question better than a
+    literal `print()` value for two of the four). Four array-specific gotchas, picked to go past
+    what `Data Structures Visual`'s own array diagram already states (its one-line "fast: O(1)
+    index / slow: O(n) insert-at-front" verdict) rather than re-testing the same two facts at
+    greater length, and with no overlap against Stage 3's own six lessons (especially
+    `Collections.tsx`, the nearest thing to a prior round on this exact subject):
+    **`[[0] * 3] * 3`'s "2D array"** secretly holds three references to the *same* inner list, not
+    three independent rows — `[0] * 3` runs once, and the outer `* 3` just repeats that one result,
+    so mutating "row 0" mutates all three (the fix is a list comprehension, which calls `[0] * 3`
+    three separate times); **`.remove()`ing from a list while a `for` loop is still walking it**
+    desyncs the loop's internal position counter from the now-shorter list and silently *skips*
+    elements — traced concretely (`[2, 4, 6, 8]` "removing every even number" leaves `[4, 8]`
+    behind) rather than asserted, and deliberately contrasted with a dict/set, which Python
+    actually detects and raises `RuntimeError` for, unlike a list, which raises nothing at all;
+    **negative indexing is bounded exactly like positive indexing** — `arr[-len(arr) - 1]` is a
+    real `IndexError`, not an infinite backward wrap, extending (not repeating) Collections'
+    slice-vs-index distinction into the negative direction specifically, a dimension that lesson
+    never tested; and **a string is an immutable array of characters** — readable by index
+    (`word[0]`), never writable by index (`word[0] = "b"` raises `TypeError`), the mutable/immutable
+    contrast Collections drew for tuples, redrawn here for the type this stage actually cares
+    about. Deliberately did not reach for "appending is amortized O(1) because of over-allocation"
+    as a fifth angle — Python exposes no ordinary observable value that reveals *when* a resize
+    happens, so there's no honest way to phrase it as a predict-the-value question without
+    reaching for non-standard introspection a beginner lesson has no business showing.
+
+    **This round needed a real `Roadmap.tsx` change, the first one since item 10 — every Stage 3
+    round through item 34 genuinely needed none.** Stage 4 had never had Stage 3's dedicated
+    "some built, some not" block; it was still rendered through the fully-locked, no-chips
+    `laterStages` path (opacity-dimmed, a `LockedTag`, one syllabus sentence, `related` links, and
+    nothing clickable). Giving Stage 4 a real concept meant it needed that same treatment Stage 3
+    got at item 10 — its own block, a chip grid, done/next/todo state — so `Roadmap.tsx` gained:
+    `stage4 = conceptsInStage(4)`, `stage4Done`, `stage4Upcoming` (mirroring stage 3's own),
+    `nextUp`'s search now includes stage 4 (so "Continue" correctly cascades into Arrays once
+    stage 1-3 are ever fully done — untested territory before this round, since no existing test
+    completes that many concepts in one session; confirmed by grep that none do, so this was a safe
+    extension, not a guess), and a new stage-4 JSX block hand-duplicated from stage 3's own rather
+    than extracted into a shared component — two data points don't justify that abstraction yet;
+    the file's own header comment says so explicitly and names the real trigger (stage 5 needing
+    the same shape) for revisiting the call. `laterStages` now filters to `n > 4` (stage 5 only).
+    `data/concepts.ts`'s `Concept.stage` type widened from `1 | 2 | 3 | null` to
+    `1 | 2 | 3 | 4 | null`, and `conceptsInStage`'s parameter type to match — both one-line, but
+    both required, unlike every Stage 3 round where the type already covered the stage in question.
+    Also corrected `curriculum.ts`'s `n: 4` entry's dead-but-inaccurate `lock: 'NOT YET BUILT'` to
+    `'IN PROGRESS'`, same reasoning as item 34's fix to stage 3's own `lock` field (never actually
+    *rendered* once a stage has its own dedicated block — `laterStages` is the only reader of
+    `stage.lock` — but a dead field holding a false value is exactly the drift that compounds
+    silently later).
+
+    `verify-interactions.mjs` gained a dedicated Arrays block mirroring the other six lessons
+    (starts unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still
+    shows the real explanation, try-again resets) plus a real structural change to the Roadmap
+    block, not just an appended chip-completion step: the "nothing left not-yet-built" checks
+    (there were two, bracketing the six-lesson Stage 3 chain) could no longer assert plain absence
+    of the string `"not built yet"` once Stage 4's own five `NotBuiltChip`s exist on the same
+    page — both became count-based (`(rm.match(/not built yet/g) ?? []).length === 5`), asserting
+    Stage 3's zero and Stage 4's five *together*, which is the actually-true invariant now.
+    Same fix for the ALL-CAPS `"NOT YET BUILT"` `LockedTag` count — it moved from `=== 2` (stages 4
+    and 5, both still in `laterStages`) to `=== 1` (stage 5 only, since stage 4 graduated out).
+    Then the sixth Roadmap chip-chain step (Files) got a seventh: click through to Arrays, answer
+    its first three questions correctly, and confirm three things at once — the stage-4 count
+    reads `"1 OF 6"`, the path total reads `"7 of 25 concepts"`, and the not-built count is *still*
+    exactly 5 (completing Arrays doesn't consume one of Stage 4's remaining `NotBuiltChip`s, since
+    Arrays was never among them — a real, non-obvious invariant worth its own assertion rather than
+    an assumption). Checked for option-text collisions across all four questions before writing the
+    clicks — none, no `.nth()` needed. 242 → 252 interaction checks (5 dedicated + 5 Roadmap, one
+    more than the usual +4-ish for the reason above: two renamed/refactored checks plus three
+    genuinely new ones for the Arrays chip-chain step).
+
+    `audit:content` stayed at its 5-artifact baseline — worth double-checking this round
+    specifically, since `Arrays` moved out of `curriculum.ts`'s literal `concepts: [...]` array
+    (which is how `COMPOSED.Roadmap`'s `'Arrays · Hash maps · Stacks & queues · Trees · Big-O ·
+    Sorting — 6 concepts'` entry used to find the word "Arrays" in source) and into
+    `data/concepts.ts` instead. It kept passing because `curriculum.ts`'s own doc comment
+    (updated this round to explain Stage 4's transition, matching every Stage-3 round's own
+    doc-comment updates) happens to name "Arrays" in prose — confirmed by re-running
+    `npm run audit:content` after the change rather than assuming the coincidence would hold.
+    The Page Gallery's hand-written archetype count moved 28 → 29 on schedule. Swept
+    `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts (33
+    routes, 32 lesson/tool pages, 27 registered concepts). Also fixed `docs/ARCHITECTURE.md` §7's
+    `Roadmap.tsx` table row, which had said "stages 1-2 built with real chip grids, stages 3-5
+    locked placeholders" since before item 10 and was never corrected across any Stage 3 round —
+    genuinely wrong for the entire time Stage 3 was partially or fully built, not just this round's
+    doing, but this round's own real `Roadmap.tsx` change was the reason it finally got noticed and
+    fixed rather than compounding further. `docs/SRS.md`'s ambiguous "`src/pages/*.tsx`, N files"
+    line and the same table's still-missing per-lesson rows for all six Stage 3 pages remain
+    unfixed, per item 33/34's own reasoning — real, pre-existing, separate gaps.
+
+    `npm run verify` green after: 33/33 routes, no overflow at any width, 252/252 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline. Ran `npm run build` before `npm run verify` from
+    the start this time (the `dist/`-staleness snag items 33/34 flagged) — no repeat of that
+    failure mode.
+
+    **Stage 4 now has 1 of 6 concepts built: Arrays.** Five remain (Hash maps, Stacks & queues,
+    Trees, Big-O, Sorting), plus Stage 5 (APIs & Databases) still fully unbuilt behind it. Unlike
+    every Stage 3 round, later Stage-4 concepts won't need another `Roadmap.tsx` structural change
+    — the dedicated block, the widened types, and `nextUp`'s extended search are all in place now,
+    so the remaining rounds on this stage should look exactly like a Stage 3 round did: a lesson
+    page, a data entry, a wiring sweep, zero `Roadmap.tsx` changes.

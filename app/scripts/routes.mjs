@@ -26,6 +26,7 @@ export const ROUTES = [
   '/collections',
   '/errors',
   '/files',
+  '/arrays',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

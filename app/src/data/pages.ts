@@ -105,6 +105,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'arrays',
+    title: 'Arrays',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'A shared-reference 2D grid, mutating a list mid-loop, negative index bounds, and string immutability — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
