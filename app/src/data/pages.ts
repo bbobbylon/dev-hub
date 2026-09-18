@@ -113,6 +113,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'hash-maps',
+    title: 'Hash Maps',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Unhashable dict keys, [] vs .get(), mutating a dict mid-loop, and insertion order since 3.7 — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

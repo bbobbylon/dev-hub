@@ -39,20 +39,21 @@ import { PATH_CONCEPTS } from './concepts'
  * deleted outright: `Roadmap.tsx` still looks it up unconditionally (`stage3Upcoming =
  * UPCOMING_STAGES.find((s) => s.n === 3)!`) to read its `.concepts.length`/`.map`, and removing the
  * entry would need that lookup rewritten for no real gain — an empty list renders zero
- * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state. Stage 4 and 5
- * remain fully unbuilt.
+ * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state. Stage 5 remains
+ * fully unbuilt; Stage 4 no longer is (see below).
  * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
  * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
  * nothing real to do — verified by reading each page, not guessed from its title. They are
  * pointers, not path concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
  *
- * **Stage 4 has its first real concept: `Arrays` → `arrays` (item 35),** the same way Stage 3
- * started (item 10). Unlike every Stage 3 round, this one needed a real `Roadmap.tsx` change, not
- * just a data change — Stage 4 had never had a dedicated "some built, some not" block the way
- * Stage 3 did; it was still rendered through the fully-locked `laterStages` path (opacity-dimmed,
- * a `LockedTag`, a syllabus sentence, no chip grid, no click-through). Stage 4 now gets that same
- * dedicated block Stage 3 had, and `laterStages` covers only Stage 5 from here on. `related` stays
- * on the `n: 4` entry below even though it now has a real concept — the three linked pages
+ * **Stage 4 has two real concepts now** — `Arrays` → `arrays` (item 35; the round that gave
+ * Stage 4 its own dedicated block in `Roadmap.tsx`, the same "some built, some not" shape Stage 3
+ * had, instead of the fully-locked `laterStages` path it used to share with a stage that had no
+ * real concepts yet) and `Hash Maps` → `hash-maps` (item 36; the design's own syllabus wrote it
+ * lower-case, "Hash maps", as one of six items in a single placeholder string, while the built
+ * page titles it "Hash Maps" like every other multi-word built label on the site — the same
+ * distinction `Control Flow` drew against its own design placeholder, "Control flow"). `related`
+ * stays on the `n: 4` entry below even with two real concepts now — the three linked pages
  * (`Data Structures Visual`, `Big-O Performance`, `Algorithm Visualizer`) are still genuinely
  * useful supplementary reading for the rest of the stage's still-unbuilt syllabus.
  */
@@ -73,7 +74,7 @@ export const UPCOMING_STAGES = [
     // Same story as stage 3's `lock` above, one round earlier in its own lifecycle: never rendered
     // once a stage has its own dedicated block, kept honest anyway.
     lock: 'IN PROGRESS',
-    concepts: ['Hash maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting'],
+    concepts: ['Stacks & queues', 'Trees', 'Big-O', 'Sorting'],
     related: [
       { label: 'Data Structures Visual', route: '/data-structures-visual' },
       { label: 'Big-O Performance', route: '/big-o-performance' },
@@ -101,7 +102,7 @@ export function syllabusOf(stage: (typeof UPCOMING_STAGES)[number]): string {
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
  * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 one concept in, stage 5 not started, as of item 35).
+ * built, stage 3 fully built, stage 4 two concepts in, stage 5 not started, as of item 36).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

@@ -430,7 +430,33 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('arrays: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, Stage 4's first (items 10, 30-35) ── */
+/* ── Hash Maps: 4 graded predict-the-value questions, Stage 4's 2nd lesson (item 36) ── */
+await resetProgress()
+await go('/hash-maps')
+let hm = await body()
+check('hash maps: starts unanswered', hm.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: "TypeError: unhashable type: 'list'", exact: true })
+  .click()
+await page.getByRole('button', { name: "KeyError: 'carol'", exact: true }).click()
+await page
+  .getByRole('button', { name: 'RuntimeError: dictionary changed size during iteration', exact: true })
+  .click()
+hm = await body()
+check('hash maps: three correct reaches the pass mark', hm.includes('Score: 3 of 4 correct'))
+check('hash maps: earns completion at the pass mark', await completed('Hash Maps'))
+await page
+  .getByRole('button', { name: "['a', 'm', 'z'] — dicts sort their keys alphabetically", exact: true })
+  .click()
+hm = await body()
+check(
+  'hash maps: a wrong pick still shows the real explanation',
+  hm.includes('insertion order and sorted order are not the same guarantee'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('hash maps: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, Stage 4's first two (items 10, 30-36) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -443,10 +469,10 @@ check(
     rm.includes('Errors') &&
     rm.includes('Files'),
 )
-check('roadmap: stage 4 shows its first real concept', rm.includes('Arrays'))
+check('roadmap: stage 4 shows both its real concepts', rm.includes('Arrays') && rm.includes('Hash Maps'))
 check(
-  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has five',
-  (rm.match(/not built yet/g) ?? []).length === 5,
+  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has four',
+  (rm.match(/not built yet/g) ?? []).length === 4,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -527,8 +553,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its five',
-  (rm.match(/not built yet/g) ?? []).length === 5,
+  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its four',
+  (rm.match(/not built yet/g) ?? []).length === 4,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -547,7 +573,26 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 5,
+  (rm.match(/not built yet/g) ?? []).length === 4,
+)
+
+await page.getByRole('link', { name: 'Hash Maps' }).click()
+await page.waitForURL('**/hash-maps')
+check('roadmap: the Hash Maps chip really links to the lesson', page.url().endsWith('/hash-maps'))
+await page
+  .getByRole('button', { name: "TypeError: unhashable type: 'list'", exact: true })
+  .click()
+await page.getByRole('button', { name: "KeyError: 'carol'", exact: true }).click()
+await page
+  .getByRole('button', { name: 'RuntimeError: dictionary changed size during iteration', exact: true })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes('2 OF 6'))
+check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
+check(
+  'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
+  (rm.match(/not built yet/g) ?? []).length === 4,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

@@ -815,3 +815,84 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     — the dedicated block, the widened types, and `nextUp`'s extended search are all in place now,
     so the remaining rounds on this stage should look exactly like a Stage 3 round did: a lesson
     page, a data entry, a wiring sweep, zero `Roadmap.tsx` changes.
+
+36. ~~**Stage 4 had one real concept (Arrays); Hash Maps was still an honest placeholder.**~~ —
+    **done 2026-09-18. `Roadmap.tsx` needed zero changes this round, confirming item 35's own
+    prediction** — Stage 4's dedicated block, `data/concepts.ts`'s widened `Concept.stage` type,
+    and `nextUp`'s extended search all already cover "however many real concepts
+    `conceptsInStage(4)` returns," so this round looked exactly like a Stage 3 round again: a
+    lesson page, a data entry, a wiring sweep. Re-checked `curriculum.ts` first rather than
+    trusting the coordinator's own suggested next step: Stage 4's `n: 4` entry listed `['Hash
+    maps', 'Stacks & queues', 'Trees', 'Big-O', 'Sorting']`, Hash maps first, matching the ask.
+    Added `/hash-maps` ("Hash Maps") — the design's own syllabus wrote it lower-case, "Hash maps",
+    the same casing distinction `Control Flow` drew against its own placeholder, footnoted the same
+    way in `curriculum.ts`'s doc comment. Four dict-specific gotchas, all from the coordinator's own
+    candidate list, checked against Arrays and Collections for overlap before writing them: an
+    **unhashable key** — `cache[[1, 2]] = "result"` raises `TypeError: unhashable type: 'list'` —
+    deliberately drawn as the flip side of Collections' own tuple-immutability question, since a
+    tuple's immutability is exactly what makes it hashable and a list's mutability is exactly what
+    makes it not; **`[]` lookup demanding the key exist**, raising `KeyError` where `.get()` would
+    quietly return `None` or a supplied default — a distinction with no prior lesson anywhere on
+    the site; **mutating a dict mid-iteration**, which Python actively detects and raises
+    `RuntimeError: dictionary changed size during iteration` for — the coordinator's own suggested
+    "good contrast if you haven't already drawn it" against Arrays' `.remove()`-during-a-loop
+    question, drawn explicitly in the explanation text (a dict fails loud, a list fails quiet,
+    which makes the dict version the easier bug to actually catch); and the **insertion-order
+    guarantee** Python's dict has carried as a real language feature since 3.7, traced concretely
+    (`d["z"]`, `d["a"]`, `d["m"]` inserted in that order comes back in that exact order, not
+    alphabetical) against the common assumption that hash maps have no defined order at all.
+    Deliberately did not add a fifth angle beyond the coordinator's four candidates — they already
+    cover four genuinely distinct mechanisms (hashability, access-method strictness, iteration
+    safety, ordering) with no overlap among themselves or against Arrays/Collections.
+
+    Wired in everywhere Arrays was: `App.tsx`'s lazy import + route (+ page-count comment),
+    `data/concepts.ts` (`stage: 4`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+    `curriculum.ts`'s `UPCOMING_STAGES` lost `'Hash maps'` from Stage 4's remaining list (four of
+    the original six left now: Stacks & queues, Trees, Big-O, Sorting), and its doc comment gained
+    the same "two real concepts now" treatment Stage 3's own comment got at each of its six rounds
+    — including catching and fixing two mentions that would have gone stale otherwise mid-edit:
+    `TOTAL_CONCEPTS`'s own comment ("stage 4 one concept in" → "two concepts in") and a leftover
+    "Stage 4 and 5 remain fully unbuilt" sentence one paragraph above the new Stage-4 writeup, which
+    would have directly contradicted it two lines later.
+
+    `verify-interactions.mjs` gained a dedicated Hash Maps block mirroring the other seven lessons,
+    plus a real fix to the Roadmap block, not just an appended step: the not-built-chip counts that
+    item 35 made count-based specifically so a second Stage-4 concept wouldn't need another
+    plain-absence rewrite — `(rm.match(/not built yet/g) ?? []).length === 5` — dropped to `=== 4`
+    in **both** places it appears (the pre-chain check and the mid-chain check right after Files'
+    six completions), since that count reflects how many Stage-4 syllabus items are still
+    *unbuilt pages*, not learner progress — it's already 4 the instant Hash Maps ships as a real
+    page, before anyone has clicked into either Stage-4 lesson. The "stage 4 shows its first real
+    concept" check became "shows both its real concepts" (`rm.includes('Arrays') &&
+    rm.includes('Hash Maps')`), and the six-lesson Files chip-chain gained an eighth step after
+    Arrays: complete Hash Maps, confirm the stage-4 count reads `"2 OF 6"`, the path total reads
+    `"8 of 25 concepts"`, and the not-built count is *still* exactly 4 (same non-obvious invariant
+    item 35 first asserted for Arrays, now confirmed a second time for a different concept — proof
+    it generalizes, not a coincidence specific to Arrays). Checked for option-text collisions across
+    all four questions before writing the clicks — none, no `.nth()` needed. 252 → 261 interaction
+    checks (5 dedicated + 4 Roadmap).
+
+    `audit:content` stayed at its 5-artifact baseline — the coordinator specifically flagged this
+    as worth double-checking since content-location keeps shifting between files round to round,
+    so it was re-run rather than assumed. "Hash maps" moved out of `curriculum.ts`'s literal
+    `concepts: [...]` array (its home for the `COMPOSED.Roadmap` phrase check since before item 10)
+    into `data/concepts.ts` instead; it kept passing for the same reason item 35's "Arrays" case
+    did — `curriculum.ts`'s own updated doc comment names "Hash maps" (lower-case, matching the
+    design placeholder's exact spelling, not the built page's Title Case) in prose, which is all
+    the piece-by-piece composed check actually needs. Confirmed with a fresh `npm run
+    audit:content` run after the edit, not by re-using item 35's reasoning without checking.
+    The Page Gallery's archetype count moved 29 → 30 on schedule. Swept `docs/SRS.md`,
+    `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts (34 routes, 33
+    lesson/tool pages, 28 registered concepts), including `docs/ARCHITECTURE.md`'s `Roadmap.tsx`
+    table row (fixed last round to say "stage 4 its first, item 35" — updated to name both
+    concepts and both items rather than going stale again one round later).
+
+    `npm run verify` green after: 34/34 routes, no overflow at any width, 261/261 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline (re-verified, not assumed). Ran `npm run build`
+    before `npm run verify` from the start, per the standing fix for the `dist/`-staleness snag.
+
+    **Stage 4 now has 2 of 6 concepts built: Arrays, Hash Maps.** Four remain (Stacks & queues,
+    Trees, Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
+    `Roadmap.tsx` was untouched this round — the architecture item 35 built is already generic
+    enough to carry Stage 4 the rest of the way without another structural change.
