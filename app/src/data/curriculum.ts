@@ -14,7 +14,7 @@
  * that is actually a list of things — now produces the number, and the prose reads from it.
  *
  * **It is not `PAGES.length`, and shouldn't be swapped for it.** A concept is a unit of the
- * designed backend-developer path; a page is one of this app's ~26 interactive screens, several of
+ * designed backend-developer path; a page is one of this app's ~31 interactive screens, several of
  * which (the gallery, Dev Hub, the 404, sign-in) teach no concept at all, while a single page like
  * CLI Basics walks through several. Nor is it `CONCEPTS.length` from `data/concepts.ts`: that
  * registry also holds the pages sitting *off* the five-stage path (Regex Lab, the Decorator
@@ -29,14 +29,18 @@ import { PATH_CONCEPTS } from './concepts'
  * them. Listed rather than counted so the count can't drift from the list the page renders — the
  * syllabus line under each stage heading is built from `concepts` below, not written out by hand.
  *
- * **Stage 3 has five real concepts now** — `Variables` → `python-variables` (BACKLOG item 10),
- * `Control Flow` → `control-flow` (item 30; the design's own syllabus wrote it lower-case,
- * "Control flow", as one of six items in a single placeholder string, while the built page titles
- * it "Control Flow" like every other multi-word built label on the site), `Functions` →
- * `functions` (item 31), `Collections` → `collections` (item 32), and `Errors` → `errors`
- * (item 33) — all in `data/concepts.ts`, so it isn't purely a placeholder anymore. `concepts` here
- * lists only what's *left* to build in that stage, one of the original six. Stage 4 and 5 remain
- * fully unbuilt.
+ * **Stage 3 is fully built now, all six of its original concepts real** — `Variables` →
+ * `python-variables` (BACKLOG item 10), `Control Flow` → `control-flow` (item 30; the design's own
+ * syllabus wrote it lower-case, "Control flow", as one of six items in a single placeholder
+ * string, while the built page titles it "Control Flow" like every other multi-word built label on
+ * the site), `Functions` → `functions` (item 31), `Collections` → `collections` (item 32),
+ * `Errors` → `errors` (item 33), and `Files` → `files` (item 34) — all in `data/concepts.ts`, so
+ * `UPCOMING_STAGES`'s own `n: 3` entry now lists an empty `concepts` array rather than being
+ * deleted outright: `Roadmap.tsx` still looks it up unconditionally (`stage3Upcoming =
+ * UPCOMING_STAGES.find((s) => s.n === 3)!`) to read its `.concepts.length`/`.map`, and removing the
+ * entry would need that lookup rewritten for no real gain — an empty list renders zero
+ * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state. Stage 4 and 5
+ * remain fully unbuilt.
  * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
  * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
  * nothing real to do — verified by reading each page, not guessed from its title. They are
@@ -46,8 +50,11 @@ export const UPCOMING_STAGES = [
   {
     n: 3,
     title: '3 · A First Language: Python',
-    lock: 'IN PROGRESS',
-    concepts: ['Files'],
+    // `lock` is never rendered for stage 3 — `Roadmap.tsx`'s stage-3 block is hardcoded to show a
+    // "N OF 6" `Tag` instead of `<LockedTag>{stage.lock}</LockedTag>` (that's `laterStages`' job,
+    // stages 4-5 only) — but the field is kept honest anyway, now that all six concepts are real.
+    lock: 'BUILT',
+    concepts: [],
   },
   {
     n: 4,

@@ -614,3 +614,96 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     same bar deserves its own full pass rather than a rushed sixth lesson tacked onto this one — the
     established per-lesson pattern (dedicated interactions block, Roadmap flow update, docs sweep,
     full `npm run verify`) is itself the reason each of items 30-33 stayed one lesson per round.
+
+34. ~~**Stage 3 had five real concepts; Files was still the last honest placeholder.**~~ — **done
+    2026-09-18. This completes Stage 3: all six of its originally-placeholder concepts are now
+    real, graded lessons — the first Roadmap stage after Stage 1 and 2 to reach that state.**
+    Re-checked `curriculum.ts`/`concepts.ts` first rather than trusting item 33's own closing note:
+    Stage 3's `UPCOMING_STAGES` was still `['Files']`, nothing had shifted. Added `/files`
+    ("Files"), Stage 3's sixth and final lesson, continuing straight on from Errors — same
+    archetype, no new page shape, four file-I/O gotchas picked to cover distinct mechanisms with no
+    overlap against any of the five lessons before it: mode `"w"` **truncating a file to zero
+    bytes the instant `open()` runs** — not when something is written, and not only if anything
+    ever is (`f.close()` doesn't need to happen first; the data is already gone before a single
+    character is written, and the file itself still exists, just empty — not a
+    `FileNotFoundError`); a file object being **a one-shot cursor**, so a second
+    `f.readlines()`/`.read()` without `f.seek(0)` comes back empty rather than the same content
+    again (not a `RuntimeError` — reading twice is legal, it just starts from wherever the cursor
+    already is); binary mode (`"rb"`) handing back **`bytes`, not `str`**, so `content == "OK"` is
+    quietly `False` even when the bytes and the string "look" identical printed (not a `TypeError`
+    — comparing two different types with `==` never raises, it just isn't equal); and a `with`
+    block's **guaranteed close** meaning the file object it named is unusable the instant code
+    steps outside the block — a real `ValueError: I/O operation on closed file`, not a silent
+    no-op and not a `NameError` (`with` doesn't create its own scope, so the name `f` is still
+    valid — it's the file behind it that's dead). Deliberately did *not* reach for "forgetting to
+    call `.close()` at all" as a fifth angle from the candidate list (context managers, modes,
+    encoding, iterating twice): it's the same underlying lesson as the `with`-block question (a
+    file needs closing, and not closing it has consequences), so it would have doubled up on
+    question 4's point rather than teaching a fifth distinct thing — the four chosen already cover
+    truncation timing, cursor/iterator exhaustion, the `bytes`/`str` type split, and resource
+    lifecycle (open → auto-close → dead handle), four genuinely different mechanisms rather than
+    four flavors of one.
+
+    Wired in everywhere the last five lessons were: `App.tsx`'s lazy import + route (+ its
+    page-count header comment, 30 → 31), `concepts.ts` (`stage: 3`), `data/pages.ts`'s gallery
+    card, `scripts/routes.mjs`. `curriculum.ts`'s `UPCOMING_STAGES` needed a real structural change
+    this time, not just dropping a string: Stage 3's `n: 3` entry's `concepts` array is now `[]`
+    (the last item, `'Files'`, removed) rather than the entry being deleted outright — `Roadmap.tsx`
+    still looks it up unconditionally (`stage3Upcoming = UPCOMING_STAGES.find((s) => s.n === 3)!`)
+    for its `.concepts.length`/`.map`, and an empty array renders zero `NotBuiltChip`s, which is
+    exactly the honest "nothing left to build" state without needing that lookup rewritten. Also
+    corrected the entry's `lock` field from `'IN PROGRESS'` to `'BUILT'` for the same reason item
+    30's Page Gallery fix and item 33's docs sweep existed — even though `lock` is never actually
+    *rendered* for stage 3 (`Roadmap.tsx`'s stage-3 block always shows a `"N OF 6"` `Tag` instead of
+    `<LockedTag>{stage.lock}</LockedTag>`, which is `laterStages`' job for stages 4-5 only), leaving
+    a dead field holding a now-false value is exactly the kind of drift that compounds silently
+    later. `Roadmap.tsx` itself again needed zero changes — fully derived, same as every round
+    since item 30, and this round is the proof: it correctly renders "6 OF 6" and zero not-built
+    chips for Stage 3 purely from the data changing shape, no template logic touched.
+
+    `verify-interactions.mjs` gained a dedicated block mirroring the other five lessons (starts
+    unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still shows the
+    real explanation, try-again resets), plus a sixth and final Roadmap-block completion flow. That
+    flow needed one real change beyond the usual per-lesson pattern: the "lists the rest as not
+    built yet" check couldn't just swap which concept name it looks for (there's nothing left to
+    name) — it's now `!rm.includes('not built yet')`, asserting the exact string that
+    `NotBuiltChip` renders appears nowhere on the page at all, confirmed safe with a repo-wide grep
+    (`NotBuiltChip` is its only source). Added one extra check beyond the routine three-per-round
+    pattern items 30-33 established (chip-links-to-lesson, stage count moves, path total moves): a
+    second, explicit "no not-built chips left" assertion right after the sixth completion, since
+    this round's actual milestone — Stage 3 reaching zero remaining placeholders — deserved its own
+    named check rather than riding along inside the "six real concepts" one. Checked for
+    option-text collisions across all four questions before writing the clicks — none this time
+    (`'keep this text'`, `'3 0'`, `'False'`, `'It writes "hello world" to out.txt'`, etc. are all
+    unique on the page), no `.nth()` needed. 233 → 242 interaction checks (5 dedicated + 4 Roadmap,
+    one more than the usual +3 for the reason above).
+
+    `audit:content` stayed at its 5-artifact baseline (Files has no design prototype to diff
+    against, same as every Stage 3 lesson). The Page Gallery's hand-written archetype count moved
+    27 → 28 on schedule (`PageGallery.tsx`'s lede + comment, `README.md`'s matching bullet + its
+    "N archetypes" history line). Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s
+    route/page/concept counts (32 routes, 31 lesson/tool pages, 26 registered concepts) — including
+    both docs' "Last updated … describes the N-page app" header lines this time, since item 33
+    already re-anchored them to today's date and it would have been the exact same one-round-behind
+    drift item 33 called out if left untouched again. Also caught and fixed one more instance of
+    that same drift pattern, this time inside the app's own source rather than `docs/`:
+    `data/curriculum.ts`'s own doc comment said "~26 interactive screens" — stale since before item
+    30, never swept because it isn't `docs/SRS.md`/`docs/ARCHITECTURE.md`/`app/README.md` and so
+    was never in scope for the usual three-file sweep — corrected to ~31. `docs/SRS.md`'s ambiguous
+    "`src/pages/*.tsx`, 25 files" line and `docs/ARCHITECTURE.md` §7's page-by-page table (still
+    missing rows for all six Stage 3 lessons) are unchanged from item 33's write-up: both remain
+    real, separate, pre-existing gaps rather than counts this sweep pattern actually touches.
+
+    `npm run verify` green after: 32/32 routes, no overflow at any width, 242/242 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline. Hit the same `dist/` snag item 33 flagged and this
+    time ran `npm run build` *before* `npm run verify` from the start, confirming the fix generalizes.
+
+    **Stage 3 is complete: 6 of 6 concepts, Variables through Files, all real graded lessons.**
+    `data/curriculum.ts`'s `UPCOMING_STAGES` still carries an `n: 3` entry with an empty
+    `concepts: []` (see above for why it wasn't deleted), so the Roadmap correctly shows Stage 3 as
+    `"6 OF 6"` with no dashed not-built chips at all — the same honest, fully-derived rendering
+    every earlier round in this series relied on, now exercised at the boundary case (zero
+    remaining) for the first time. Stage 4 (Data Structures & Algorithms) and Stage 5 (APIs &
+    Databases) remain fully unbuilt, twelve concepts between them — the next real work on the
+    Roadmap, whenever it's picked up, starts there.

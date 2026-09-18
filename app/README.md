@@ -32,8 +32,16 @@ than ported from a prototype:
   `except Exception:` swallowing an unrelated `TypeError` bug alongside the failure it was written
   to catch, a bare `except:` catching `SystemExit` (which `except Exception:` never would, since
   `SystemExit` inherits from `BaseException`), and an `except` clause ordered after a more general
-  one that can now never run. One of the original six Python concepts is still honestly labelled
-  "not built yet."
+  one that can now never run.
+- **Files** (`/files`) — Stage 3's sixth and final real page: the same archetype once more, now on
+  mode `"w"` truncating a file to zero bytes the instant it's *opened* rather than when something
+  is actually written, a file object being a one-shot cursor (reading it a second time without
+  `f.seek(0)` returns nothing rather than the same content again), binary mode handing back `bytes`
+  instead of `str` (so `content == "OK"` is quietly `False`, never an error), and a `with` block's
+  guaranteed close meaning the file object it named raises a real `ValueError` the instant code
+  touches it again from outside the block. **This completes Stage 3** — all six of its originally
+  placeholder concepts (Variables, Control Flow, Functions, Collections, Errors, Files) are now
+  real, graded lessons; nothing on the Roadmap reads "not built yet" for it anymore.
 
 ## Beyond the mockups
 
@@ -50,7 +58,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 25 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 26 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -61,7 +69,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 27 archetypes. Both have empty states.
+  gallery gained a filter across all 28 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -113,7 +121,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 31 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 32 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -149,8 +157,8 @@ extractor artifacts**, not omissions:
   archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 once Shell
   Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
-  had, 27 now that Errors has) — see `PAGES.length` in `data/pages.ts` for the number that's
-  actually true.
+  had, 27 once Errors had, 28 now that Files has) — see `PAGES.length` in `data/pages.ts` for the
+  number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

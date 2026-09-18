@@ -382,21 +382,46 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('errors: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap stage 3: five real concepts, the rest honestly not-yet-built (items 10, 30-33) ── */
+/* ── Files: 4 graded predict-the-value questions, Stage 3's 6th and final lesson (item 34) ── */
+await resetProgress()
+await go('/files')
+let fi = await body()
+check('files: starts unanswered', fi.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: 'an empty string — the file has nothing in it', exact: true })
+  .click()
+await page.getByRole('button', { name: '3 0', exact: true }).click()
+await page.getByRole('button', { name: 'False', exact: true }).click()
+fi = await body()
+check('files: three correct reaches the pass mark', fi.includes('Score: 3 of 4 correct'))
+check('files: earns completion at the pass mark', await completed('Files'))
+await page
+  .getByRole('button', { name: 'It writes "hello world" to out.txt', exact: true })
+  .click()
+fi = await body()
+check(
+  'files: a wrong pick still shows the real explanation',
+  fi.includes('I/O operation on closed file'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('files: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap stage 3: all six real concepts, none left not-yet-built (items 10, 30-34) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
 check(
-  'roadmap: stage 3 shows its five real concepts',
+  'roadmap: stage 3 shows all six real concepts',
   rm.includes('Variables') &&
     rm.includes('Control Flow') &&
     rm.includes('Functions') &&
     rm.includes('Collections') &&
-    rm.includes('Errors'),
+    rm.includes('Errors') &&
+    rm.includes('Files'),
 )
 check(
-  'roadmap: stage 3 lists the rest as not built yet',
-  rm.includes('Files') && rm.includes('not built yet'),
+  'roadmap: stage 3 has nothing left not-yet-built',
+  !rm.includes('not built yet'),
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -463,6 +488,23 @@ await go('/roadmap')
 rm = await body()
 check('roadmap: completing all five moves the stage-3 count a fifth time', rm.includes('5 OF 6'))
 check('roadmap: it also moves the path total a fifth time', rm.includes('5 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Files' }).click()
+await page.waitForURL('**/files')
+check('roadmap: the Files chip really links to the lesson', page.url().endsWith('/files'))
+await page
+  .getByRole('button', { name: 'an empty string — the file has nothing in it', exact: true })
+  .click()
+await page.getByRole('button', { name: '3 0', exact: true }).click()
+await page.getByRole('button', { name: 'False', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
+check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
+check(
+  'roadmap: Stage 3 has no not-built chips left once all six are done',
+  !rm.includes('not built yet'),
+)
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so

@@ -97,6 +97,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'files',
+    title: 'Files',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: '"w" mode truncating on open, a one-shot file cursor, binary vs. text, and a closed file after with — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
