@@ -121,6 +121,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'stacks-queues',
+    title: 'Stacks & Queues',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'list.pop(0) degrading to O(n), deque(maxlen) silently dropping items, popleft() vs pop(), and popping empty — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

@@ -144,7 +144,7 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
-  // ── Stage 4 · Data Structures & Algorithms (two concepts built so far) ─
+  // ── Stage 4 · Data Structures & Algorithms (three concepts built so far)
   {
     slug: 'arrays',
     label: 'Arrays',
@@ -156,6 +156,13 @@ export const CONCEPTS: Concept[] = [
     slug: 'hash-maps',
     label: 'Hash Maps',
     route: '/hash-maps',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'stacks-queues',
+    label: 'Stacks & Queues',
+    route: '/stacks-queues',
     stage: 4,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },

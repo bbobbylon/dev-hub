@@ -456,7 +456,36 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('hash maps: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, Stage 4's first two (items 10, 30-36) ── */
+/* ── Stacks & Queues: 4 graded predict-the-value questions, Stage 4's 3rd lesson (item 37) ── */
+await resetProgress()
+await go('/stacks-queues')
+let sq = await body()
+check('stacks & queues: starts unanswered', sq.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: 'O(n) — every remaining element shifts left by one', exact: true })
+  .click()
+await page
+  .getByRole('button', { name: 'deque([2, 3, 4], maxlen=3) — 1 is silently dropped', exact: true })
+  .click()
+await page.getByRole('button', { name: 'third', exact: true }).click()
+sq = await body()
+check('stacks & queues: three correct reaches the pass mark', sq.includes('Score: 3 of 4 correct'))
+check('stacks & queues: earns completion at the pass mark', await completed('Stacks & Queues'))
+await page
+  .getByRole('button', {
+    name: '"profile" then "home", then history.pop() outside the loop returns None',
+    exact: true,
+  })
+  .click()
+sq = await body()
+check(
+  'stacks & queues: a wrong pick still shows the real explanation',
+  sq.includes('pop from empty list'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('stacks & queues: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, Stage 4's first three (items 10, 30-37) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -469,10 +498,13 @@ check(
     rm.includes('Errors') &&
     rm.includes('Files'),
 )
-check('roadmap: stage 4 shows both its real concepts', rm.includes('Arrays') && rm.includes('Hash Maps'))
 check(
-  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has four',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  'roadmap: stage 4 shows all three of its real concepts',
+  rm.includes('Arrays') && rm.includes('Hash Maps') && rm.includes('Stacks & Queues'),
+)
+check(
+  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has three',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -553,8 +585,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its four',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its three',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -573,7 +605,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -592,7 +624,29 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
+)
+
+await page.getByRole('link', { name: 'Stacks & Queues' }).click()
+await page.waitForURL('**/stacks-queues')
+check(
+  'roadmap: the Stacks & Queues chip really links to the lesson',
+  page.url().endsWith('/stacks-queues'),
+)
+await page
+  .getByRole('button', { name: 'O(n) — every remaining element shifts left by one', exact: true })
+  .click()
+await page
+  .getByRole('button', { name: 'deque([2, 3, 4], maxlen=3) — 1 is silently dropped', exact: true })
+  .click()
+await page.getByRole('button', { name: 'third', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Stacks & Queues moves the stage-4 count a third time', rm.includes('3 OF 6'))
+check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
+check(
+  'roadmap: completing Stacks & Queues does not consume a stage-4 not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

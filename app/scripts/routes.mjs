@@ -28,6 +28,7 @@ export const ROUTES = [
   '/files',
   '/arrays',
   '/hash-maps',
+  '/stacks-queues',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

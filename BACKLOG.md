@@ -896,3 +896,76 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     Trees, Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
     `Roadmap.tsx` was untouched this round — the architecture item 35 built is already generic
     enough to carry Stage 4 the rest of the way without another structural change.
+
+37. ~~**Stage 4 had two real concepts (Arrays, Hash Maps); Stacks & Queues was still an honest
+    placeholder.**~~ — **done 2026-09-18. Second consecutive round confirming item 35's
+    prediction: `Roadmap.tsx` needed zero changes again.** Re-checked `curriculum.ts` first: Stage
+    4's `n: 4` entry listed `['Stacks & queues', 'Trees', 'Big-O', 'Sorting']`, Stacks & queues
+    first, matching the ask. Added `/stacks-queues` ("Stacks & Queues") — the design's placeholder
+    wrote it lower-case, "Stacks & queues"; the route drops the "&" and hyphenates the two words
+    directly (`stacks-queues`), the same pattern `Rebase & History` → `rebase-history` and
+    `Branching & Merging` → `git-branching` already set, and the built label keeps the "&", also
+    matching that pair — footnoted the same way in `curriculum.ts`'s doc comment.
+
+    Four gotchas, all touched on in the coordinator's own candidate list but consolidated with
+    real editorial judgment rather than taken as a literal four-item checklist: `list.pop(0)`
+    costing O(n) because every remaining element has to shift left to close the gap, the reason a
+    "queue" built from a plain list silently degrades as it grows rather than failing loudly;
+    `deque(maxlen=N)` silently dropping the oldest element once full instead of growing or
+    raising — the entire point of `maxlen`, but a dangerous default if you expected an error;
+    `append()` + `pop()` giving a stack (LIFO) where `append()` + `popleft()` gives a queue
+    (FIFO) — the classic stack-vs-queue mixup, and neither call raises anything to catch it; and
+    popping an empty structure raising a real `IndexError: pop from empty list`, deliberately
+    contrasted in the same snippet with the safe `while stack:` draining pattern that correctly
+    empties the same structure one line earlier. Deliberately did **not** spend a full, separate
+    question on "`list.append()`/`list.pop()` is a genuinely O(1) stack" as the coordinator's own
+    candidate list suggested as a fourth-or-fifth angle — it's the *positive* half of the same fact
+    `pop(0)`'s cost teaches negatively, and it's already load-bearing inside that question's own
+    explanation (which spells out the append/pop() vs pop(0) contrast explicitly, then names
+    `deque.popleft()` as the fix). Repeating it as its own question would have taught the same idea
+    twice instead of a fourth genuinely distinct one — the same "don't pad the count, pick four
+    that don't overlap" standard every round since item 32 has applied to itself.
+
+    Wired in everywhere Hash Maps was: `App.tsx`'s lazy import + route (+ page-count comment),
+    `data/concepts.ts` (`stage: 4`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+    `curriculum.ts`'s `UPCOMING_STAGES` lost `'Stacks & queues'` from Stage 4's remaining list
+    (three left now: Trees, Big-O, Sorting), and both of its doc comments picked up the same
+    "N concepts now" bump `TOTAL_CONCEPTS`'s own comment has gotten every round since item 35 —
+    checked both this time rather than just the one the previous round's diff happened to touch.
+
+    `verify-interactions.mjs` gained a dedicated Stacks & Queues block mirroring the other eight
+    lessons, plus the now-familiar Roadmap-block fix: the not-built-chip counts dropped from `4` to
+    `3` in **all three** places they appear (the pre-chain check, the mid-chain check after Files,
+    and the post-Arrays/Hash-Maps check) — confirmed by grep rather than trusting memory of where
+    item 36 left them, since missing one of three would have shipped a red `npm run verify` the
+    instant that specific assertion ran. The "stage 4 shows its real concepts" check grew a third
+    name (`rm.includes('Stacks & Queues')`), and the Hash Maps chip-chain step gained a ninth:
+    complete Stacks & Queues, confirm the stage-4 count reads `"3 OF 6"`, the path total reads
+    `"9 of 25 concepts"`, and the not-built count is *still* exactly 3 — the same non-obvious
+    invariant confirmed a third time now, for a third different concept. Checked for option-text
+    collisions across all four questions before writing the clicks — none, no `.nth()` needed.
+    261 → 270 interaction checks (5 dedicated + 4 Roadmap, the same shape every Stage-4 round has
+    had since item 36).
+
+    `audit:content` stayed at its 5-artifact baseline — double-checked again per the coordinator's
+    standing ask, since "Stacks & queues" moved out of `curriculum.ts`'s literal array into
+    `data/concepts.ts`, the same relocation Arrays and Hash Maps each went through, and it kept
+    passing for the identical reason both of theirs did: `curriculum.ts`'s own updated doc comment
+    names "Stacks & queues" (lower-case, ampersand kept, matching the design placeholder's exact
+    spelling) in prose. Confirmed with a fresh `npm run audit:content` run, third time in a row this
+    has been checked rather than assumed. The Page Gallery's archetype count moved 30 → 31 on
+    schedule. Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept
+    counts (35 routes, 34 lesson/tool pages, 29 registered concepts), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row again — now naming all three Stage-4 concepts
+    and their item numbers, kept current every round since item 35 rather than left to go stale the
+    way it did for years before that.
+
+    `npm run verify` green after: 35/35 routes, no overflow at any width, 270/270 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline (re-verified). Ran `npm run build` before
+    `npm run verify` from the start, per the standing fix for the `dist/`-staleness snag.
+
+    **Stage 4 now has 3 of 6 concepts built: Arrays, Hash Maps, Stacks & Queues.** Three remain
+    (Trees, Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
+    `Roadmap.tsx` was untouched for the second round running — the architecture item 35 built keeps
+    proving out as generic enough to carry the rest of Stage 4 without another structural change.
