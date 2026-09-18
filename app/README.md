@@ -26,8 +26,14 @@ than ported from a prototype:
 - **Collections** (`/collections`) — Stage 3's fourth real page: the same archetype once more, now
   on `b = a` aliasing a list instead of copying it, a tuple refusing the mutation a list would
   allow, a dict literal silently keeping only the last value for a repeated key, and a slice
-  tolerating out-of-range bounds that plain indexing never would. Two of the original six Python
-  concepts are still honestly labelled "not built yet."
+  tolerating out-of-range bounds that plain indexing never would.
+- **Errors** (`/errors`) — Stage 3's fifth real page: the same archetype once more, now on a
+  `finally` block's own `return` silently overriding the value `try` already returned, a broad
+  `except Exception:` swallowing an unrelated `TypeError` bug alongside the failure it was written
+  to catch, a bare `except:` catching `SystemExit` (which `except Exception:` never would, since
+  `SystemExit` inherits from `BaseException`), and an `except` clause ordered after a more general
+  one that can now never run. One of the original six Python concepts is still honestly labelled
+  "not built yet."
 
 ## Beyond the mockups
 
@@ -44,7 +50,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 24 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 25 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -55,7 +61,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 26 archetypes. Both have empty states.
+  gallery gained a filter across all 27 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -107,7 +113,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 30 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 31 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -142,8 +148,9 @@ extractor artifacts**, not omissions:
   snapshot that will always say "20"; the gallery's own lede is deliberately kept current as
   archetypes are added on top of the original 23 (21 once Rebase & History shipped, 22 once Shell
   Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
-  adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 now that
-  Collections has) — see `PAGES.length` in `data/pages.ts` for the number that's actually true.
+  adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
+  had, 27 now that Errors has) — see `PAGES.length` in `data/pages.ts` for the number that's
+  actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

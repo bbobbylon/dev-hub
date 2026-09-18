@@ -24,6 +24,7 @@ export const ROUTES = [
   '/control-flow',
   '/functions',
   '/collections',
+  '/errors',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

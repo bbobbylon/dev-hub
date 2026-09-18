@@ -529,3 +529,88 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     `npm run verify` green after: 30/30 routes, no overflow at any width, 225/225 interaction
     checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
     `audit:content` at its 5-artifact baseline.
+
+## Found while working (2026-09-18)
+
+33. ~~**Stage 3 had four real concepts; the other two were still honest placeholders.**~~ — **done
+    2026-09-18.** Re-checked `curriculum.ts`/`concepts.ts` first, per the standing rule, rather than
+    trusting the task description's summary: Stage 3's `UPCOMING_STAGES` was still `['Errors',
+    'Files']`, nothing had shifted since item 32. Added `/errors` ("Errors"), Stage 3's fifth
+    lesson, continuing straight on from Collections — same archetype, no new page shape, four
+    exception-handling gotchas picked from the candidate list to cover distinct behaviors with no
+    overlap against any of the four lessons before it: a `finally` block's own `return` **silently
+    overriding** the value `try` already returned (`finally` doesn't just run after a `return` —
+    if it has a `return` of its own, that one wins and the original value never leaves the
+    function), a broad `except Exception:` **swallowing an unrelated bug** alongside the failure it
+    was actually written for (a `TypeError` from a caller passing the wrong argument type gets
+    silently rewritten to the exact same fallback as a legitimate `ZeroDivisionError`, so the
+    caller can't tell "expected failure" from "you called this wrong"), a bare `except:` **catching
+    `SystemExit`** that a properly-scoped `except Exception:` never would (`SystemExit` and
+    `KeyboardInterrupt` inherit from `BaseException`, not `Exception` — a bare `except:` catches
+    `BaseException`, so it can swallow a program's own attempt to shut down), and an `except`
+    clause **ordered after a more general one**, making it permanently unreachable with no error to
+    say so (Python matches top to bottom and stops at the first hit; a specific class listed below
+    a broader one is silent dead code, not a `SyntaxError`). Deliberately skipped exception
+    chaining/`raise ... from` and "re-raising losing the traceback" from the candidate list — both
+    are real, but neither has an observable *printed value* difference to predict (the difference
+    lives in the traceback object, which this archetype's "predict what prints" format can't ask
+    about honestly without inventing a fake `__cause__`-reading snippet); the four chosen already
+    cover four genuinely different mechanisms (return-vs-cleanup control flow, catch-clause
+    granularity, the `BaseException`/`Exception` split, and except-clause evaluation order) rather
+    than four flavors of one.
+
+    Wired in everywhere the last four lessons were: `App.tsx`'s lazy import + route (plus its
+    "N page-sized lessons/tools" header comment, 29 → 30), `concepts.ts` (`stage: 3`),
+    `curriculum.ts`'s `UPCOMING_STAGES` (`'Errors'` dropped — one of the original six left now:
+    `Files`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`. `Roadmap.tsx` again needed zero
+    changes — fully derived, same as every round since item 30.
+
+    `verify-interactions.mjs` gained a dedicated block mirroring the other four lessons (starts
+    unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still shows the
+    real explanation, try-again resets), plus a fifth Roadmap-block completion flow (`"5 OF 6"`,
+    `"5 of 25 concepts"`) and an update to the "lists the rest as not built yet" check, which now
+    looks for `Files` instead of the now-built `Errors`. Checked for option-text collisions across
+    all four questions before writing the clicks — none this time (`'1'`, `'2'`, `'None then
+    None'`, `'fatal error, then the program exits'`, `'general handler'`, etc. are all unique on
+    the page), no `.nth()` needed. 225 → 233 interaction checks.
+
+    A real gotcha surfaced by the verify run itself, not the lesson content: `npm run verify` reads
+    `dist/`, not the dev server, and doesn't rebuild it — the first run after adding the page failed
+    every route with a "thin render" on `/errors` alone (it 404'd inside the SPA) because `dist/`
+    was still the pre-Errors build. `npm run build` before `npm run verify` fixed it; worth stating
+    plainly since the failure mode (a real page, a real route registered, a real 404) looks exactly
+    like a routing bug and nothing in the failure output says "stale build."
+
+    Same two drift checks as the last three rounds: `audit:content` stayed at its 5-artifact
+    baseline (Errors has no design prototype to diff against, same as every Stage 3 lesson so far —
+    the `MAP` in `audit-content.mjs` only covers ported pages). The Page Gallery's hand-written
+    archetype count moved 26 → 27 on schedule (`PageGallery.tsx`'s lede + comment, `README.md`'s
+    matching bullet). While sweeping `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s
+    route/page/concept counts (31 routes, 30 lesson/tool pages, 25 registered concepts), found two
+    more counts that had drifted silently for several rounds and were never part of the sweep
+    pattern items 30-32 actually touched: both docs' own "_Last updated: … describes the N-page
+    app_" header lines (stuck at "25-page"/"26-page" since 2026-09-09/09-13, three lessons behind),
+    `docs/SRS.md`'s "`data/concepts.ts` registers all 20" line (stuck since before item 10 —_20_
+    was never even right for four lessons ago), and `docs/ARCHITECTURE.md`'s `data/concepts.ts` /
+    `data/curriculum.ts` table-row counts ("21 concepts", "~29 screens"). Fixed all of them to the
+    real current numbers rather than perpetuating the miss, same call item 30 made on the Page
+    Gallery lede — these are the kind of drift that compounds silently if each round only touches
+    the one line its own diff happened to graze. Left `docs/SRS.md`'s "`src/pages/*.tsx`, 25 files"
+    line alone: that one counts a different, ambiguous set (all files under `src/pages/`, not
+    `PAGES.length`), already 34 today, and guessing at its intended definition risked writing a new
+    wrong number rather than fixing the old one — flagging it here instead. Also left
+    `docs/ARCHITECTURE.md` §7's page-by-page table alone: it has never had rows for `PythonVariables`/
+    `ControlFlow`/`Functions`/`Collections` either, a pre-existing gap that predates item 10 and is
+    a real, separate backfill job, not a count to sweep.
+
+    `npm run verify` green after: 31/31 routes, no overflow at any width, 233/233 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean,
+    `audit:content` at its 5-artifact baseline.
+
+    **Stage 3 is now 5 of 6 concepts built — only Files is left.** Given the remaining time/budget
+    in this session, Files was deliberately not started in the same pass: picking four genuinely
+    distinct, non-overlapping file-I/O gotchas (context managers vs. forgetting `.close()`, modes,
+    encoding, iterating a file twice without seeking back, etc.) and writing/verifying them to the
+    same bar deserves its own full pass rather than a rushed sixth lesson tacked onto this one — the
+    established per-lesson pattern (dedicated interactions block, Roadmap flow update, docs sweep,
+    full `npm run verify`) is itself the reason each of items 30-33 stayed one lesson per round.

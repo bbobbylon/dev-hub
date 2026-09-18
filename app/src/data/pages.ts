@@ -89,6 +89,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'errors',
+    title: 'Errors',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'finally overriding a return, an over-broad except, bare except vs. SystemExit, and except ordering — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
