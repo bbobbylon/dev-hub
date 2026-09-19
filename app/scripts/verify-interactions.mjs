@@ -557,7 +557,47 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('big-o: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, Stage 4's first five (items 10, 30-39) ── */
+/* ── Sorting: 4 graded predict-the-value questions, Stage 4's 6th and final lesson (item 40) ── */
+await resetProgress()
+await go('/sorting')
+let so = await body()
+check('sorting: starts unanswered', so.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: 'None — sort() sorts nums in place and hands back nothing',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "[('Bo', 25), ('Amy', 30), ('Cy', 30)] — Amy still comes before Cy, since they tie",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "['apple', 'Banana', 'Cherry'] — compared case-insensitively, but returned in their original casing",
+    exact: true,
+  })
+  .click()
+so = await body()
+check('sorting: three correct reaches the pass mark', so.includes('Score: 3 of 4 correct'))
+check('sorting: earns completion at the pass mark', await completed('Sorting'))
+await page
+  .getByRole('button', {
+    name: "[1, 3, 'two'] — Python sorts the numbers first, then appends the strings",
+    exact: true,
+  })
+  .click()
+so = await body()
+check(
+  'sorting: a wrong pick still shows the real explanation',
+  so.includes('forces int and str alike through the same string comparison'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('sorting: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts (items 10, 30-40) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -575,16 +615,17 @@ check(
 // pass even if the concept chip itself never rendered.
 const bigOChipCount = await page.getByRole('link', { name: 'Big-O', exact: true }).count()
 check(
-  'roadmap: stage 4 shows all five of its real concepts',
+  'roadmap: stage 4 shows all six of its real concepts',
   rm.includes('Arrays') &&
     rm.includes('Hash Maps') &&
     rm.includes('Stacks & Queues') &&
     rm.includes('Trees') &&
-    bigOChipCount > 0,
+    bigOChipCount > 0 &&
+    rm.includes('Sorting'),
 )
 check(
-  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has one',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built',
+  !rm.includes('not built yet'),
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -665,8 +706,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its one',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4',
+  !rm.includes('not built yet'),
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -685,7 +726,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  !rm.includes('not built yet'),
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -704,7 +745,7 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  !rm.includes('not built yet'),
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -726,7 +767,7 @@ check('roadmap: completing Stacks & Queues moves the stage-4 count a third time'
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
   'roadmap: completing Stacks & Queues does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  !rm.includes('not built yet'),
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -751,7 +792,7 @@ check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.incl
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
   'roadmap: completing Trees does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  !rm.includes('not built yet'),
 )
 
 await page.getByRole('link', { name: 'Big-O', exact: true }).click()
@@ -781,7 +822,37 @@ check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.inclu
 check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
 check(
   'roadmap: completing Big-O does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  !rm.includes('not built yet'),
+)
+
+await page.getByRole('link', { name: 'Sorting' }).click()
+await page.waitForURL('**/sorting')
+check('roadmap: the Sorting chip really links to the lesson', page.url().endsWith('/sorting'))
+await page
+  .getByRole('button', {
+    name: 'None — sort() sorts nums in place and hands back nothing',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "[('Bo', 25), ('Amy', 30), ('Cy', 30)] — Amy still comes before Cy, since they tie",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "['apple', 'Banana', 'Cherry'] — compared case-insensitively, but returned in their original casing",
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes('6 OF 6'))
+check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
+check(
+  'roadmap: Stage 4 has no not-built chips left once all six are done',
+  !rm.includes('not built yet'),
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

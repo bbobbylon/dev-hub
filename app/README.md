@@ -101,6 +101,25 @@ than ported from a prototype:
   already-sorted list always is. Also needed zero `Roadmap.tsx` changes — the third consecutive
   round confirming it. Not to be confused with `/big-o-performance`, a separate static reference
   page linked from Stage 4's "related" list, not this graded lesson.
+- **Sorting** (`/sorting`) — Stage 4's sixth and final real page: the same archetype once more,
+  now on `list.sort()` mutating in place and returning `None` — not the sorted list — so the
+  classic `x = nums.sort()` bug leaves `x` empty while `nums` really is sorted, contrasted with
+  `sorted()`'s genuinely new list; sort *stability* (two elements that tie under the sort key keep
+  their original relative order, which is what makes a "sort by A, then stably sort by B"
+  multi-key technique work); `key=` transforming what's compared without ever touching the actual
+  values, contrasted with the real, surprising default — Python compares strings by raw code
+  point, so every capital letter sorts before every lowercase one, not dictionary order; and
+  sorting a list with genuinely incomparable types (`int` and `str` together) raising `TypeError`
+  outright rather than silently guessing an order. Big-O's own fourth question already covered
+  `.sort()`'s O(n log n) bound (and Timsort's O(n) best case on already-sorted input), so this
+  round deliberately stayed on behavior, not cost. **This completes Stage 4** — all six of its
+  originally placeholder concepts (Arrays, Hash Maps, Stacks & Queues, Trees, Big-O, Sorting) are
+  now real, graded lessons; nothing on the Roadmap reads "not built yet" for it anymore, the third
+  stage (after Stage 1/2 and Stage 3) to reach that state. Fixed a real staleness bug found while
+  wiring this in: `Roadmap.tsx`'s own stage-4 JSX comment had read "one real concept built
+  (Arrays, item 35)" through four rounds of "zero Roadmap.tsx changes" — true for the file's logic,
+  never true for that comment after item 36. Corrected it the same way Stage 3's analogous comment
+  was corrected when it completed at item 34.
 
 ## Beyond the mockups
 
@@ -117,7 +136,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 31 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 32 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -128,7 +147,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 33 archetypes. Both have empty states.
+  gallery gained a filter across all 34 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -180,7 +199,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 37 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 38 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -217,8 +236,8 @@ extractor artifacts**, not omissions:
   Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
-  Stacks & Queues had, 32 once Trees had, 33 now that Big-O has) — see `PAGES.length` in
-  `data/pages.ts` for the number that's actually true.
+  Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 now that Sorting has) — see
+  `PAGES.length` in `data/pages.ts` for the number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

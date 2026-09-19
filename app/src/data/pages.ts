@@ -145,6 +145,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'sorting',
+    title: 'Sorting',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'sort() vs. sorted(), sort stability, what key= actually does, and sorting incomparable types — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

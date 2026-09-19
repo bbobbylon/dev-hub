@@ -31,6 +31,7 @@ export const ROUTES = [
   '/stacks-queues',
   '/trees',
   '/big-o',
+  '/sorting',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

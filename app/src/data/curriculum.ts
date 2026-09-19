@@ -40,31 +40,38 @@ import { PATH_CONCEPTS } from './concepts'
  * UPCOMING_STAGES.find((s) => s.n === 3)!`) to read its `.concepts.length`/`.map`, and removing the
  * entry would need that lookup rewritten for no real gain — an empty list renders zero
  * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state. Stage 5 remains
- * fully unbuilt; Stage 4 no longer is (see below).
+ * the only stage still fully unbuilt; Stage 4 is now fully built too (see below).
  * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
  * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
  * nothing real to do — verified by reading each page, not guessed from its title. They are
  * pointers, not path concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
  *
- * **Stage 4 has five real concepts now** — `Arrays` → `arrays` (item 35; the round that gave
- * Stage 4 its own dedicated block in `Roadmap.tsx`, the same "some built, some not" shape Stage 3
- * had, instead of the fully-locked `laterStages` path it used to share with a stage that had no
- * real concepts yet), `Hash Maps` → `hash-maps` (item 36; the design's own syllabus wrote it
- * lower-case, "Hash maps", as one of six items in a single placeholder string, while the built
- * page titles it "Hash Maps" like every other multi-word built label on the site — the same
- * distinction `Control Flow` drew against its own design placeholder, "Control flow"),
- * `Stacks & Queues` → `stacks-queues` (item 37; the design's placeholder wrote it lower-case too,
- * "Stacks & queues" — the route drops the "&" and hyphenates the two words directly, the same
- * pattern `Rebase & History` → `rebase-history` and `Branching & Merging` → `git-branching`
- * already set; the built label keeps the "&", also matching that pair), `Trees` → `trees`
- * (item 38; single word, no casing footnote needed, same as `Errors`/`Files`/`Arrays`), and
+ * **Stage 4 is fully built now too, all six of its original concepts real** — `Arrays` → `arrays`
+ * (item 35; the round that gave Stage 4 its own dedicated block in `Roadmap.tsx`, the same "some
+ * built, some not" shape Stage 3 had, instead of the fully-locked `laterStages` path it used to
+ * share with a stage that had no real concepts yet), `Hash Maps` → `hash-maps` (item 36; the
+ * design's own syllabus wrote it lower-case, "Hash maps", as one of six items in a single
+ * placeholder string, while the built page titles it "Hash Maps" like every other multi-word built
+ * label on the site — the same distinction `Control Flow` drew against its own design placeholder,
+ * "Control flow"), `Stacks & Queues` → `stacks-queues` (item 37; the design's placeholder wrote it
+ * lower-case too, "Stacks & queues" — the route drops the "&" and hyphenates the two words
+ * directly, the same pattern `Rebase & History` → `rebase-history` and `Branching & Merging` →
+ * `git-branching` already set; the built label keeps the "&", also matching that pair), `Trees` →
+ * `trees` (item 38; single word, no casing footnote needed, same as `Errors`/`Files`/`Arrays`),
  * `Big-O` → `big-o` (item 39; the hyphen was already in the design's own placeholder, so the
  * route just lower-cases it — no ampersand or casing footnote needed either. Not to be confused
  * with the off-path `Big-O Performance` → `big-o-performance` pointer in `related` below, a
- * separate static reference page, not this graded lesson).
- * `related` stays on the `n: 4` entry below even with five real concepts now — the three linked
- * pages (`Data Structures Visual`, `Big-O Performance`, `Algorithm Visualizer`) are still
- * genuinely useful supplementary reading for the rest of the stage's still-unbuilt syllabus.
+ * separate static reference page, not this graded lesson), and `Sorting` → `sorting` (item 40;
+ * single word, no casing footnote needed either, same as `Trees`/`Errors`/`Files`/`Arrays`) — all
+ * in `data/concepts.ts`, so `UPCOMING_STAGES`'s own `n: 4` entry now lists an empty `concepts`
+ * array rather than being deleted outright, the exact same reasoning Stage 3's `n: 3` entry above
+ * already established.
+ * `related` stays on this now-fully-built entry anyway — the three linked pages
+ * (`Data Structures Visual`, `Big-O Performance`, `Algorithm Visualizer`) are still genuinely
+ * useful review and depth material once the six graded lessons cover the syllabus itself, not
+ * pointers to unbuilt content anymore; nothing about `Roadmap.tsx`'s render logic forces `related`
+ * to disappear just because a stage finished, and cutting it would only make the page less useful
+ * for no real reason.
  */
 export const UPCOMING_STAGES = [
   {
@@ -80,10 +87,10 @@ export const UPCOMING_STAGES = [
   {
     n: 4,
     title: '4 · Data Structures & Algorithms',
-    // Same story as stage 3's `lock` above, one round earlier in its own lifecycle: never rendered
-    // once a stage has its own dedicated block, kept honest anyway.
-    lock: 'IN PROGRESS',
-    concepts: ['Sorting'],
+    // Same story as stage 3's `lock` above — never rendered once a stage has its own dedicated
+    // block — but the field is kept honest anyway, now that all six concepts here are real too.
+    lock: 'BUILT',
+    concepts: [],
     related: [
       { label: 'Data Structures Visual', route: '/data-structures-visual' },
       { label: 'Big-O Performance', route: '/big-o-performance' },
@@ -111,7 +118,7 @@ export function syllabusOf(stage: (typeof UPCOMING_STAGES)[number]): string {
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
  * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 five concepts in, stage 5 not started, as of item 39).
+ * built, stage 3 fully built, stage 4 fully built, stage 5 not started, as of item 40).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

@@ -144,7 +144,7 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
-  // ── Stage 4 · Data Structures & Algorithms (five concepts built so far)
+  // ── Stage 4 · Data Structures & Algorithms (all six concepts built)
   {
     slug: 'arrays',
     label: 'Arrays',
@@ -177,6 +177,13 @@ export const CONCEPTS: Concept[] = [
     slug: 'big-o',
     label: 'Big-O',
     route: '/big-o',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'sorting',
+    label: 'Sorting',
+    route: '/sorting',
     stage: 4,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },

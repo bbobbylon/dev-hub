@@ -1136,3 +1136,97 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     remains (Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
     `Roadmap.tsx` was untouched for the fourth round running — the architecture item 35 built keeps
     proving out as generic enough to carry the rest of Stage 4 without another structural change.
+
+40. ~~**Stage 4 had five real concepts (Arrays, Hash Maps, Stacks & Queues, Trees, Big-O); Sorting
+    was still an honest placeholder.**~~ — **done 2026-09-19. Same shape as item 34's Stage 3
+    completion.** Re-checked `curriculum.ts` first: Stage 4's `n: 4` entry listed `['Sorting']`,
+    the sole remaining item, matching the ask. Added `/sorting` ("Sorting") — single word, no
+    casing footnote needed, same as `Trees`/`Errors`/`Files`/`Arrays`.
+
+    Four gotchas, none overlapping a prior lesson and none re-teaching Big-O's own `.sort()`
+    complexity coverage (double-checked its fourth question before picking these, per the
+    coordinator's explicit ask): `list.sort()` mutating the list in place and returning `None` —
+    not the sorted list — so the classic `x = nums.sort()` bug leaves `x` empty while `nums` really
+    is sorted, contrasted with `sorted()`'s genuinely new list that leaves the original untouched;
+    sort *stability* — when two elements tie under the sort key, Python's sort keeps them in their
+    original relative order rather than picking arbitrarily, which is exactly what makes a "sort by
+    A, then stably sort by B" multi-key technique reliable; `key=` transforming what's *compared*
+    without ever touching the actual values, contrasted with the genuinely surprising default —
+    Python compares strings by raw code point, so every capital letter sorts before every lowercase
+    one, not the dictionary order `key=str.lower` fixes; and sorting a list of genuinely
+    incomparable types (`int` and `str` together) raising `TypeError` outright rather than silently
+    guessing an order — Python 3 refuses to invent an answer to "is 3 less than 'two'?", unlike
+    Python 2's old cross-type ordering. All four are behavior questions, not complexity ones — the
+    coordinator's note left room to extend the predict-the-complexity shape "where it fits," and
+    none of these four naturally needed it, so all four stayed on what each call actually *does*.
+
+    Wired in everywhere Big-O was: `App.tsx`'s lazy import + route (+ page-count comment, 36 → 37),
+    `data/concepts.ts` (`stage: 4`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+    `curriculum.ts`'s `UPCOMING_STAGES` needed the same real structural change item 34 made for
+    Stage 3's own completion, not just a string drop: Stage 4's `n: 4` entry's `concepts` array is
+    now `[]` rather than the entry being deleted outright (`Roadmap.tsx` still looks it up
+    unconditionally for `.concepts.length`/`.map`), and its `lock` field corrected `'IN PROGRESS'`
+    → `'BUILT'`, mirroring Stage 3's own correction exactly. Unlike Stage 3, Stage 4's entry keeps
+    its `related` array (`Data Structures Visual`, `Big-O Performance`, `Algorithm Visualizer`) —
+    `Roadmap.tsx` renders it unconditionally once `'related' in stage4Upcoming`, and those three
+    pages stay genuinely useful review/depth material now that the syllabus itself is covered, not
+    pointers to unbuilt content. Both `curriculum.ts` doc-comment paragraphs (Stage 4's and
+    `TOTAL_CONCEPTS`'s) were rewritten to the same "is fully built now" phrasing Stage 3's own
+    paragraph uses, not just bumped in place.
+
+    **A real staleness bug caught and fixed, not just a number bump.** `Roadmap.tsx`'s own stage-4
+    JSX comment had read "one real concept built (Arrays, item 35), the rest of its syllabus
+    honestly not-yet-built" since item 35 — and every round since (items 36-39, including this
+    session's own Trees and Big-O rounds) reported "zero Roadmap.tsx changes" truthfully for the
+    file's *logic*, which never needed touching, while that comment silently drifted further wrong
+    each time a concept was added. No gate catches this — `tmp_vcheck`-style scripts don't exist
+    here, and `verify-interactions.mjs` tests behavior, not comment accuracy. Caught it by rereading
+    the file directly rather than trusting the "no changes needed" streak, and fixed it the same way
+    item 34 fixed Stage 3's analogous comment when *that* stage completed: "stage 4 — fully built:
+    all six real concepts, nothing left not-yet-built." Also updated the file's top-of-file docblock
+    ("stage 3 has all six of its own" → "stage 3 and stage 4 both have all six of their own") for
+    the same reason — true either way, but no longer the most accurate true statement available.
+    This is a comment-only diff to `Roadmap.tsx`, not a logic change — the "Roadmap.tsx needed zero
+    changes" streak was always about behavior, and stays intact in that sense, but it's worth being
+    honest that the file itself was not, in fact, left alone for four rounds.
+
+    `verify-interactions.mjs` gained a dedicated Sorting block mirroring the other eleven lessons,
+    plus the Roadmap chip-chain's final step. This round hit the same boundary case item 34 hit for
+    Stage 3: with Sorting built, Stage 4's own not-built-chip count also drops to zero, and since
+    Stage 3 was already at zero, the *entire app* now has no "not built yet" chip anywhere. Rather
+    than track a shrinking number through the whole chain, converted all seven of the file's
+    `(rm.match(/not built yet/g) ?? []).length === 1` checks — the ones item 39 left matched on `1`
+    — to `!rm.includes('not built yet')`, the exact operator item 34 switched Stage 3's own checks
+    to at its own zero-remaining boundary, and wrote the new eighth check (right after Sorting's own
+    completion, the actual milestone moment) directly in that same style rather than as a `=== 0`
+    that would need converting again next round — confirmed by grep that no `.length === N` variant
+    of this check survives anywhere in the file. The "stage 4 shows its real concepts" check grew a sixth
+    name, and the Big-O chip-chain step gained a twelfth: complete Sorting, confirm the stage-4
+    count reads `"6 OF 6"`, the path total reads `"12 of 25 concepts"`, and — the actual milestone —
+    `!rm.includes('not built yet')` now holds app-wide. Checked all twelve Sorting option strings
+    for collisions against each other before writing the clicks — none, no `.nth()` needed. 288 →
+    297 interaction checks (5 dedicated + 4 Roadmap, the same shape every Stage-4 round has had
+    since item 36 — the seven converted `not built yet` assertions changed existing checks' logic
+    without adding new ones; only the dedicated block and the four Roadmap chip-chain steps do).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run. The Page Gallery's archetype count moved 33 → 34 on schedule. Swept
+    `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts (37
+    lesson/tool pages, 38 routes total, 32 registered concepts), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row again — now saying stage 3 *and* stage 4 are
+    both fully built, all six concepts each, rather than counting Stage 4's real concepts as a
+    fraction.
+
+    `npm run build` run first (the standing fix for the `dist/`-staleness snag), confirming
+    `Sorting-A0cuWgRm.js` built. `npm run verify` green after: 38/38 routes, no overflow at any
+    width, 297/297 interaction checks, a11y clean with zero regression (35/19, unchanged — the a11y
+    audit's own note confirmed it compared against a 38-route run, up from 30 at baseline recording,
+    new pairs only). `npm run typecheck` clean, `audit:content` at its 5-artifact baseline
+    (re-verified).
+
+    **Stage 4 is now complete: 6 of 6 concepts (Arrays, Hash Maps, Stacks & Queues, Trees, Big-O,
+    Sorting) are real, graded lessons** — the third Roadmap stage to reach that state, after Stage
+    1/2 and Stage 3 (item 34). Only Stage 5 (APIs & Databases) remains fully unbuilt: six concepts
+    (HTTP, REST, SQL basics, Joins, Auth, Deploy) plus the capstone project, all still honestly
+    reading "not yet built" behind its own `laterStages` lock. That is the next real work whenever
+    picked up.

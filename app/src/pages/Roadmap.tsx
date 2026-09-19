@@ -6,7 +6,7 @@
  * one of the places those two link from. Stage 5 (`UPCOMING_STAGES`'s `n: 5`
  * entry, via `laterStages`) is the only stage still a fully locked
  * placeholder with no page behind any of it; stages 1-4 each have at least
- * one real, built concept now (stage 3 has all six of its own).
+ * one real, built concept now (stage 3 and stage 4 both have all six of their own).
  *
  * Every chip state, stage badge and count on this page is derived from
  * `state.concepts` against `data/concepts.ts`; none of it is hardcoded. It
@@ -406,9 +406,9 @@ export default function Roadmap() {
             </div>
           </div>
 
-          {/* stage 4 — one real concept built (Arrays, item 35), the rest of its syllabus
-              honestly not-yet-built. Same shape stage 3 had while it was still partial; see the
-              file header comment for why this is a hand-duplicated block, not a shared one. */}
+          {/* stage 4 — fully built: all six real concepts, nothing left not-yet-built. Same shape
+              stage 3's block above; see the file header comment for why this is a hand-duplicated
+              block, not a shared one, and why `related` still renders below even now. */}
           <div style={{ display: 'flex', gap: 22 }}>
             <StageRail connector="neutral" node={<NumberNode n={4} state="current" />} />
             <div style={{ flex: 1, paddingBottom: 34 }}>
