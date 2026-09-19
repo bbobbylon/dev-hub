@@ -161,6 +161,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'rest',
+    title: 'REST',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Resource-oriented URLs, 404 vs. an empty {} or [], query params vs. one path per view, and POST vs. PUT for creation — predict what a well-designed API does, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

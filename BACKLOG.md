@@ -1361,3 +1361,81 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     removal, not the "zero changes" streak items 36-39 reported, because this round is exactly the
     boundary case that streak's own precedent (item 35, item 34) always said would eventually need
     one.
+
+42. ~~**Stage 5's second concept, REST, was still an honest placeholder** (`['SQL basics', 'Joins',
+    'Auth', 'Deploy']` was all that remained of Stage 5's original six-item syllabus once HTTP
+    shipped at item 41, but `REST` itself hadn't moved yet).~~ — **done 2026-09-19.** Picked up
+    after a session-wide rate limit killed the agent that had written `Rest.tsx`'s full lesson
+    content (401 lines, four predict-the-outcome questions) but crashed before wiring the page into
+    anything — no route, no `App.tsx` entry, no `data/concepts.ts`/`curriculum.ts` registration, no
+    interaction tests, no docs. Rather than trust that hand-off, re-read `Rest.tsx` in full end to
+    end first: genuinely REST-specific content, not a re-skin of HTTP's own four gotchas — checked
+    against `/api-anatomy` and `/http` by the file's own header comment, same discipline item 41
+    used — so it needed wiring, not rewriting.
+
+    Four gotchas, all design conventions REST layers on top of HTTP rather than protocol rules HTTP
+    already owns: **resource-oriented URLs** — `/users/55/reviews` names two resources and nests
+    one under the other, versus `/getReviewsForUser/55` baking a verb into the path that `GET`
+    already carries; **collection vs. single-item response shape** — `/books/9999` names one
+    specific resource, so a missing one is `404`, never a `200` dressed up as `{}` or `[]` (the
+    empty-array shape is *correct*, but only for a collection endpoint, never a single-item one —
+    mixing the two is what makes a client's parsing code have to guess); **query parameters vs. one
+    path per view** — `/products?sort=price&page=2` asks for a different view of the one `/products`
+    resource, versus inventing a distinct URL per sort order and page number, which balloons
+    unboundedly and breaks the moment two filters need combining; and **POST-to-a-collection vs.
+    PUT-to-a-known-URL for creation** — who invents the new resource's id, and what a retried,
+    identical request does under each choice (a second `POST` makes a second user; a second
+    identical `PUT` does not) — deliberately revisiting `PUT`'s idempotency from item 41's own first
+    question, but from the "which verb should a client even reach for" angle rather than repeating
+    "does resending PUT change anything further." `CodeListing` stayed the presentation shell,
+    `.http`-style request transcripts exactly like `/http` used — REST is a set of conventions *for*
+    HTTP, not a different wire format, so there was no reason to invent a new listing style.
+
+    Wired in everywhere HTTP was: `App.tsx`'s lazy import + route (+ page-count comment, 38 → 39),
+    `scripts/routes.mjs`, `data/pages.ts`'s gallery card, `data/concepts.ts` (`stage: 5`, folded
+    into the existing "Stage 5 · APIs & Databases" section header rather than a new one), and
+    `PageGallery.tsx`'s archetype count (35 → 36). **One real bug caught by rerunning the totals,
+    not by reading the diff** — the first pass edited `curriculum.ts`'s doc-comment prose to say
+    Stage 5 now has "two real concepts" but never actually removed `'REST'` from the `n: 5` entry's
+    `concepts` array itself, so `TOTAL_CONCEPTS` silently computed 26 instead of 25 and four
+    `concepts:` roadmap-panel checks failed with a stale "0 of 25" baseline. Caught by running a
+    throwaway `npx tsx -e` script printing `PATH_CONCEPTS.length`/the `UPCOMING_STAGES` sum/
+    `TOTAL_CONCEPTS` directly rather than trusting the doc comment matched the array below it —
+    the exact class of drift `docs/ARCHITECTURE.md`'s own `TOTAL_CONCEPTS` history (23 → 25) was
+    written to warn about. Fixed by actually editing the array; reran the same script to confirm
+    25 before rerunning the suites.
+
+    `verify-interactions.mjs` gained a dedicated REST block mirroring HTTP's own (start unanswered,
+    three correct reaches the pass mark, earns completion, a wrong pick shows the real explanation,
+    try again resets), plus a Roadmap chip-chain step following HTTP's: complete REST, confirm the
+    stage-5 count reads `"2 OF 6"`, the path total reads `"14 of 25 concepts"`, and the not-built
+    count is *still* exactly 4 (REST completing is a progress event, not a build event — it doesn't
+    touch `UPCOMING_STAGES.concepts`, which already dropped to 4 the moment the page was wired in).
+    All nine of item 41's `(rm.match(/not built yet/g) ?? []).length === 5` checks — spanning the
+    whole Stage 3/4 chip-chain, not just the Stage 5 ones — reverted to `=== 4`, since the "not
+    built yet" count reflects what's *coded*, not what a given moment in the test's simulated
+    progress has *earned*, so it drops for the entire file the instant REST has a real page, not
+    just from REST's own completion step onward. Added an exact-match `page.getByRole('link', {
+    name: 'REST', exact: true })` count, the same collision-avoidance habit `HTTP`/`Big-O`
+    established. 306 → 316 interaction checks (6 dedicated + 4 Roadmap, one more than item 41's own
+    5+4 split since this round's dedicated block also gained the wrong-pick coverage HTTP's had from
+    the start).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run, unrelated to REST. Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and
+    `app/README.md`'s route/page/concept counts (39 lesson/tool pages, 40 routes total, 34
+    registered concepts — read the routes figure off `npm run verify`'s own `40/40 routes clean`
+    output, the same lesson item 40 and item 41 both already flagged), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row (now naming both HTTP and REST, "four remain"
+    not "five") and a stale `Roadmap.tsx` inline comment still reading "its first real concept
+    (HTTP, item 41)".
+
+    `npm run build` run first, confirming `Rest-C_Re3WIu.js` built alongside `Http-D0dcO-xO.js`.
+    `npm run verify` green after: 40/40 routes, no overflow at any width, 316/316 interaction
+    checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck` clean.
+    `audit:content` at its 5-artifact baseline (re-verified).
+
+    **Stage 5 now has 2 of 6 concepts built: HTTP, REST.** Four remain (`SQL basics`, `Joins`,
+    `Auth`, `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no
+    further change this round — `PartialStage`, extracted at item 41 specifically so a later
+    Stage-5 concept wouldn't need one, held up on its very first use.

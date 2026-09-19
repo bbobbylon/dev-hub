@@ -460,8 +460,8 @@ export default function Roadmap() {
             connector="neutral"
           />
 
-          {/* stage 5 — its first real concept (HTTP, item 41); the last block on the page now,
-              so its rail connector stops here instead of continuing down. */}
+          {/* stage 5 — its first two real concepts (HTTP item 41, REST item 42); the last block
+              on the page now, so its rail connector stops here instead of continuing down. */}
           <PartialStage
             n={5}
             title="5 · APIs & Databases"

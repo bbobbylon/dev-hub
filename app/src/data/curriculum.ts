@@ -72,21 +72,22 @@ import { PATH_CONCEPTS } from './concepts'
  * to disappear just because a stage finished, and cutting it would only make the page less useful
  * for no real reason.
  *
- * **Stage 5 has its first real concept now** — `HTTP` → `http` (item 41; the design's own
+ * **Stage 5 has its first two real concepts now** — `HTTP` → `http` (item 41; the design's own
  * placeholder wrote it all-caps as an acronym, and the built label keeps that acronym rather than
  * title-casing it to "Http", the same "keep the real-world spelling" call `Big-O` made for its own
- * hyphen). Five remain (`REST`, `SQL basics`, `Joins`, `Auth`, `Deploy`). This is the round that
- * graduates Stage 5 out of `Roadmap.tsx`'s fully-locked `laterStages` path and into its own
+ * hyphen) and `REST` → `rest` (item 42; same all-caps-acronym reasoning). This is the round that
+ * graduated Stage 5 out of `Roadmap.tsx`'s fully-locked `laterStages` path and into its own
  * `PartialStage` block, the same restructuring `Arrays.tsx` did for Stage 4 at item 35 — except
- * this time it also retires the locked-stage machinery outright, since Stage 5 was the *last* stage
+ * this time it also retired the locked-stage machinery outright, since Stage 5 was the *last* stage
  * still using it (there is no stage 6 in a five-stage path), so nothing was left that could ever
  * render through it again. See `Roadmap.tsx`'s own header comment for the rest of that story.
- * Stage 5's `tail` (`". Ends with the capstone project."`) doesn't survive that move — the
+ * Stage 5's `tail` (`". Ends with the capstone project."`) didn't survive that move — the
  * `PartialStage` shape Stage 3/4 already established has no slot for one, and inventing a
  * Stage-5-only feature for a single sentence wasn't worth it when `related` already does the same
  * job: `Project Build-Along` (the app's one capstone-shaped concept, `stage: null` in
  * `data/concepts.ts`) was added there instead, alongside `API Anatomy`, so the pointer survives
- * through the same, already-proven mechanism rather than a new one-off feature.
+ * through the same, already-proven mechanism rather than a new one-off feature. Four remain
+ * (`SQL basics`, `Joins`, `Auth`, `Deploy`).
  */
 export const UPCOMING_STAGES = [
   {
@@ -113,11 +114,11 @@ export const UPCOMING_STAGES = [
   {
     n: 5,
     title: '5 · APIs & Databases',
-    // Same story again — not fully built yet (five of six remain), but no longer "not yet built"
-    // either, now that HTTP is real. Matches the exact 'IN PROGRESS' value Stage 4's own entry held
-    // from item 35 through item 39, before it became 'BUILT' at item 40.
+    // Same story again — not fully built yet (four of six remain), but no longer "not yet built"
+    // either, now that HTTP and REST are real. Matches the exact 'IN PROGRESS' value Stage 4's own
+    // entry held from item 35 through item 39, before it became 'BUILT' at item 40.
     lock: 'IN PROGRESS',
-    concepts: ['REST', 'SQL basics', 'Joins', 'Auth', 'Deploy'],
+    concepts: ['SQL basics', 'Joins', 'Auth', 'Deploy'],
     related: [
       { label: 'API Anatomy', route: '/api-anatomy' },
       { label: 'Project Build-Along', route: '/project-build-along' },

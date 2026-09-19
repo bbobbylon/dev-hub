@@ -33,6 +33,7 @@ export const ROUTES = [
   '/big-o',
   '/sorting',
   '/http',
+  '/rest',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

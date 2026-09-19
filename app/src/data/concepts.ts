@@ -188,11 +188,18 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
-  // ── Stage 5 · APIs & Databases (one concept built so far)
+  // ── Stage 5 · APIs & Databases (two concepts built so far)
   {
     slug: 'http',
     label: 'HTTP',
     route: '/http',
+    stage: 5,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
+  },
+  {
+    slug: 'rest',
+    label: 'REST',
+    route: '/rest',
     stage: 5,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
   },

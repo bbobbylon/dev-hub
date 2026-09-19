@@ -140,6 +140,26 @@ than ported from a prototype:
   in place rendering nothing. Stages 3-5's near-identical block shape was extracted into a real
   `PartialStage` component at the same time — the file's own comment had named "stage 5 needs the
   same shape too" as the exact trigger to do that, back when it was written at item 35.
+- **REST** (`/rest`) — Stage 5's second real page, continuing straight on from HTTP: HTTP taught
+  the protocol's own rules in the abstract, REST is the layer on top — conventions for how a URL
+  should be shaped and which verb an action should reach for. Checked `/api-anatomy` again first,
+  same as HTTP's own build note did, so none of the four questions repeat its bare verb-to-purpose
+  or 2xx/4xx/5xx ground. Four REST-specific gotchas, none a repeat of HTTP's own four: resource-
+  oriented URLs (`/users/55/reviews`, a noun the verb already covers, nested to express "belongs
+  to" — not `/getReviewsForUser/55`, a verb baked into the path); collection vs. single-item
+  response shape (`/books/9999` names one specific resource, so a missing one is `404`, never a
+  `200` dressed up as `{}` or `[]` — the latter is the *correct* empty shape, but only for a
+  collection endpoint); query parameters vs. one path per view (`?sort=&page=` asks for a
+  different view of the same resource, not a new one); and POST-to-a-collection vs.
+  PUT-to-a-known-URL for creation — who invents the new resource's id, and what a retried,
+  identical request does under each choice (a second POST makes a second user; a second identical
+  PUT does not), revisiting `PUT`'s idempotency from a new, creation-specific angle rather than
+  repeating HTTP's own "does resending PUT change anything further" question. Same archetype as
+  every lesson before it, and — like every Stage 4/5 round since Arrays — needed no `Roadmap.tsx`
+  change: `PartialStage` is fully derived from `conceptsInStage(5)` and `UPCOMING_STAGES`'s `n: 5`
+  entry, so removing `'REST'` from the latter's `concepts` array was the entire wiring change that
+  page needed. **Stage 5 now has two of six concepts built** (HTTP, REST); four remain (SQL basics,
+  Joins, Auth, Deploy).
 
 ## Beyond the mockups
 
@@ -156,7 +176,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 33 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 34 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -167,7 +187,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 35 archetypes. Both have empty states.
+  gallery gained a filter across all 36 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -219,7 +239,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 39 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 40 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -256,8 +276,8 @@ extractor artifacts**, not omissions:
   Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
-  Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 now that HTTP
-  has) — see `PAGES.length` in `data/pages.ts` for the number that's actually true.
+  Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 once HTTP had,
+  36 now that REST has) — see `PAGES.length` in `data/pages.ts` for the number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text
