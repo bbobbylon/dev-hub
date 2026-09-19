@@ -14,7 +14,7 @@
  * that is actually a list of things — now produces the number, and the prose reads from it.
  *
  * **It is not `PAGES.length`, and shouldn't be swapped for it.** A concept is a unit of the
- * designed backend-developer path; a page is one of this app's ~31 interactive screens, several of
+ * designed backend-developer path; a page is one of this app's ~38 interactive screens, several of
  * which (the gallery, Dev Hub, the 404, sign-in) teach no concept at all, while a single page like
  * CLI Basics walks through several. Nor is it `CONCEPTS.length` from `data/concepts.ts`: that
  * registry also holds the pages sitting *off* the five-stage path (Regex Lab, the Decorator
@@ -39,12 +39,11 @@ import { PATH_CONCEPTS } from './concepts'
  * deleted outright: `Roadmap.tsx` still looks it up unconditionally (`stage3Upcoming =
  * UPCOMING_STAGES.find((s) => s.n === 3)!`) to read its `.concepts.length`/`.map`, and removing the
  * entry would need that lookup rewritten for no real gain — an empty list renders zero
- * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state. Stage 5 remains
- * the only stage still fully unbuilt; Stage 4 is now fully built too (see below).
+ * `NotBuiltChip`s, which is exactly the honest "nothing left to build here" state.
  * `related` names existing off-path pages (`stage: null` in `data/concepts.ts`) whose content
- * genuinely overlaps a locked stage's syllabus, so a learner who reaches it isn't left with
- * nothing real to do — verified by reading each page, not guessed from its title. They are
- * pointers, not path concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
+ * genuinely overlaps a stage's syllabus, so a learner who reaches it isn't left with nothing real
+ * to do — verified by reading each page, not guessed from its title. They are pointers, not path
+ * concepts: linking one here doesn't move `TOTAL_CONCEPTS` or its stage's count.
  *
  * **Stage 4 is fully built now too, all six of its original concepts real** — `Arrays` → `arrays`
  * (item 35; the round that gave Stage 4 its own dedicated block in `Roadmap.tsx`, the same "some
@@ -72,23 +71,37 @@ import { PATH_CONCEPTS } from './concepts'
  * pointers to unbuilt content anymore; nothing about `Roadmap.tsx`'s render logic forces `related`
  * to disappear just because a stage finished, and cutting it would only make the page less useful
  * for no real reason.
+ *
+ * **Stage 5 has its first real concept now** — `HTTP` → `http` (item 41; the design's own
+ * placeholder wrote it all-caps as an acronym, and the built label keeps that acronym rather than
+ * title-casing it to "Http", the same "keep the real-world spelling" call `Big-O` made for its own
+ * hyphen). Five remain (`REST`, `SQL basics`, `Joins`, `Auth`, `Deploy`). This is the round that
+ * graduates Stage 5 out of `Roadmap.tsx`'s fully-locked `laterStages` path and into its own
+ * `PartialStage` block, the same restructuring `Arrays.tsx` did for Stage 4 at item 35 — except
+ * this time it also retires the locked-stage machinery outright, since Stage 5 was the *last* stage
+ * still using it (there is no stage 6 in a five-stage path), so nothing was left that could ever
+ * render through it again. See `Roadmap.tsx`'s own header comment for the rest of that story.
+ * Stage 5's `tail` (`". Ends with the capstone project."`) doesn't survive that move — the
+ * `PartialStage` shape Stage 3/4 already established has no slot for one, and inventing a
+ * Stage-5-only feature for a single sentence wasn't worth it when `related` already does the same
+ * job: `Project Build-Along` (the app's one capstone-shaped concept, `stage: null` in
+ * `data/concepts.ts`) was added there instead, alongside `API Anatomy`, so the pointer survives
+ * through the same, already-proven mechanism rather than a new one-off feature.
  */
 export const UPCOMING_STAGES = [
   {
     n: 3,
     title: '3 · A First Language: Python',
-    // `lock` is never rendered for stage 3 — `Roadmap.tsx`'s stage-3 block is hardcoded to show a
-    // "N OF 6" `Tag` instead of `<LockedTag>{stage.lock}</LockedTag>` (that's `laterStages`' job,
-    // stage 5 only, now that stage 4 has its own dedicated block too) — but the field is kept
-    // honest anyway, now that all six concepts are real.
+    // `lock` is never rendered for stage 3 — `Roadmap.tsx`'s `PartialStage` shows a "N OF 6" `Tag`
+    // instead of a locked-stage treatment — but the field is kept honest anyway, now that all six
+    // concepts are real.
     lock: 'BUILT',
     concepts: [],
   },
   {
     n: 4,
     title: '4 · Data Structures & Algorithms',
-    // Same story as stage 3's `lock` above — never rendered once a stage has its own dedicated
-    // block — but the field is kept honest anyway, now that all six concepts here are real too.
+    // Same story as stage 3's `lock` above — kept honest even though nothing renders it.
     lock: 'BUILT',
     concepts: [],
     related: [
@@ -100,25 +113,24 @@ export const UPCOMING_STAGES = [
   {
     n: 5,
     title: '5 · APIs & Databases',
-    lock: 'NOT YET BUILT',
-    concepts: ['HTTP', 'REST', 'SQL basics', 'Joins', 'Auth', 'Deploy'],
-    tail: '. Ends with the capstone project.',
-    related: [{ label: 'API Anatomy', route: '/api-anatomy' }],
+    // Same story again — not fully built yet (five of six remain), but no longer "not yet built"
+    // either, now that HTTP is real. Matches the exact 'IN PROGRESS' value Stage 4's own entry held
+    // from item 35 through item 39, before it became 'BUILT' at item 40.
+    lock: 'IN PROGRESS',
+    concepts: ['REST', 'SQL basics', 'Joins', 'Auth', 'Deploy'],
+    related: [
+      { label: 'API Anatomy', route: '/api-anatomy' },
+      { label: 'Project Build-Along', route: '/project-build-along' },
+    ],
   },
 ] as const
-
-/** The one-line syllabus the Roadmap prints under a locked stage's heading. */
-export function syllabusOf(stage: (typeof UPCOMING_STAGES)[number]): string {
-  const list = `${stage.concepts.join(' · ')} — ${stage.concepts.length} concepts`
-  return 'tail' in stage ? list + stage.tail : list
-}
 
 /**
  * Concepts in the designed backend-developer path, across all five Roadmap stages: every built
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
  * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 fully built, stage 5 not started, as of item 40).
+ * built, stage 3 fully built, stage 4 fully built, stage 5 one concept in, as of item 41).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

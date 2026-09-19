@@ -1,12 +1,17 @@
 /**
  * Route `/roadmap` — the five-stage backend-developer learning path, showing
- * "you are here" and locked-stage states and progress toward `TOTAL_CONCEPTS`
- * via `useProgress()`. Stage 2's chip grid links out to individual lesson
- * pages, including `/shell-scripting` and `/rebase-history` — this page is
- * one of the places those two link from. Stage 5 (`UPCOMING_STAGES`'s `n: 5`
- * entry, via `laterStages`) is the only stage still a fully locked
- * placeholder with no page behind any of it; stages 1-4 each have at least
- * one real, built concept now (stage 3 and stage 4 both have all six of their own).
+ * "you are here" states and progress toward `TOTAL_CONCEPTS` via
+ * `useProgress()`. Stage 2's chip grid links out to individual lesson pages,
+ * including `/shell-scripting` and `/rebase-history` — this page is one of
+ * the places those two link from. All five stages have at least one real,
+ * built concept now (stage 3 and stage 4 have all six of their own; stage 5
+ * has its first, HTTP, item 41) — no stage on this page is a fully locked
+ * placeholder any more, and the `LockedTag`/locked-`NumberNode` machinery a
+ * fully-locked stage used to need is gone rather than left idle: once stage
+ * 5 has a real concept, `UPCOMING_STAGES.filter((s) => s.n > 5)` is
+ * permanently empty (this is a five-stage path; there is no stage 6), so the
+ * block that used to render it could never run again either. See
+ * `PartialStage`'s own comment for the rest of this round's restructuring.
  *
  * Every chip state, stage badge and count on this page is derived from
  * `state.concepts` against `data/concepts.ts`; none of it is hardcoded. It
@@ -19,13 +24,15 @@
  * marked done — that marking happens from the Progress Dashboard's concept
  * list instead, since there is nowhere on this page to click through to.
  *
- * **Stage 3 and stage 4 share one JSX shape, hand-duplicated rather than
- * extracted into a component (item 35).** Both render a chip grid for their
- * real concepts plus a `NotBuiltChip` for each remaining syllabus item, with
- * a `"N OF total"` `Tag` instead of stage 2's card treatment or stage 1/5's
- * lock/complete states. Two data points don't yet justify a shared
- * `PartialStage` component over two ~20-line blocks that read fine in place;
- * revisit that call once stage 5 needs the same shape too, not before.
+ * **Stages 3, 4 and 5 share one JSX shape, now a real `PartialStage`
+ * component (item 41) instead of the hand-duplicated blocks items 35-40 each
+ * kept in place.** The file's own comment named the exact trigger for making
+ * that call — "two data points don't yet justify it; revisit once stage 5
+ * needs the same shape too, not before" — and stage 5 needing it, for real,
+ * is what this round is. Each stage renders a chip grid for its real
+ * concepts plus a `NotBuiltChip` for whatever's still unbuilt, with a
+ * `"N OF total"` `Tag` instead of stage 2's card treatment or stage 1's
+ * complete-checkmark state.
  */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -34,7 +41,7 @@ import { TopNav } from '../components/TopNav'
 import { Icon } from '../components/Icon'
 import { Meter, Tag } from '../components/ui'
 import { useDocumentTitle } from '../components/useDocumentTitle'
-import { TOTAL_CONCEPTS, UPCOMING_STAGES, syllabusOf } from '../data/curriculum'
+import { TOTAL_CONCEPTS, UPCOMING_STAGES } from '../data/curriculum'
 import { type Concept, conceptsInStage, pathDone } from '../data/concepts'
 
 /** A concept chip inside a stage: done, next up, or not started. */
@@ -141,16 +148,6 @@ function StageRail({
   )
 }
 
-/** A neutral `Tag` with a lock icon, used for a fully-unbuilt stage's "NOT YET BUILT" label. */
-function LockedTag({ children }: { children: string }) {
-  return (
-    <Tag tone="neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-      <Icon name="lock" size={11} />
-      {children}
-    </Tag>
-  )
-}
-
 /** A syllabus item with no page behind it yet — deliberately not a `Chip`: nothing to click. */
 function NotBuiltChip({ label }: { label: string }) {
   return (
@@ -189,8 +186,10 @@ function RelatedLessons({ items }: { items: readonly { label: string; route: str
   )
 }
 
-/** The circular numbered node on the stage rail; filled when `state` is 'current', dimmed when 'locked'. */
-function NumberNode({ n, state }: { n: number; state: 'current' | 'locked' }) {
+/** The circular numbered node on the stage rail. Every stage is unlocked now (item 41), so it's
+ *  always filled — the dimmed 'locked' variant this used to support was removed alongside
+ *  `LockedTag`, since neither had anything left to render once stage 5 got a real concept. */
+function NumberNode({ n }: { n: number }) {
   return (
     <div
       style={{
@@ -202,12 +201,65 @@ function NumberNode({ n, state }: { n: number; state: 'current' | 'locked' }) {
         justifyContent: 'center',
         fontFamily: 'var(--font-heading)',
         fontSize: 18,
-        background: state === 'current' ? 'var(--color-accent)' : 'var(--color-neutral-300)',
-        color: state === 'current' ? 'var(--color-bg)' : 'var(--color-neutral-700)',
-        boxShadow: state === 'current' ? 'var(--shadow-md)' : undefined,
+        background: 'var(--color-accent)',
+        color: 'var(--color-bg)',
+        boxShadow: 'var(--shadow-md)',
       }}
     >
       {n}
+    </div>
+  )
+}
+
+/**
+ * A fully-derived "N of total" stage block — extracted at item 41 (Stage 5's first concept, HTTP)
+ * per the trigger the file header names: stages 3 and 4 each had this exact shape hand-duplicated
+ * since item 35, and a third repetition for stage 5 is what the original comment was waiting for.
+ * Renders the stage's real concept chips, a `NotBuiltChip` for whatever's still unbuilt, and
+ * `RelatedLessons` when the `UPCOMING_STAGES` entry names any — unconditionally, even once a stage
+ * is fully built, since those pages stay genuinely useful review material rather than pointers to
+ * unbuilt content (see `data/curriculum.ts`'s own reasoning). `connector` is `'none'` only for
+ * whichever stage is currently the last block on the page — right now, stage 5.
+ */
+function PartialStage({
+  n,
+  title,
+  done,
+  built,
+  upcoming,
+  chipState,
+  connector,
+}: {
+  n: number
+  title: string
+  done: number
+  built: Concept[]
+  upcoming: (typeof UPCOMING_STAGES)[number]
+  chipState: (c: Concept) => 'done' | 'next' | 'todo'
+  connector: 'neutral' | 'none'
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 22 }}>
+      <StageRail connector={connector} node={<NumberNode n={n} />} />
+      <div style={{ flex: 1, paddingBottom: connector === 'none' ? 0 : 34 }}>
+        <div
+          style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}
+        >
+          <h2 style={{ fontSize: 24, margin: 0 }}>{title}</h2>
+          <Tag tone="neutral">
+            {done} OF {built.length + upcoming.concepts.length}
+          </Tag>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {built.map((c) => (
+            <Chip key={c.slug} label={c.label} state={chipState(c)} to={c.route} />
+          ))}
+          {upcoming.concepts.map((label) => (
+            <NotBuiltChip key={label} label={label} />
+          ))}
+        </div>
+        {'related' in upcoming ? <RelatedLessons items={upcoming.related} /> : null}
+      </div>
     </div>
   )
 }
@@ -224,26 +276,29 @@ export default function Roadmap() {
   const stage2 = conceptsInStage(2)
   const stage3 = conceptsInStage(3)
   const stage4 = conceptsInStage(4)
+  const stage5 = conceptsInStage(5)
   const isDone = (c: Concept) => Boolean(state.concepts[c.slug])
   // Exactly one chip on the page reads as "next up": the earliest concept in path order that
   // isn't done and has a page to do it on. Concepts with no `route` can't be next — nothing
-  // would happen if you clicked them. Stage 4 joined this search in item 35; until every routed
-  // concept in stages 1-3 is done, nextUp never reaches it, same as stage 3 never used to be
-  // reached before stage 1-2 were both finished.
-  const nextUp = [...stage1, ...stage2, ...stage3, ...stage4].find((c) => !isDone(c) && c.route)
+  // would happen if you clicked them. Stage 4 joined this search in item 35, stage 5 in item 41;
+  // until every routed concept in the stages before it is done, nextUp never reaches it, same as
+  // stage 3 never used to be reached before stage 1-2 were both finished.
+  const nextUp = [...stage1, ...stage2, ...stage3, ...stage4, ...stage5].find(
+    (c) => !isDone(c) && c.route,
+  )
   /** done / next / todo for one chip, from the learner's actual record. */
   const chipState = (c: Concept) => (isDone(c) ? 'done' : c === nextUp ? 'next' : 'todo')
   const stage1Done = stage1.filter(isDone).length
   const stage2Done = stage2.filter(isDone).length
   const stage3Done = stage3.filter(isDone).length
   const stage4Done = stage4.filter(isDone).length
-  // Stage 3 and stage 4's remaining not-yet-built syllabus items — everything left in
-  // UPCOMING_STAGES's n:3/n:4 entries (stage 3's is empty now; see that file for why the entry
-  // stays rather than being deleted). Stage 5's is read inside `laterStages` below instead, since
-  // it has no built concepts yet to pair it with.
+  const stage5Done = stage5.filter(isDone).length
+  // Stages 3-5's remaining not-yet-built syllabus items — everything left in UPCOMING_STAGES's
+  // n:3/n:4/n:5 entries (stage 3 and stage 4's are empty now; see that file for why the entries
+  // stay rather than being deleted).
   const stage3Upcoming = UPCOMING_STAGES.find((s) => s.n === 3)!
   const stage4Upcoming = UPCOMING_STAGES.find((s) => s.n === 4)!
-  const laterStages = UPCOMING_STAGES.filter((s) => s.n > 4)
+  const stage5Upcoming = UPCOMING_STAGES.find((s) => s.n === 5)!
 
   return (
     <div className="page">
@@ -313,7 +368,7 @@ export default function Roadmap() {
                     <Icon name="check" size={20} color="var(--color-bg)" />
                   </div>
                 ) : (
-                  <NumberNode n={1} state="current" />
+                  <NumberNode n={1} />
                 )
               }
             />
@@ -340,7 +395,7 @@ export default function Roadmap() {
 
           {/* stage 2 — you are here */}
           <div style={{ display: 'flex', gap: 22 }}>
-            <StageRail connector="neutral" node={<NumberNode n={2} state="current" />} />
+            <StageRail connector="neutral" node={<NumberNode n={2} />} />
             <div style={{ flex: 1, paddingBottom: 34 }}>
               <div
                 className="card elev-md"
@@ -384,80 +439,38 @@ export default function Roadmap() {
           </div>
 
           {/* stage 3 — fully built: all six real concepts, nothing left not-yet-built */}
-          <div style={{ display: 'flex', gap: 22 }}>
-            <StageRail connector="neutral" node={<NumberNode n={3} state="current" />} />
-            <div style={{ flex: 1, paddingBottom: 34 }}>
-              <div
-                style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}
-              >
-                <h2 style={{ fontSize: 24, margin: 0 }}>3 · A First Language: Python</h2>
-                <Tag tone="neutral">
-                  {stage3Done} OF {stage3.length + stage3Upcoming.concepts.length}
-                </Tag>
-              </div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                {stage3.map((c) => (
-                  <Chip key={c.slug} label={c.label} state={chipState(c)} to={c.route} />
-                ))}
-                {stage3Upcoming.concepts.map((label) => (
-                  <NotBuiltChip key={label} label={label} />
-                ))}
-              </div>
-            </div>
-          </div>
+          <PartialStage
+            n={3}
+            title="3 · A First Language: Python"
+            done={stage3Done}
+            built={stage3}
+            upcoming={stage3Upcoming}
+            chipState={chipState}
+            connector="neutral"
+          />
 
-          {/* stage 4 — fully built: all six real concepts, nothing left not-yet-built. Same shape
-              stage 3's block above; see the file header comment for why this is a hand-duplicated
-              block, not a shared one, and why `related` still renders below even now. */}
-          <div style={{ display: 'flex', gap: 22 }}>
-            <StageRail connector="neutral" node={<NumberNode n={4} state="current" />} />
-            <div style={{ flex: 1, paddingBottom: 34 }}>
-              <div
-                style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}
-              >
-                <h2 style={{ fontSize: 24, margin: 0 }}>4 · Data Structures &amp; Algorithms</h2>
-                <Tag tone="neutral">
-                  {stage4Done} OF {stage4.length + stage4Upcoming.concepts.length}
-                </Tag>
-              </div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                {stage4.map((c) => (
-                  <Chip key={c.slug} label={c.label} state={chipState(c)} to={c.route} />
-                ))}
-                {stage4Upcoming.concepts.map((label) => (
-                  <NotBuiltChip key={label} label={label} />
-                ))}
-              </div>
-              {'related' in stage4Upcoming ? <RelatedLessons items={stage4Upcoming.related} /> : null}
-            </div>
-          </div>
+          {/* stage 4 — fully built: all six real concepts, nothing left not-yet-built */}
+          <PartialStage
+            n={4}
+            title="4 · Data Structures & Algorithms"
+            done={stage4Done}
+            built={stage4}
+            upcoming={stage4Upcoming}
+            chipState={chipState}
+            connector="neutral"
+          />
 
-          {/* stage 5 — fully locked, but honestly pointed at real related content */}
-          {laterStages.map((stage, i) => {
-            const last = i === laterStages.length - 1
-            return (
-            <div key={stage.n} style={{ display: 'flex', gap: 22 }}>
-              <StageRail
-                connector={last ? 'none' : 'neutral'}
-                node={<NumberNode n={stage.n} state="locked" />}
-              />
-              <div style={{ flex: 1, paddingBottom: last ? 0 : 34, opacity: 0.65 }}>
-                <div
-                  style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}
-                >
-                  <h2 style={{ fontSize: 22, margin: 0, color: 'var(--color-neutral-700)' }}>
-                    {stage.title}
-                  </h2>
-                  <LockedTag>{stage.lock}</LockedTag>
-                </div>
-                <p style={{ fontSize: 13.5, color: 'var(--color-neutral-700)', margin: 0 }}>
-                  {syllabusOf(stage)}
-                </p>
-                {'related' in stage ? <RelatedLessons items={stage.related} /> : null}
-              </div>
-            </div>
-            )
-          })}
+          {/* stage 5 — its first real concept (HTTP, item 41); the last block on the page now,
+              so its rail connector stops here instead of continuing down. */}
+          <PartialStage
+            n={5}
+            title="5 · APIs & Databases"
+            done={stage5Done}
+            built={stage5}
+            upcoming={stage5Upcoming}
+            chipState={chipState}
+            connector="none"
+          />
         </div>
       </main>
     </div>

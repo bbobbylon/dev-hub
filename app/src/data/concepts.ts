@@ -36,9 +36,9 @@ export interface Concept {
   label: string
   /** Route that teaches it, or `undefined` when the path names a concept this app has no page for. */
   route?: string
-  /** Roadmap stage (1-4 have at least one built concept; 5 is still a fully locked placeholder),
-   *  or `null` when off the path. */
-  stage: 1 | 2 | 3 | 4 | null
+  /** Roadmap stage (1-5 each have at least one built concept now — stage 3 and stage 4 all six of
+   *  their own), or `null` when off the path. */
+  stage: 1 | 2 | 3 | 4 | 5 | null
   /** What records it — prose for the next reader, kept in step with the page's `<ConceptComplete>`. */
   earnedBy: string
 }
@@ -188,6 +188,15 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
+  // ── Stage 5 · APIs & Databases (one concept built so far)
+  {
+    slug: 'http',
+    label: 'HTTP',
+    route: '/http',
+    stage: 5,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
+  },
+
   // ── Off the five-stage path ─────────────────────────────────────────────
   {
     slug: 'decorator-pattern',
@@ -291,7 +300,7 @@ export const CONCEPT_BY_SLUG: Record<string, Concept> = Object.fromEntries(
 export const PATH_CONCEPTS = CONCEPTS.filter((c) => c.stage !== null)
 
 /** The concepts a given built Roadmap stage lists, in chip order. */
-export function conceptsInStage(stage: 1 | 2 | 3 | 4): Concept[] {
+export function conceptsInStage(stage: 1 | 2 | 3 | 4 | 5): Concept[] {
   return CONCEPTS.filter((c) => c.stage === stage)
 }
 

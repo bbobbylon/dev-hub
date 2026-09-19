@@ -1230,3 +1230,134 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     (HTTP, REST, SQL basics, Joins, Auth, Deploy) plus the capstone project, all still honestly
     reading "not yet built" behind its own `laterStages` lock. That is the next real work whenever
     picked up.
+
+41. ~~**Stage 5 (APIs & Databases) was still fully unbuilt — six concepts, no real page behind any
+    of them.**~~ — **done 2026-09-19. Stage 5's first real concept, and the round that graduates it
+    out of `Roadmap.tsx`'s locked-stage path for good.** Re-checked `curriculum.ts` first, per the
+    standing rule, rather than trusting the coordinator's own summary of the syllabus: Stage 5's
+    `n: 5` entry listed `['HTTP', 'REST', 'SQL basics', 'Joins', 'Auth', 'Deploy']`, HTTP first,
+    confirming both the exact list and the order. Added `/http` ("HTTP") — the design's own
+    placeholder wrote it all-caps as the acronym it is, and the built label keeps that rather than
+    title-casing it, the same "keep the real spelling" call `Big-O` made for its own hyphen.
+
+    **A genuinely different question shape, used because it fits, not by default.** Every prior
+    Stage 3/4 lesson asked "what does this Python code do"; HTTP has no code to run — just a
+    request (or two) and the real protocol rule that decides the outcome, so three of the four
+    questions land on a status code instead of a printed value, the same predict-then-reveal
+    mechanic every lesson has used, aimed at what HTTP actually hands back. Checked `/api-anatomy`
+    first (Stage 5's own `related` reference page) to avoid re-teaching its wire-dump-and-decoder
+    strip's ground — bare verb-to-purpose mapping and the 2xx/4xx/5xx families are already covered
+    there as static reference material, so none of the four went there. Four gotchas instead: `PUT`
+    being idempotent — resending an identical request a second time changes nothing further, which
+    is exactly why it's safe to retry automatically and `POST` isn't; `401 Unauthorized` ("I don't
+    know who you are; log in") vs `403 Forbidden` ("I know exactly who you are, and it's still no")
+    — a distinction `/api-anatomy`'s own status strip labels but never explains; `PUT` silently
+    deleting fields a client didn't resend, because `PUT` replaces the *entire* resource rather than
+    merging in what was sent — the real data-loss bug `PATCH` exists to prevent; and HTTP's
+    statelessness — a login a few seconds ago buys a follow-up request nothing at all unless it
+    carries its own proof (a cookie, a token), because the protocol itself has no memory between
+    requests. `CodeListing` stayed the presentation shell (a `.http`-style request transcript is as
+    "showable" in it as a Python snippet was), coloring HTTP methods/headers/JSON with the same
+    `syn.kw`/`syn.fn`/`syn.str`/`syn.cm` keys rather than inventing a new component for a new
+    subject — the same minimal-necessary shift `BigO.tsx` made to its prompt wording without
+    touching the page shape around it.
+
+    **The real second half of this round: graduating Stage 5 out of the locked-stage path, the way
+    the coordinator asked — "the same way Stage 4 did on Arrays," except Stage 5 is the *last*
+    stage, so this round also had to retire the machinery that shape existed for.** Widened
+    `Concept.stage`'s type and `conceptsInStage()`'s signature from `1 | 2 | 3 | 4` to include `5`
+    (a real, previously-missing gap — nothing had needed a stage-5 concept before this round, so it
+    had never been caught). `curriculum.ts`'s `n: 5` entry lost `'HTTP'` from its `concepts` array
+    and its `lock` moved `'NOT YET BUILT'` → `'IN PROGRESS'`, the exact same value Stage 4's own
+    entry held from item 35 through item 39 before it hit `'BUILT'` at item 40. In `Roadmap.tsx`:
+    `laterStages = UPCOMING_STAGES.filter((s) => s.n > 4)` — the array that used to render Stage 5's
+    fully-locked block — becomes `filter((s) => s.n > 5)` once Stage 5 leaves it, and in a five-stage
+    path that's now *permanently* empty; there is no stage 6 coming. Rather than leave a `.map()`
+    over a guaranteed-forever-empty array sitting in the file (the same "dead field" drift item 34's
+    own `lock` fix warned about, one level up), removed `laterStages` entirely, along with
+    `LockedTag` (now had nothing left to render) and `NumberNode`'s `'locked'` state (every stage is
+    unlocked now, so it always renders `'current'` — simplified to drop the prop rather than keep an
+    always-true branch alive).
+
+    **Extracted the `PartialStage` component the file's own comment had been waiting to write.**
+    Stage 3 and Stage 4's "N of total" block had been hand-duplicated since item 35, with a comment
+    explicitly naming the trigger for changing that: *"two data points don't yet justify a shared
+    component... revisit that call once stage 5 needs the same shape too, not before."* Stage 5
+    needing it, for real, is what this round is — so rather than hand-duplicate a third ~20-line
+    block, extracted `PartialStage(n, title, done, built, upcoming, chipState, connector)` and
+    rewired all three stages through it. One real behavior preserved deliberately, not by accident:
+    `connector` is `'none'` only for whichever stage is currently *last* on the page (now stage 5,
+    where stage 4 used to be) — the same `paddingBottom: last ? 0 : 34` treatment the old
+    `laterStages` block gave its own last item, now correctly following whichever stage is actually
+    last rather than being hardcoded to one. Roadmap chunk size dropped 8.28 kB → 7.04 kB in the
+    build output despite the new component, net evidence the removal outweighed the addition.
+
+    **One real bug caught before it shipped, not after.** First pass wrote `title="4 · Data
+    Structures &amp; Algorithms"` as a plain string prop to `PartialStage` — copied straight from
+    the old JSX children text, where `&amp;` is a real HTML entity React decodes. As a plain TS
+    string literal passed through `{title}` interpolation, it isn't: it would have rendered the
+    literal five characters `&amp;` on the page instead of `&`, invisible to every automated gate
+    (renders fine, no console error, no broken link) and only catchable by actually reading the
+    rendered text — caught by rereading the diff before running anything, not by a test failing.
+    Fixed to a literal `&` in both `title` props (stage 4 and stage 5) before the first build.
+
+    **Stage 5's `tail` (`". Ends with the capstone project."`) needed a real decision, not a silent
+    drop.** `PartialStage`'s shape, inherited from Stage 3/4's own block, has no slot for a trailing
+    sentence — neither of them ever needed one. Dropping `tail` silently while wiring Stage 5 into
+    that shape would have been a real information-loss regression introduced *by this round*, not
+    inherited staleness from an earlier one, so it needed handling, not skipping. Folded the same
+    information into `related` instead — added `Project Build-Along` (the app's one capstone-shaped
+    concept, `stage: null` in `data/concepts.ts`, already routing to `/project-build-along`)
+    alongside the existing `API Anatomy` — reusing the `related`-lessons mechanism Stage 4's own
+    graduation already proved survives a stage finishing, rather than inventing a one-off feature
+    for a single sentence. `syllabusOf()` (the function that used to print `tail`) lost its only
+    caller in the same edit and was removed as dead code alongside `laterStages`.
+
+    Wired in everywhere Sorting was: `App.tsx`'s lazy import + route (+ page-count comment, 37 →
+    38), `data/concepts.ts` (`stage: 5`, plus the new `// ── Stage 5 · APIs & Databases (one concept
+    built so far)` section header), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+
+    `verify-interactions.mjs` gained a dedicated HTTP block mirroring the other twelve lessons, plus
+    a real reworking of the Roadmap section rather than a routine chip-chain append. The app-wide
+    "not built yet" count, which had briefly hit true zero at item 40 (both Stage 3 and Stage 4
+    fully built, nothing else in the path yet), is no longer zero — Stage 5 contributes five
+    (`REST`, `SQL basics`, `Joins`, `Auth`, `Deploy`) — so every one of the eight
+    `!rm.includes('not built yet')` checks item 40 had just switched to were reverted to counting
+    `(rm.match(/not built yet/g) ?? []).length === 5`, the exact style used before item 40's
+    boundary case, now with a new constant. Also removed the now-permanently-false "stage 5 still
+    reads not yet built" (`NOT YET BUILT` tag) check outright — that uppercase tag came from
+    `LockedTag`, which no longer exists — rather than adjust it to assert something that isn't true
+    anymore. Added an exact-match `page.getByRole('link', { name: 'HTTP', exact: true })` count for
+    the "stage 5 shows its first real concept" check, the same defensive habit `Big-O`'s own
+    collision-avoidance established, even though no current collision exists for "HTTP" — cheap
+    insurance against a future one a plain substring couldn't catch. The "stage 5 points at" check
+    grew to require both `API Anatomy` and `Project Build-Along`. New chip-chain step: complete
+    HTTP, confirm the stage-5 count reads `"1 OF 6"`, the path total reads `"13 of 25 concepts"`,
+    and the not-built count is *still* exactly 5 — the same invariant proven for Stage 4's own
+    concepts now proven for Stage 5's first. Checked all twelve HTTP option strings for collisions
+    against each other before writing the clicks — none, no `.nth()` needed. 297 → 306 interaction
+    checks (5 dedicated + 4 Roadmap, the same shape every new-lesson round has had since item 36).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run. The Page Gallery's archetype count moved 34 → 35 on schedule. Swept
+    `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts (38
+    lesson/tool pages, 39 routes total, 33 registered concepts — read the routes figure off `npm run
+    verify`'s own `39/39 routes clean` output rather than hand-computed, the same lesson item 40
+    flagged), including `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row and its `data/curriculum.ts`
+    row (which still named the now-removed `syllabusOf` in its exports list — caught and fixed
+    while sweeping, not left for a future round to find stale).
+
+    `npm run build` run first (the standing fix for the `dist/`-staleness snag), confirming
+    `Http-CE_PgNn7.js` built and that `Roadmap`'s own chunk got smaller, not bigger, despite the new
+    component. `npm run verify` green after: 39/39 routes, no overflow at any width, 306/306
+    interaction checks, a11y clean with zero regression (35/19, unchanged). `npm run typecheck`
+    clean — including through the `Concept.stage`/`conceptsInStage()` type-widening and the full
+    `Roadmap.tsx` rewrite — and `audit:content` at its 5-artifact baseline (re-verified).
+
+    **Stage 5 now has 1 of 6 concepts built: HTTP.** Five remain (`REST`, `SQL basics`, `Joins`,
+    `Auth`, `Deploy`), plus the capstone project still ahead of it. No stage on the Roadmap is a
+    fully locked placeholder any more — the last one graduated this round. `git status` confirms
+    `Roadmap.tsx` *was* touched this time, deliberately: a real component extraction and a dead-code
+    removal, not the "zero changes" streak items 36-39 reported, because this round is exactly the
+    boundary case that streak's own precedent (item 35, item 34) always said would eventually need
+    one.

@@ -153,6 +153,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'http',
+    title: 'HTTP',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'PUT idempotency, 401 vs. 403, PUT vs. PATCH, and statelessness — predict what the server does, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

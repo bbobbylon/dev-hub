@@ -597,7 +597,44 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('sorting: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts (items 10, 30-40) ── */
+/* ── HTTP: 4 graded predict-the-outcome questions, Stage 5's 1st lesson (item 41) ── */
+await resetProgress()
+await go('/http')
+let ht = await body()
+check('http: starts unanswered', ht.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: "It's identical to sending the request once — PUT is idempotent, so repeating it changes nothing further",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Visitor A gets 401 Unauthorized (no identity to check at all); Visitor B gets 403 Forbidden (a known identity the server is refusing)',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'name: "Bea" and nothing else — the email is gone, because PUT replaces the whole resource with exactly what was sent',
+    exact: true,
+  })
+  .click()
+ht = await body()
+check('http: three correct reaches the pass mark', ht.includes('Score: 3 of 4 correct'))
+check('http: earns completion at the pass mark', await completed('HTTP'))
+await page
+  .getByRole('button', { name: 'It succeeds — the server remembers Ana just logged in', exact: true })
+  .click()
+ht = await body()
+check(
+  'http: a wrong pick still shows the real explanation',
+  ht.includes('never in the browser tab, the connection, or the IP address'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('http: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first (items 10, 30-41) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -623,17 +660,24 @@ check(
     bigOChipCount > 0 &&
     rm.includes('Sorting'),
 )
+// 'HTTP' is checked by exact link match, not a plain substring, matching the same defensive
+// habit 'Big-O' established — no known collision on this page today, but an exact link count
+// can never be fooled by one appearing later, where a substring silently could.
+const httpChipCount = await page.getByRole('link', { name: 'HTTP', exact: true }).count()
+check('roadmap: stage 5 shows its first real concept', httpChipCount > 0)
 check(
-  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built',
-  !rm.includes('not built yet'),
+  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
   'roadmap: stage 4 points at real related lessons',
   rm.includes('Data Structures Visual') && rm.includes('Big-O Performance') && rm.includes('Algorithm Visualizer'),
 )
-check('roadmap: stage 5 points at API Anatomy', rm.includes('API Anatomy'))
-check('roadmap: stage 5 still reads not yet built', (rm.match(/NOT YET BUILT/g) ?? []).length === 1)
+check(
+  'roadmap: stage 5 points at real related lessons',
+  rm.includes('API Anatomy') && rm.includes('Project Build-Along'),
+)
 
 await page.getByRole('link', { name: 'Variables' }).click()
 await page.waitForURL('**/python-variables')
@@ -706,8 +750,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4',
-  !rm.includes('not built yet'),
+  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -725,8 +769,8 @@ rm = await body()
 check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
-  'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  !rm.includes('not built yet'),
+  'roadmap: completing Arrays does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -744,8 +788,8 @@ rm = await body()
 check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes('2 OF 6'))
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
-  'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
-  !rm.includes('not built yet'),
+  'roadmap: completing Hash Maps does not consume a not-built chip either',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -766,8 +810,8 @@ rm = await body()
 check('roadmap: completing Stacks & Queues moves the stage-4 count a third time', rm.includes('3 OF 6'))
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
-  'roadmap: completing Stacks & Queues does not consume a stage-4 not-built chip',
-  !rm.includes('not built yet'),
+  'roadmap: completing Stacks & Queues does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -791,8 +835,8 @@ rm = await body()
 check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.includes('4 OF 6'))
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
-  'roadmap: completing Trees does not consume a stage-4 not-built chip',
-  !rm.includes('not built yet'),
+  'roadmap: completing Trees does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Big-O', exact: true }).click()
@@ -821,8 +865,8 @@ rm = await body()
 check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.includes('5 OF 6'))
 check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
 check(
-  'roadmap: completing Big-O does not consume a stage-4 not-built chip',
-  !rm.includes('not built yet'),
+  'roadmap: completing Big-O does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 await page.getByRole('link', { name: 'Sorting' }).click()
@@ -851,8 +895,38 @@ rm = await body()
 check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
 check(
-  'roadmap: Stage 4 has no not-built chips left once all six are done',
-  !rm.includes('not built yet'),
+  'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'HTTP', exact: true }).click()
+await page.waitForURL('**/http')
+check('roadmap: the HTTP chip really links to the lesson', page.url().endsWith('/http'))
+await page
+  .getByRole('button', {
+    name: "It's identical to sending the request once — PUT is idempotent, so repeating it changes nothing further",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Visitor A gets 401 Unauthorized (no identity to check at all); Visitor B gets 403 Forbidden (a known identity the server is refusing)',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'name: "Bea" and nothing else — the email is gone, because PUT replaces the whole resource with exactly what was sent',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing HTTP moves the stage-5 count', rm.includes('1 OF 6'))
+check('roadmap: it also moves the path total a thirteenth time', rm.includes('13 of 25 concepts'))
+check(
+  "roadmap: completing HTTP does not consume any of stage 5's not-built chips",
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

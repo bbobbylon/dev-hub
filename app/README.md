@@ -120,6 +120,26 @@ than ported from a prototype:
   (Arrays, item 35)" through four rounds of "zero Roadmap.tsx changes" — true for the file's logic,
   never true for that comment after item 36. Corrected it the same way Stage 3's analogous comment
   was corrected when it completed at item 34.
+- **HTTP** (`/http`) — Stage 5's first real page, on a new stage ("APIs & Databases") and the
+  path's first step off pure Python: no snippet to run, just a request (or two) and the real HTTP
+  rule that decides the outcome, three of the four questions landing on a status code rather than
+  a printed value. `PUT` being idempotent — resending an identical request changes nothing further,
+  which is exactly why it's safe to retry automatically and `POST` isn't; `401 Unauthorized` (no
+  identity to check at all — log in) vs `403 Forbidden` (a known identity the server still says no
+  to) — a mix-up `/api-anatomy`'s own status strip labels but never explains; `PUT` silently
+  deleting fields a client didn't resend, because `PUT` replaces the *entire* resource rather than
+  merging in what was sent — the real data-loss bug `PATCH` exists to prevent; and HTTP's
+  statelessness — a login a few seconds ago buys a follow-up request nothing unless it carries its
+  own proof (a cookie, a token), because the protocol has no memory between requests at all.
+  Deliberately skipped the bare verb-to-purpose mapping and 2xx/4xx/5xx families — `/api-anatomy`'s
+  wire-dump-and-decoder-strip already covers that ground as reference material. This is also the
+  round that graduates Stage 5 out of `Roadmap.tsx`'s fully-locked path and into its own dedicated
+  block, the same restructuring `Arrays.tsx` did for Stage 4 at item 35 — except this time, since
+  Stage 5 was the *last* stage that could ever need the locked-stage machinery (`LockedTag`,
+  `NumberNode`'s locked state, `syllabusOf`), that machinery was removed outright rather than left
+  in place rendering nothing. Stages 3-5's near-identical block shape was extracted into a real
+  `PartialStage` component at the same time — the file's own comment had named "stage 5 needs the
+  same shape too" as the exact trigger to do that, back when it was written at item 35.
 
 ## Beyond the mockups
 
@@ -136,7 +156,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 32 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 33 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -147,7 +167,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 34 archetypes. Both have empty states.
+  gallery gained a filter across all 35 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -199,7 +219,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 38 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 39 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -236,8 +256,8 @@ extractor artifacts**, not omissions:
   Scripting had too, 23 once Variables had — that one's bump went missing at the time, caught while
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
-  Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 now that Sorting has) — see
-  `PAGES.length` in `data/pages.ts` for the number that's actually true.
+  Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 now that HTTP
+  has) — see `PAGES.length` in `data/pages.ts` for the number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text
