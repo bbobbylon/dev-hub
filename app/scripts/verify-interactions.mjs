@@ -485,7 +485,39 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('stacks & queues: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, Stage 4's first three (items 10, 30-37) ── */
+/* ── Trees: 4 graded predict-the-value questions, Stage 4's 4th lesson (item 38) ── */
+await resetProgress()
+await go('/trees')
+let tr = await body()
+check('trees: starts unanswered', tr.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: '[1, 2, 3]', exact: true }).click()
+await page
+  .getByRole('button', {
+    name: "AttributeError: 'NoneType' object has no attribute 'left'",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'A straight right-leaning chain — every node has only a right child, five deep',
+    exact: true,
+  })
+  .click()
+tr = await body()
+check('trees: three correct reaches the pass mark', tr.includes('Score: 3 of 4 correct'))
+check('trees: earns completion at the pass mark', await completed('Trees'))
+await page
+  .getByRole('button', { name: 'True — bst_search finds every value in the tree', exact: true })
+  .click()
+tr = await body()
+check(
+  'trees: a wrong pick still shows the real explanation',
+  tr.includes('on the wrong side to ever be found'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('trees: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, Stage 4's first four (items 10, 30-38) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -499,12 +531,15 @@ check(
     rm.includes('Files'),
 )
 check(
-  'roadmap: stage 4 shows all three of its real concepts',
-  rm.includes('Arrays') && rm.includes('Hash Maps') && rm.includes('Stacks & Queues'),
+  'roadmap: stage 4 shows all four of its real concepts',
+  rm.includes('Arrays') &&
+    rm.includes('Hash Maps') &&
+    rm.includes('Stacks & Queues') &&
+    rm.includes('Trees'),
 )
 check(
-  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has three',
-  (rm.match(/not built yet/g) ?? []).length === 3,
+  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has two',
+  (rm.match(/not built yet/g) ?? []).length === 2,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -585,8 +620,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its three',
-  (rm.match(/not built yet/g) ?? []).length === 3,
+  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its two',
+  (rm.match(/not built yet/g) ?? []).length === 2,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -605,7 +640,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 3,
+  (rm.match(/not built yet/g) ?? []).length === 2,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -624,7 +659,7 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 3,
+  (rm.match(/not built yet/g) ?? []).length === 2,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -646,7 +681,32 @@ check('roadmap: completing Stacks & Queues moves the stage-4 count a third time'
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
   'roadmap: completing Stacks & Queues does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 3,
+  (rm.match(/not built yet/g) ?? []).length === 2,
+)
+
+await page.getByRole('link', { name: 'Trees' }).click()
+await page.waitForURL('**/trees')
+check('roadmap: the Trees chip really links to the lesson', page.url().endsWith('/trees'))
+await page.getByRole('button', { name: '[1, 2, 3]', exact: true }).click()
+await page
+  .getByRole('button', {
+    name: "AttributeError: 'NoneType' object has no attribute 'left'",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'A straight right-leaning chain — every node has only a right child, five deep',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.includes('4 OF 6'))
+check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
+check(
+  'roadmap: completing Trees does not consume a stage-4 not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 2,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

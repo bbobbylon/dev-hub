@@ -969,3 +969,90 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     (Trees, Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
     `Roadmap.tsx` was untouched for the second round running — the architecture item 35 built keeps
     proving out as generic enough to carry the rest of Stage 4 without another structural change.
+
+## Found while working (2026-09-19)
+
+38. ~~**Stage 4 had three real concepts (Arrays, Hash Maps, Stacks & Queues); Trees was still an
+    honest placeholder.**~~ — **done 2026-09-19. Third consecutive round confirming item 35's
+    prediction: `Roadmap.tsx` needed zero changes again.** Picked up mid-round after a prior
+    session was cut off by a rate limit (not a real error — since reset) right after the lesson
+    content and all wiring diffs were already written but never verified or committed. Rather than
+    trust that hand-off summary, re-read `Trees.tsx` in full and diffed every wiring file
+    (`App.tsx`, `data/concepts.ts`, `data/curriculum.ts`, `data/pages.ts`, `PageGallery.tsx`,
+    `scripts/routes.mjs`, `scripts/verify-interactions.mjs`) against `HashMaps.tsx`/
+    `StacksQueues.tsx`'s own archetype — all of it was genuinely complete and internally
+    consistent (route, concept entry, curriculum removal, gallery card, archetype count, route
+    registration, and a full dedicated interaction-test block with option-text that actually
+    matches `Trees.tsx`'s own `QUESTIONS` array), so nothing needed rewriting, only verifying.
+    Re-checked `curriculum.ts` first anyway, per the standing rule: Stage 4's `n: 4` entry listed
+    `['Trees', 'Big-O', 'Sorting']`, Trees first, matching the ask. `/trees` ("Trees") is a single
+    word — no casing-footnote needed in `curriculum.ts`'s doc comment, unlike Hash Maps' or Stacks
+    & Queues' own.
+
+    Four gotchas, and the first lesson on this path built on a genuinely recursive structure — every
+    prior Stage 3/4 concept was a flat sequence or mapping, and there's no built-in tree type, so
+    every question defines its own minimal `Node` class the way any two real scripts about trees
+    would: in-order traversal (left, node, right) producing sorted output for a BST, where the exact
+    same tree in pre-order gives a completely different sequence (the explanation draws that
+    contrast rather than spending a second question re-testing "order changes the output" a
+    different way); a recursive `height()` with no base case for `None` raising `AttributeError` on
+    the simplest possible input, a single leaf, rather than overflowing the stack — the single most
+    common bug in a first tree-recursion function, and often the very first error a beginner sees on
+    this topic; inserting already-sorted values into a BST degenerating it into a straight
+    right-leaning chain, an O(log n) structure silently becoming O(n) with no error to announce it,
+    which is why real-world BSTs (AVL, red-black) rebalance themselves and a plain one doesn't
+    promise to; and a BST search trusting an ordering invariant it never actually checks, so a tree
+    built without maintaining that invariant gives a confidently *wrong* negative — not a crash, not
+    an obviously-broken answer, just a value that's really there, silently unreachable by the one
+    search path that assumes it wouldn't be. Deliberately did **not** spend a full question on
+    "mutating a node's children mid-traversal" (one of the coordinator's own candidates) — every
+    clean version tried either wasn't actually buggy (both swap-then-recurse and recurse-then-swap
+    invert a tree correctly) or needed enough scaffolding to set up a real bug that it would have
+    taught less per word than the invariant-violation angle above, which reaches a genuinely
+    surprising, verifiable wrong answer in four honest lines.
+
+    Wired in everywhere Stacks & Queues was: `App.tsx`'s lazy import + route (+ page-count comment,
+    34 → 35), `data/concepts.ts` (`stage: 4`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+    `curriculum.ts`'s `UPCOMING_STAGES` lost `'Trees'` from Stage 4's remaining list (two left now:
+    Big-O, Sorting), and both of its doc comments picked up the same "N concepts now" bump
+    `TOTAL_CONCEPTS`'s own comment has gotten every round since item 35.
+
+    `verify-interactions.mjs` gained a dedicated Trees block mirroring the other nine lessons
+    (starts unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still
+    shows the real explanation, try-again resets), plus the now-familiar Roadmap-block fix: the
+    not-built-chip counts dropped from `3` to `2` in **all three** places they appear, confirmed by
+    grep rather than trusting memory of where item 37 left them. The "stage 4 shows its real
+    concepts" check grew a fourth name (`rm.includes('Trees')`), and the chip-chain gained a tenth
+    step: complete Trees, confirm the stage-4 count reads `"4 OF 6"`, the path total reads
+    `"10 of 25 concepts"`, and the not-built count is *still* exactly 2. Checked the already-written
+    option-text against `Trees.tsx`'s actual `QUESTIONS` array for collisions before trusting the
+    hand-off's clicks — all four matched exactly (`'[1, 2, 3]'`, the `AttributeError` string, the
+    right-leaning-chain string, and the wrong `bst_search` pick with its "on the wrong side" reveal
+    text). 270 → 279 interaction checks (5 dedicated + 4 Roadmap, the same shape every Stage-4 round
+    has had since item 36).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run rather than assumed from the hand-off. The Page Gallery's archetype count
+    moved 31 → 32 on schedule (already correctly written in the uncommitted diff; verified against
+    `PAGES.length`, not just read). Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and
+    `app/README.md`'s route/page/concept counts (36 routes, 35 lesson/tool pages, 30 registered
+    concepts), including `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row again — now naming all
+    four Stage-4 concepts and their item numbers — plus a stale `~34`/`30-file` drift check: the
+    `data/concepts.ts`-row concept count and the "~N screens" figure in the `TOTAL_CONCEPTS` row
+    both needed the same bump every round since item 35 gets them, and both got it; the unrelated
+    "pages/ … 30 files" line in §3's directory tree has been stale since long before this lesson
+    (27 → 30 at some earlier, undated point, never touched by items 35-37 either) and was left alone
+    rather than folded into this round's scope.
+
+    `npm run build` run first (the standing fix for the `dist/`-staleness snag), confirming
+    `Trees-C6R3RaLw.js` built — the exact same chunk hash the interrupted session's last message
+    named, proof the content hadn't drifted across the gap. `npm run verify` green after: 36/36
+    routes, no overflow at any width, 279/279 interaction checks, a11y clean with zero regression
+    (35/19, unchanged — `npm run verify`'s own a11y leg noted it saw 36 routes against a 30-route
+    baseline and compared new pairs only, exactly the mechanism BACKLOG item 26 built for this).
+    `npm run typecheck` clean, `audit:content` at its 5-artifact baseline (re-verified).
+
+    **Stage 4 now has 4 of 6 concepts built: Arrays, Hash Maps, Stacks & Queues, Trees.** Two remain
+    (Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms `Roadmap.tsx`
+    was untouched for the third round running — the architecture item 35 built keeps proving out as
+    generic enough to carry the rest of Stage 4 without another structural change.

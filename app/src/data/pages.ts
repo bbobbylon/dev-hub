@@ -129,6 +129,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'trees',
+    title: 'Trees',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Traversal order, a missing recursion base case, a BST degenerating into a chain, and a broken search invariant — predict what happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
