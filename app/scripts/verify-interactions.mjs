@@ -298,22 +298,386 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('python variables: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap stage 3: one real concept, the rest honestly not-yet-built (item 10) ── */
+/* ── Control Flow: 4 graded predict-the-value questions, Stage 3's 2nd lesson (item 30) ── */
+await resetProgress()
+await go('/control-flow')
+let cf = await body()
+check('control flow: starts unanswered', cf.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+await page.getByRole('button', { name: '6', exact: true }).click()
+// Q2's wrong option and Q3's correct option are both the bare text "3" — Q2's card renders
+// first, so the second match is Q3's.
+await page.getByRole('button', { name: '3', exact: true }).nth(1).click()
+cf = await body()
+check('control flow: three correct reaches the pass mark', cf.includes('Score: 3 of 4 correct'))
+check('control flow: earns completion at the pass mark', await completed('Control Flow'))
+await page.getByRole('button', { name: 'has items', exact: true }).click()
+cf = await body()
+check(
+  'control flow: a wrong pick still shows the real explanation',
+  cf.includes('always falsy'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('control flow: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Functions: 4 graded predict-the-value questions, Stage 3's 3rd lesson (item 31) ── */
+await resetProgress()
+await go('/functions')
+let fn = await body()
+check('functions: starts unanswered', fn.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: "['apple', 'banana']", exact: true }).click()
+await page.getByRole('button', { name: 'Hi, Ana!', exact: true }).click()
+await page.getByRole('button', { name: 'None', exact: true }).click()
+fn = await body()
+check('functions: three correct reaches the pass mark', fn.includes('Score: 3 of 4 correct'))
+check('functions: earns completion at the pass mark', await completed('Functions'))
+await page.getByRole('button', { name: '0', exact: true }).click()
+fn = await body()
+check(
+  'functions: a wrong pick still shows the real explanation',
+  fn.includes('the loop has already finished'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('functions: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Collections: 4 graded predict-the-value questions, Stage 3's 4th lesson (item 32) ── */
+await resetProgress()
+await go('/collections')
+let co = await body()
+check('collections: starts unanswered', co.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: '[1, 2, 3, 4]', exact: true }).click()
+await page
+  .getByRole('button', { name: "TypeError — a tuple can't be changed after it's created", exact: true })
+  .click()
+await page.getByRole('button', { name: "{'a': 3, 'b': 2}", exact: true }).click()
+co = await body()
+check('collections: three correct reaches the pass mark', co.includes('Score: 3 of 4 correct'))
+check('collections: earns completion at the pass mark', await completed('Collections'))
+await page.getByRole('button', { name: 'IndexError — 10 is out of range', exact: true }).click()
+co = await body()
+check(
+  'collections: a wrong pick still shows the real explanation',
+  co.includes('Slicing is forgiving'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('collections: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Errors: 4 graded predict-the-value questions, Stage 3's 5th lesson (item 33) ── */
+await resetProgress()
+await go('/errors')
+let er = await body()
+check('errors: starts unanswered', er.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: '2', exact: true }).click()
+await page.getByRole('button', { name: 'None then None', exact: true }).click()
+await page.getByRole('button', { name: 'recovered, then still running', exact: true }).click()
+er = await body()
+check('errors: three correct reaches the pass mark', er.includes('Score: 3 of 4 correct'))
+check('errors: earns completion at the pass mark', await completed('Errors'))
+await page.getByRole('button', { name: 'specific handler', exact: true }).click()
+er = await body()
+check(
+  'errors: a wrong pick still shows the real explanation',
+  er.includes('dead code that can never fire'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('errors: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Files: 4 graded predict-the-value questions, Stage 3's 6th and final lesson (item 34) ── */
+await resetProgress()
+await go('/files')
+let fi = await body()
+check('files: starts unanswered', fi.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: 'an empty string — the file has nothing in it', exact: true })
+  .click()
+await page.getByRole('button', { name: '3 0', exact: true }).click()
+await page.getByRole('button', { name: 'False', exact: true }).click()
+fi = await body()
+check('files: three correct reaches the pass mark', fi.includes('Score: 3 of 4 correct'))
+check('files: earns completion at the pass mark', await completed('Files'))
+await page
+  .getByRole('button', { name: 'It writes "hello world" to out.txt', exact: true })
+  .click()
+fi = await body()
+check(
+  'files: a wrong pick still shows the real explanation',
+  fi.includes('I/O operation on closed file'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('files: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Arrays: 4 graded predict-the-value questions, Stage 4's 1st lesson (item 35) ── */
+await resetProgress()
+await go('/arrays')
+let ar = await body()
+check('arrays: starts unanswered', ar.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: '[[1, 0, 0], [1, 0, 0], [1, 0, 0]]', exact: true })
+  .click()
+await page.getByRole('button', { name: '[4, 8]', exact: true }).click()
+await page
+  .getByRole('button', { name: 'IndexError — list index out of range', exact: true })
+  .click()
+ar = await body()
+check('arrays: three correct reaches the pass mark', ar.includes('Score: 3 of 4 correct'))
+check('arrays: earns completion at the pass mark', await completed('Arrays'))
+await page.getByRole('button', { name: 'cat', exact: true }).click()
+ar = await body()
+check(
+  'arrays: a wrong pick still shows the real explanation',
+  ar.includes('does not support item assignment'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('arrays: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Hash Maps: 4 graded predict-the-value questions, Stage 4's 2nd lesson (item 36) ── */
+await resetProgress()
+await go('/hash-maps')
+let hm = await body()
+check('hash maps: starts unanswered', hm.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: "TypeError: unhashable type: 'list'", exact: true })
+  .click()
+await page.getByRole('button', { name: "KeyError: 'carol'", exact: true }).click()
+await page
+  .getByRole('button', { name: 'RuntimeError: dictionary changed size during iteration', exact: true })
+  .click()
+hm = await body()
+check('hash maps: three correct reaches the pass mark', hm.includes('Score: 3 of 4 correct'))
+check('hash maps: earns completion at the pass mark', await completed('Hash Maps'))
+await page
+  .getByRole('button', { name: "['a', 'm', 'z'] — dicts sort their keys alphabetically", exact: true })
+  .click()
+hm = await body()
+check(
+  'hash maps: a wrong pick still shows the real explanation',
+  hm.includes('insertion order and sorted order are not the same guarantee'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('hash maps: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Stacks & Queues: 4 graded predict-the-value questions, Stage 4's 3rd lesson (item 37) ── */
+await resetProgress()
+await go('/stacks-queues')
+let sq = await body()
+check('stacks & queues: starts unanswered', sq.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', { name: 'O(n) — every remaining element shifts left by one', exact: true })
+  .click()
+await page
+  .getByRole('button', { name: 'deque([2, 3, 4], maxlen=3) — 1 is silently dropped', exact: true })
+  .click()
+await page.getByRole('button', { name: 'third', exact: true }).click()
+sq = await body()
+check('stacks & queues: three correct reaches the pass mark', sq.includes('Score: 3 of 4 correct'))
+check('stacks & queues: earns completion at the pass mark', await completed('Stacks & Queues'))
+await page
+  .getByRole('button', {
+    name: '"profile" then "home", then history.pop() outside the loop returns None',
+    exact: true,
+  })
+  .click()
+sq = await body()
+check(
+  'stacks & queues: a wrong pick still shows the real explanation',
+  sq.includes('pop from empty list'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('stacks & queues: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Trees: 4 graded predict-the-value questions, Stage 4's 4th lesson (item 38) ── */
+await resetProgress()
+await go('/trees')
+let tr = await body()
+check('trees: starts unanswered', tr.includes('Score: 0 of 4 correct'))
+await page.getByRole('button', { name: '[1, 2, 3]', exact: true }).click()
+await page
+  .getByRole('button', {
+    name: "AttributeError: 'NoneType' object has no attribute 'left'",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'A straight right-leaning chain — every node has only a right child, five deep',
+    exact: true,
+  })
+  .click()
+tr = await body()
+check('trees: three correct reaches the pass mark', tr.includes('Score: 3 of 4 correct'))
+check('trees: earns completion at the pass mark', await completed('Trees'))
+await page
+  .getByRole('button', { name: 'True — bst_search finds every value in the tree', exact: true })
+  .click()
+tr = await body()
+check(
+  'trees: a wrong pick still shows the real explanation',
+  tr.includes('on the wrong side to ever be found'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('trees: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Big-O: 4 graded predict-the-complexity questions, Stage 4's 5th lesson (item 39) ── */
+await resetProgress()
+await go('/big-o')
+let bo = await body()
+check('big-o: starts unanswered', bo.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: "in_list is O(n) — Python may have to check every element before it can say no; in_set is O(1) — one hash computation jumps straight to a bucket",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — the inner loop runs all the way through once for every single pass of the outer loop',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — strings are immutable, so every += builds an entirely new string and copies everything accumulated so far into it',
+    exact: true,
+  })
+  .click()
+bo = await body()
+check('big-o: three correct reaches the pass mark', bo.includes('Score: 3 of 4 correct'))
+check('big-o: earns completion at the pass mark', await completed('Big-O'))
+await page
+  .getByRole('button', {
+    name: "O(n log n) — that's sorting's guaranteed bound, no matter how the input already looks",
+    exact: true,
+  })
+  .click()
+bo = await body()
+check(
+  'big-o: a wrong pick still shows the real explanation',
+  bo.includes('already-sorted input is it'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('big-o: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Sorting: 4 graded predict-the-value questions, Stage 4's 6th and final lesson (item 40) ── */
+await resetProgress()
+await go('/sorting')
+let so = await body()
+check('sorting: starts unanswered', so.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: 'None — sort() sorts nums in place and hands back nothing',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "[('Bo', 25), ('Amy', 30), ('Cy', 30)] — Amy still comes before Cy, since they tie",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "['apple', 'Banana', 'Cherry'] — compared case-insensitively, but returned in their original casing",
+    exact: true,
+  })
+  .click()
+so = await body()
+check('sorting: three correct reaches the pass mark', so.includes('Score: 3 of 4 correct'))
+check('sorting: earns completion at the pass mark', await completed('Sorting'))
+await page
+  .getByRole('button', {
+    name: "[1, 3, 'two'] — Python sorts the numbers first, then appends the strings",
+    exact: true,
+  })
+  .click()
+so = await body()
+check(
+  'sorting: a wrong pick still shows the real explanation',
+  so.includes('forces int and str alike through the same string comparison'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('sorting: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── HTTP: 4 graded predict-the-outcome questions, Stage 5's 1st lesson (item 41) ── */
+await resetProgress()
+await go('/http')
+let ht = await body()
+check('http: starts unanswered', ht.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: "It's identical to sending the request once — PUT is idempotent, so repeating it changes nothing further",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Visitor A gets 401 Unauthorized (no identity to check at all); Visitor B gets 403 Forbidden (a known identity the server is refusing)',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'name: "Bea" and nothing else — the email is gone, because PUT replaces the whole resource with exactly what was sent',
+    exact: true,
+  })
+  .click()
+ht = await body()
+check('http: three correct reaches the pass mark', ht.includes('Score: 3 of 4 correct'))
+check('http: earns completion at the pass mark', await completed('HTTP'))
+await page
+  .getByRole('button', { name: 'It succeeds — the server remembers Ana just logged in', exact: true })
+  .click()
+ht = await body()
+check(
+  'http: a wrong pick still shows the real explanation',
+  ht.includes('never in the browser tab, the connection, or the IP address'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('http: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first (items 10, 30-41) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
-check('roadmap: stage 3 shows its one real concept', rm.includes('Variables'))
 check(
-  'roadmap: stage 3 lists the rest as not built yet',
-  rm.includes('Control flow') && rm.includes('not built yet'),
+  'roadmap: stage 3 shows all six real concepts',
+  rm.includes('Variables') &&
+    rm.includes('Control Flow') &&
+    rm.includes('Functions') &&
+    rm.includes('Collections') &&
+    rm.includes('Errors') &&
+    rm.includes('Files'),
+)
+// 'Big-O' is checked by exact link match, not a plain substring — the page's own Stage 4
+// "related" links already print "Big-O Performance", which would make rm.includes('Big-O')
+// pass even if the concept chip itself never rendered.
+const bigOChipCount = await page.getByRole('link', { name: 'Big-O', exact: true }).count()
+check(
+  'roadmap: stage 4 shows all six of its real concepts',
+  rm.includes('Arrays') &&
+    rm.includes('Hash Maps') &&
+    rm.includes('Stacks & Queues') &&
+    rm.includes('Trees') &&
+    bigOChipCount > 0 &&
+    rm.includes('Sorting'),
+)
+// 'HTTP' is checked by exact link match, not a plain substring, matching the same defensive
+// habit 'Big-O' established — no known collision on this page today, but an exact link count
+// can never be fooled by one appearing later, where a substring silently could.
+const httpChipCount = await page.getByRole('link', { name: 'HTTP', exact: true }).count()
+check('roadmap: stage 5 shows its first real concept', httpChipCount > 0)
+check(
+  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
   'roadmap: stage 4 points at real related lessons',
   rm.includes('Data Structures Visual') && rm.includes('Big-O Performance') && rm.includes('Algorithm Visualizer'),
 )
-check('roadmap: stage 5 points at API Anatomy', rm.includes('API Anatomy'))
-check('roadmap: stage 4 and 5 still read not yet built', (rm.match(/NOT YET BUILT/g) ?? []).length === 2)
+check(
+  'roadmap: stage 5 points at real related lessons',
+  rm.includes('API Anatomy') && rm.includes('Project Build-Along'),
+)
 
 await page.getByRole('link', { name: 'Variables' }).click()
 await page.waitForURL('**/python-variables')
@@ -325,6 +689,245 @@ await go('/roadmap')
 rm = await body()
 check('roadmap: completing it moves the stage-3 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total', rm.includes('1 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Control Flow' }).click()
+await page.waitForURL('**/control-flow')
+check('roadmap: the Control Flow chip really links to the lesson', page.url().endsWith('/control-flow'))
+await page.getByRole('button', { name: 'B', exact: true }).click()
+await page.getByRole('button', { name: '6', exact: true }).click()
+// Same "3"/"3" collision as the dedicated block above — Q3's is the second match.
+await page.getByRole('button', { name: '3', exact: true }).nth(1).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing both moves the stage-3 count again', rm.includes('2 OF 6'))
+check('roadmap: it also moves the path total again', rm.includes('2 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Functions' }).click()
+await page.waitForURL('**/functions')
+check('roadmap: the Functions chip really links to the lesson', page.url().endsWith('/functions'))
+await page.getByRole('button', { name: "['apple', 'banana']", exact: true }).click()
+await page.getByRole('button', { name: 'Hi, Ana!', exact: true }).click()
+await page.getByRole('button', { name: 'None', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all three moves the stage-3 count a third time', rm.includes('3 OF 6'))
+check('roadmap: it also moves the path total a third time', rm.includes('3 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Collections' }).click()
+await page.waitForURL('**/collections')
+check('roadmap: the Collections chip really links to the lesson', page.url().endsWith('/collections'))
+await page.getByRole('button', { name: '[1, 2, 3, 4]', exact: true }).click()
+await page
+  .getByRole('button', { name: "TypeError — a tuple can't be changed after it's created", exact: true })
+  .click()
+await page.getByRole('button', { name: "{'a': 3, 'b': 2}", exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all four moves the stage-3 count a fourth time', rm.includes('4 OF 6'))
+check('roadmap: it also moves the path total a fourth time', rm.includes('4 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Errors' }).click()
+await page.waitForURL('**/errors')
+check('roadmap: the Errors chip really links to the lesson', page.url().endsWith('/errors'))
+await page.getByRole('button', { name: '2', exact: true }).click()
+await page.getByRole('button', { name: 'None then None', exact: true }).click()
+await page.getByRole('button', { name: 'recovered, then still running', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all five moves the stage-3 count a fifth time', rm.includes('5 OF 6'))
+check('roadmap: it also moves the path total a fifth time', rm.includes('5 of 25 concepts'))
+
+await page.getByRole('link', { name: 'Files' }).click()
+await page.waitForURL('**/files')
+check('roadmap: the Files chip really links to the lesson', page.url().endsWith('/files'))
+await page
+  .getByRole('button', { name: 'an empty string — the file has nothing in it', exact: true })
+  .click()
+await page.getByRole('button', { name: '3 0', exact: true }).click()
+await page.getByRole('button', { name: 'False', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
+check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
+check(
+  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Arrays' }).click()
+await page.waitForURL('**/arrays')
+check('roadmap: the Arrays chip really links to the lesson', page.url().endsWith('/arrays'))
+await page
+  .getByRole('button', { name: '[[1, 0, 0], [1, 0, 0], [1, 0, 0]]', exact: true })
+  .click()
+await page.getByRole('button', { name: '[4, 8]', exact: true }).click()
+await page
+  .getByRole('button', { name: 'IndexError — list index out of range', exact: true })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'))
+check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
+check(
+  'roadmap: completing Arrays does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Hash Maps' }).click()
+await page.waitForURL('**/hash-maps')
+check('roadmap: the Hash Maps chip really links to the lesson', page.url().endsWith('/hash-maps'))
+await page
+  .getByRole('button', { name: "TypeError: unhashable type: 'list'", exact: true })
+  .click()
+await page.getByRole('button', { name: "KeyError: 'carol'", exact: true }).click()
+await page
+  .getByRole('button', { name: 'RuntimeError: dictionary changed size during iteration', exact: true })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes('2 OF 6'))
+check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
+check(
+  'roadmap: completing Hash Maps does not consume a not-built chip either',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Stacks & Queues' }).click()
+await page.waitForURL('**/stacks-queues')
+check(
+  'roadmap: the Stacks & Queues chip really links to the lesson',
+  page.url().endsWith('/stacks-queues'),
+)
+await page
+  .getByRole('button', { name: 'O(n) — every remaining element shifts left by one', exact: true })
+  .click()
+await page
+  .getByRole('button', { name: 'deque([2, 3, 4], maxlen=3) — 1 is silently dropped', exact: true })
+  .click()
+await page.getByRole('button', { name: 'third', exact: true }).click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Stacks & Queues moves the stage-4 count a third time', rm.includes('3 OF 6'))
+check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
+check(
+  'roadmap: completing Stacks & Queues does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Trees' }).click()
+await page.waitForURL('**/trees')
+check('roadmap: the Trees chip really links to the lesson', page.url().endsWith('/trees'))
+await page.getByRole('button', { name: '[1, 2, 3]', exact: true }).click()
+await page
+  .getByRole('button', {
+    name: "AttributeError: 'NoneType' object has no attribute 'left'",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'A straight right-leaning chain — every node has only a right child, five deep',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.includes('4 OF 6'))
+check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
+check(
+  'roadmap: completing Trees does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Big-O', exact: true }).click()
+await page.waitForURL('**/big-o')
+check('roadmap: the Big-O chip really links to the lesson', page.url().endsWith('/big-o'))
+await page
+  .getByRole('button', {
+    name: "in_list is O(n) — Python may have to check every element before it can say no; in_set is O(1) — one hash computation jumps straight to a bucket",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — the inner loop runs all the way through once for every single pass of the outer loop',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — strings are immutable, so every += builds an entirely new string and copies everything accumulated so far into it',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.includes('5 OF 6'))
+check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
+check(
+  'roadmap: completing Big-O does not consume a not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'Sorting' }).click()
+await page.waitForURL('**/sorting')
+check('roadmap: the Sorting chip really links to the lesson', page.url().endsWith('/sorting'))
+await page
+  .getByRole('button', {
+    name: 'None — sort() sorts nums in place and hands back nothing',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "[('Bo', 25), ('Amy', 30), ('Cy', 30)] — Amy still comes before Cy, since they tie",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "['apple', 'Banana', 'Cherry'] — compared case-insensitively, but returned in their original casing",
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes('6 OF 6'))
+check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
+check(
+  'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has five',
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
+
+await page.getByRole('link', { name: 'HTTP', exact: true }).click()
+await page.waitForURL('**/http')
+check('roadmap: the HTTP chip really links to the lesson', page.url().endsWith('/http'))
+await page
+  .getByRole('button', {
+    name: "It's identical to sending the request once — PUT is idempotent, so repeating it changes nothing further",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Visitor A gets 401 Unauthorized (no identity to check at all); Visitor B gets 403 Forbidden (a known identity the server is refusing)',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'name: "Bea" and nothing else — the email is gone, because PUT replaces the whole resource with exactly what was sent',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing HTTP moves the stage-5 count', rm.includes('1 OF 6'))
+check('roadmap: it also moves the path total a thirteenth time', rm.includes('13 of 25 concepts'))
+check(
+  "roadmap: completing HTTP does not consume any of stage 5's not-built chips",
+  (rm.match(/not built yet/g) ?? []).length === 5,
+)
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */
 // Client-side routing changes the URL before React commits the new DOM, so
@@ -465,7 +1068,7 @@ check('search: non-matches are hidden', !searched.includes('Shell Scripting'))
 await page.getByLabel('Search concepts').fill('zzzz')
 check('search: empty state explains itself', (await body()).includes('Nothing matches'))
 
-// Gallery filter across all 23 archetypes.
+// Gallery filter across all 26 archetypes.
 await go('/')
 await page.getByLabel('Filter pages').fill('dark')
 const gallery = await body()

@@ -111,7 +111,15 @@ export function CodeListing({
                 width: gutterWidth,
                 textAlign: 'right',
                 paddingRight: 14,
-                color: 'var(--color-neutral-600)',
+                // -600 reads fine as a muted step on a *light* ground (the
+                // rule the -700 ramp pass applied everywhere else), but this
+                // gutter sits on the dark --color-neutral-900 pane above, and
+                // darkening further would only fail harder — the dark-ground
+                // case needs a *lighter* explicit step instead, same idea as
+                // .topnav-dark's own override. -500 is the least-lightened
+                // step that still clears 4.5:1 here (4.9:1), matching the
+                // chrome bar's "note" text right above at the same weight.
+                color: 'var(--color-neutral-500)',
                 flex: 'none',
               }}
             >

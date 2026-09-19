@@ -19,12 +19,24 @@ import { CommandPalette } from './components/CommandPalette'
 import PageGallery from './pages/PageGallery'
 import NotFound from './pages/NotFound'
 
-// Lazy: the 26 page-sized lessons/tools. A visit only ever needs a handful of
+// Lazy: the 38 page-sized lessons/tools. A visit only ever needs a handful of
 // these, so there's no reason to ship all of them in the initial bundle.
 const DevHub = lazy(() => import('./pages/DevHub'))
 const CliBasics = lazy(() => import('./pages/CliBasics'))
 const ShellScripting = lazy(() => import('./pages/ShellScripting'))
 const PythonVariables = lazy(() => import('./pages/PythonVariables'))
+const ControlFlow = lazy(() => import('./pages/ControlFlow'))
+const Functions = lazy(() => import('./pages/Functions'))
+const Collections = lazy(() => import('./pages/Collections'))
+const Errors = lazy(() => import('./pages/Errors'))
+const Files = lazy(() => import('./pages/Files'))
+const Arrays = lazy(() => import('./pages/Arrays'))
+const HashMaps = lazy(() => import('./pages/HashMaps'))
+const StacksQueues = lazy(() => import('./pages/StacksQueues'))
+const Trees = lazy(() => import('./pages/Trees'))
+const BigO = lazy(() => import('./pages/BigO'))
+const Sorting = lazy(() => import('./pages/Sorting'))
+const Http = lazy(() => import('./pages/Http'))
 const DecoratorPattern = lazy(() => import('./pages/DecoratorPattern'))
 const VideoLesson = lazy(() => import('./pages/VideoLesson'))
 const ArchitectureDeepDive = lazy(() => import('./pages/ArchitectureDeepDive'))
@@ -85,6 +97,18 @@ export default function App() {
             <Route path="/cli-basics" element={<CliBasics />} />
             <Route path="/shell-scripting" element={<ShellScripting />} />
             <Route path="/python-variables" element={<PythonVariables />} />
+            <Route path="/control-flow" element={<ControlFlow />} />
+            <Route path="/functions" element={<Functions />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/errors" element={<Errors />} />
+            <Route path="/files" element={<Files />} />
+            <Route path="/arrays" element={<Arrays />} />
+            <Route path="/hash-maps" element={<HashMaps />} />
+            <Route path="/stacks-queues" element={<StacksQueues />} />
+            <Route path="/trees" element={<Trees />} />
+            <Route path="/big-o" element={<BigO />} />
+            <Route path="/sorting" element={<Sorting />} />
+            <Route path="/http" element={<Http />} />
             <Route path="/decorator-pattern" element={<DecoratorPattern />} />
             <Route path="/video-lesson" element={<VideoLesson />} />
             <Route path="/architecture-deep-dive" element={<ArchitectureDeepDive />} />

@@ -36,9 +36,9 @@ export interface Concept {
   label: string
   /** Route that teaches it, or `undefined` when the path names a concept this app has no page for. */
   route?: string
-  /** Roadmap stage (1-3 have at least one built concept; 4-5 are still locked placeholders), or
-   *  `null` when off the path. */
-  stage: 1 | 2 | 3 | null
+  /** Roadmap stage (1-5 each have at least one built concept now — stage 3 and stage 4 all six of
+   *  their own), or `null` when off the path. */
+  stage: 1 | 2 | 3 | 4 | 5 | null
   /** What records it — prose for the next reader, kept in step with the page's `<ConceptComplete>`. */
   earnedBy: string
 }
@@ -100,13 +100,101 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'stepping the rebase walkthrough to its last frame',
   },
 
-  // ── Stage 3 · A First Language: Python (one concept built so far) ──────
+  // ── Stage 3 · A First Language: Python (all six concepts built) ────────
   {
     slug: 'python-variables',
     label: 'Variables',
     route: '/python-variables',
     stage: 3,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'control-flow',
+    label: 'Control Flow',
+    route: '/control-flow',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'functions',
+    label: 'Functions',
+    route: '/functions',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'collections',
+    label: 'Collections',
+    route: '/collections',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'errors',
+    label: 'Errors',
+    route: '/errors',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'files',
+    label: 'Files',
+    route: '/files',
+    stage: 3,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+
+  // ── Stage 4 · Data Structures & Algorithms (all six concepts built)
+  {
+    slug: 'arrays',
+    label: 'Arrays',
+    route: '/arrays',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'hash-maps',
+    label: 'Hash Maps',
+    route: '/hash-maps',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'stacks-queues',
+    label: 'Stacks & Queues',
+    route: '/stacks-queues',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'trees',
+    label: 'Trees',
+    route: '/trees',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'big-o',
+    label: 'Big-O',
+    route: '/big-o',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+  {
+    slug: 'sorting',
+    label: 'Sorting',
+    route: '/sorting',
+    stage: 4,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
+  },
+
+  // ── Stage 5 · APIs & Databases (one concept built so far)
+  {
+    slug: 'http',
+    label: 'HTTP',
+    route: '/http',
+    stage: 5,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
   },
 
   // ── Off the five-stage path ─────────────────────────────────────────────
@@ -212,7 +300,7 @@ export const CONCEPT_BY_SLUG: Record<string, Concept> = Object.fromEntries(
 export const PATH_CONCEPTS = CONCEPTS.filter((c) => c.stage !== null)
 
 /** The concepts a given built Roadmap stage lists, in chip order. */
-export function conceptsInStage(stage: 1 | 2 | 3): Concept[] {
+export function conceptsInStage(stage: 1 | 2 | 3 | 4 | 5): Concept[] {
   return CONCEPTS.filter((c) => c.stage === stage)
 }
 
