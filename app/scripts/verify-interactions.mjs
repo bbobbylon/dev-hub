@@ -517,7 +517,47 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('trees: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, Stage 4's first four (items 10, 30-38) ── */
+/* ── Big-O: 4 graded predict-the-complexity questions, Stage 4's 5th lesson (item 39) ── */
+await resetProgress()
+await go('/big-o')
+let bo = await body()
+check('big-o: starts unanswered', bo.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: "in_list is O(n) — Python may have to check every element before it can say no; in_set is O(1) — one hash computation jumps straight to a bucket",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — the inner loop runs all the way through once for every single pass of the outer loop',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — strings are immutable, so every += builds an entirely new string and copies everything accumulated so far into it',
+    exact: true,
+  })
+  .click()
+bo = await body()
+check('big-o: three correct reaches the pass mark', bo.includes('Score: 3 of 4 correct'))
+check('big-o: earns completion at the pass mark', await completed('Big-O'))
+await page
+  .getByRole('button', {
+    name: "O(n log n) — that's sorting's guaranteed bound, no matter how the input already looks",
+    exact: true,
+  })
+  .click()
+bo = await body()
+check(
+  'big-o: a wrong pick still shows the real explanation',
+  bo.includes('already-sorted input is it'),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('big-o: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, Stage 4's first five (items 10, 30-39) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -530,16 +570,21 @@ check(
     rm.includes('Errors') &&
     rm.includes('Files'),
 )
+// 'Big-O' is checked by exact link match, not a plain substring — the page's own Stage 4
+// "related" links already print "Big-O Performance", which would make rm.includes('Big-O')
+// pass even if the concept chip itself never rendered.
+const bigOChipCount = await page.getByRole('link', { name: 'Big-O', exact: true }).count()
 check(
-  'roadmap: stage 4 shows all four of its real concepts',
+  'roadmap: stage 4 shows all five of its real concepts',
   rm.includes('Arrays') &&
     rm.includes('Hash Maps') &&
     rm.includes('Stacks & Queues') &&
-    rm.includes('Trees'),
+    rm.includes('Trees') &&
+    bigOChipCount > 0,
 )
 check(
-  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has two',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  'roadmap: stage 3 has nothing left not-yet-built; stage 4 still has one',
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -620,8 +665,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its two',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  'roadmap: Stage 3 has no not-built chips left; Stage 4 still has its one',
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -640,7 +685,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -659,7 +704,7 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a stage-4 not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -681,7 +726,7 @@ check('roadmap: completing Stacks & Queues moves the stage-4 count a third time'
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
   'roadmap: completing Stacks & Queues does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -706,7 +751,37 @@ check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.incl
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
   'roadmap: completing Trees does not consume a stage-4 not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
+)
+
+await page.getByRole('link', { name: 'Big-O', exact: true }).click()
+await page.waitForURL('**/big-o')
+check('roadmap: the Big-O chip really links to the lesson', page.url().endsWith('/big-o'))
+await page
+  .getByRole('button', {
+    name: "in_list is O(n) — Python may have to check every element before it can say no; in_set is O(1) — one hash computation jumps straight to a bucket",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — the inner loop runs all the way through once for every single pass of the outer loop',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'It becomes O(n²) — strings are immutable, so every += builds an entirely new string and copies everything accumulated so far into it',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.includes('5 OF 6'))
+check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
+check(
+  'roadmap: completing Big-O does not consume a stage-4 not-built chip',
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

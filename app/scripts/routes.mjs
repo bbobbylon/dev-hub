@@ -30,6 +30,7 @@ export const ROUTES = [
   '/hash-maps',
   '/stacks-queues',
   '/trees',
+  '/big-o',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

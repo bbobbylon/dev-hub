@@ -137,6 +137,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'big-o',
+    title: 'Big-O',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'List vs. set membership, nested loops, string concatenation, and Timsort on already-sorted input — predict the complexity, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

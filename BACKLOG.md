@@ -1056,3 +1056,83 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     (Big-O, Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms `Roadmap.tsx`
     was untouched for the third round running — the architecture item 35 built keeps proving out as
     generic enough to carry the rest of Stage 4 without another structural change.
+
+39. ~~**Stage 4 had four real concepts (Arrays, Hash Maps, Stacks & Queues, Trees); Big-O was
+    still an honest placeholder.**~~ — **done 2026-09-19. Fourth consecutive round confirming
+    item 35's prediction: `Roadmap.tsx` needed zero changes again.** Re-checked `curriculum.ts`
+    first: Stage 4's `n: 4` entry listed `['Big-O', 'Sorting']`, Big-O first, matching the ask.
+    Added `/big-o` ("Big-O") — the hyphen was already in the design's own placeholder, so the
+    route just lower-cases it, no ampersand or casing footnote needed. Deliberately distinct from
+    the existing off-path `Big-O Performance` → `big-o-performance` (`related` link, a static
+    chart-and-table reference page, not a graded lesson, and not part of `conceptsInStage(4)`'s
+    count) — checked both `App.tsx` and `data/concepts.ts` for a name collision before adding
+    anything, found none.
+
+    A genuinely different shape of question from every lesson before it: rather than predict a
+    printed value, each of the four asks the learner to name a complexity class — the same
+    multiple-choice-of-growth-rates format Stacks & Queues' own first question (`list.pop(0)`'s
+    O(n) cost) already used once, now the whole lesson's format. Four mechanisms, none overlapping
+    a prior lesson: `x in a_list` walking element by element (O(n), worst case touching everything)
+    versus `x in a_set` computing one hash and jumping straight to a bucket (O(1)) — the same
+    hash-table mechanism Hash Maps' own unhashable-list question ran into from the opposite side,
+    now named explicitly in Big-O terms rather than left implicit, and the exact contrast the
+    coordinator's own candidate list asked to be "extended explicitly to complexity terms"; two
+    nested loops multiplying their costs rather than adding them, so a function built from two
+    individually-ordinary-looking `for` loops is O(n²), not O(n) — the "each loop looks small" trap
+    named directly in the prompt, with a callback to the previous question's set trick as the
+    genuinely-O(n) fix; string concatenation inside a loop being O(n²) in total because a Python
+    `str` is immutable and every `+=` copies everything accumulated so far into a brand-new string,
+    contrasted with `''.join()`'s genuinely O(n) single-pass-and-copy — the same string immutability
+    Arrays' own indexing question already established, now shown to have a second, costlier
+    consequence; and `list.sort()`/`sorted()` being O(n log n) as one of the most confidently
+    memorized rules in the whole topic, with a real, narrow exception: Timsort's actual best case is
+    O(n) on input that's already one sorted run, which an already-sorted list always is. Deliberately
+    did **not** spend a question on `list.pop(0)`'s O(n) cost or `deque.popleft()`'s O(1) fix —
+    Stacks & Queues already taught that exact contrast in this exact vocabulary; repeating it here
+    would have taught the same fact a second time wearing a Big-O label instead of a fourth
+    genuinely new one.
+
+    Wired in everywhere Trees was: `App.tsx`'s lazy import + route (+ page-count comment, 35 → 36),
+    `data/concepts.ts` (`stage: 4`), `data/pages.ts`'s gallery card, `scripts/routes.mjs`.
+    `curriculum.ts`'s `UPCOMING_STAGES` lost `'Big-O'` from Stage 4's remaining list (one left now:
+    Sorting), and both of its doc comments picked up the same "N concepts now" bump `TOTAL_CONCEPTS`'s
+    own comment has gotten every round since item 35.
+
+    `verify-interactions.mjs` gained a dedicated Big-O block mirroring the other ten lessons (starts
+    unanswered, three-correct reaches the pass mark, earns completion, a wrong pick still shows the
+    real explanation, try-again resets), plus the now-familiar Roadmap-block fix — this time a real
+    subtlety, not just a number bump: Stage 4's own related-links list already prints the text
+    "Big-O Performance" on the same Roadmap page, so a plain `rm.includes('Big-O')` substring check
+    would have passed even if the Big-O concept chip itself never rendered. Used an exact-match
+    `page.getByRole('link', { name: 'Big-O', exact: true })` count instead, and left a comment
+    explaining why, rather than let a coincidental substring collision quietly weaken the check the
+    way `.nth()` collisions have been called out before. The not-built-chip count dropped from `2`
+    to `1` in **all seven** places it appears — one more site than any prior round, since Big-O was
+    itself one of the two concepts that count was tracking — confirmed by grep rather than trusting
+    memory of where item 38 left them. The "stage 4 shows its real concepts" check grew a fifth
+    name via that same exact-link check, and the Trees chip-chain step gained an eleventh: complete
+    Big-O, confirm the stage-4 count reads `"5 OF 6"`, the path total reads `"11 of 25 concepts"`,
+    and the not-built count is *still* exactly 1. Checked all twelve option strings across the four
+    questions for collisions, both against each other and against the Stage-4 related-links text,
+    before writing the clicks. 279 → 288 interaction checks (5 dedicated + 4 Roadmap, the same shape
+    every Stage-4 round has had since item 36).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run. The Page Gallery's archetype count moved 32 → 33 on schedule. Swept
+    `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts — this
+    round's actual `npm run verify` output (`37/37 routes clean`) caught that the routes total had
+    already ticked over from the figure written down mid-round (36) to 37 by the time Big-O's route
+    was live, a reminder to read the count off the tool's own output rather than compute it by hand
+    (36 lesson/tool pages, 37 routes total, 31 registered concepts), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row again — now naming all five Stage-4 concepts
+    and their item numbers.
+
+    `npm run build` run first (the standing fix for the `dist/`-staleness snag), confirming
+    `BigO-d5d52y7e.js` built. `npm run verify` green after: 37/37 routes, no overflow at any width,
+    288/288 interaction checks, a11y clean with zero regression (35/19, unchanged). `npm run
+    typecheck` clean, `audit:content` at its 5-artifact baseline (re-verified).
+
+    **Stage 4 now has 5 of 6 concepts built: Arrays, Hash Maps, Stacks & Queues, Trees, Big-O.** One
+    remains (Sorting), plus Stage 5 still fully unbuilt behind it. `git status` confirms
+    `Roadmap.tsx` was untouched for the fourth round running — the architecture item 35 built keeps
+    proving out as generic enough to carry the rest of Stage 4 without another structural change.
