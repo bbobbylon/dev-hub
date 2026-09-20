@@ -169,6 +169,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'sql-basics',
+    title: 'SQL Basics',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'NULL vs. a real value, DELETE with no WHERE clause, COUNT(*) vs. COUNT(column), and WHERE vs. HAVING — predict what the query actually does, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

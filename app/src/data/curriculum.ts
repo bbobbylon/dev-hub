@@ -86,8 +86,17 @@ import { PATH_CONCEPTS } from './concepts'
  * Stage-5-only feature for a single sentence wasn't worth it when `related` already does the same
  * job: `Project Build-Along` (the app's one capstone-shaped concept, `stage: null` in
  * `data/concepts.ts`) was added there instead, alongside `API Anatomy`, so the pointer survives
- * through the same, already-proven mechanism rather than a new one-off feature. Four remain
- * (`SQL basics`, `Joins`, `Auth`, `Deploy`).
+ * through the same, already-proven mechanism rather than a new one-off feature.
+ *
+ * **Stage 5 has three real concepts now** — `SQL Basics` → `sql-basics` (item 43; the design's own
+ * placeholder wrote it lower-case, "SQL basics", one of four items in a single placeholder string
+ * — the same distinction every other multi-word built label has drawn against its own design
+ * placeholder — while the built page titles it "SQL Basics", keeping the acronym's real-world
+ * capitalization the way `HTTP`/`REST` did for their own). Unlike HTTP-then-REST, this round had no
+ * prior SQL content on the path to build on or avoid repeating — the site had never taught SQL
+ * before — so its four questions were scoped to stay single-table on purpose, leaving `Joins`, the
+ * very next name below, real ground still to cover rather than a rerun. Three remain (`Joins`,
+ * `Auth`, `Deploy`).
  */
 export const UPCOMING_STAGES = [
   {
@@ -114,11 +123,11 @@ export const UPCOMING_STAGES = [
   {
     n: 5,
     title: '5 · APIs & Databases',
-    // Same story again — not fully built yet (four of six remain), but no longer "not yet built"
-    // either, now that HTTP and REST are real. Matches the exact 'IN PROGRESS' value Stage 4's own
-    // entry held from item 35 through item 39, before it became 'BUILT' at item 40.
+    // Same story again — not fully built yet (three of six remain), but no longer "not yet built"
+    // either, now that HTTP, REST and SQL Basics are real. Matches the exact 'IN PROGRESS' value
+    // Stage 4's own entry held from item 35 through item 39, before it became 'BUILT' at item 40.
     lock: 'IN PROGRESS',
-    concepts: ['SQL basics', 'Joins', 'Auth', 'Deploy'],
+    concepts: ['Joins', 'Auth', 'Deploy'],
     related: [
       { label: 'API Anatomy', route: '/api-anatomy' },
       { label: 'Project Build-Along', route: '/project-build-along' },
@@ -131,7 +140,7 @@ export const UPCOMING_STAGES = [
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
  * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 fully built, stage 5 one concept in, as of item 41).
+ * built, stage 3 fully built, stage 4 fully built, stage 5 three concepts in, as of item 43).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

@@ -1439,3 +1439,98 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     `Auth`, `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no
     further change this round — `PartialStage`, extracted at item 41 specifically so a later
     Stage-5 concept wouldn't need one, held up on its very first use.
+
+43. ~~**Stage 5's third concept, SQL basics, was still an honest placeholder** (`['SQL basics',
+    'Joins', 'Auth', 'Deploy']` was all that remained of Stage 5's original six-item syllabus once
+    HTTP and REST shipped at items 41-42).~~ — **done 2026-09-20.** Confirmed the exact next item
+    against `BACKLOG.md`'s own most recent entries first, per the standing rule, then re-read
+    `curriculum.ts` fresh rather than trusting the task hand-off's own summary: Stage 5's `n: 5`
+    entry listed `['SQL basics', 'Joins', 'Auth', 'Deploy']`, SQL basics first, confirming both the
+    list and the order. Grepped `src/pages/` and `src/data/` for "SQL" before writing a line of
+    lesson content, per the standing instruction — the only hit was `curriculum.ts`'s own
+    placeholder string, so this is genuinely new subject matter on the path, not a duplicate of an
+    existing page.
+
+    **No prior lesson to build on or avoid repeating, unlike REST building on HTTP — so the scoping
+    decision was what to leave OUT, not what not to re-teach.** `Joins` is the very next name in
+    Stage 5's own remaining syllabus, so every one of the four questions was kept deliberately
+    single-table: no `JOIN` appears anywhere in any of the four `.sql` listings, so that lesson
+    still has real, untaught ground to stand on rather than a rerun of this one. Four gotchas, all
+    built around the same throughline — SQL fails silently far more often than it errors loudly,
+    a genuinely different kind of trap than anything HTTP or REST taught, where a wrong verb or a
+    missing header is at least visible in the response: **NULL comparison** — `WHERE phone = NULL`
+    matches zero rows, not the rows where `phone` really is NULL, because SQL's three-valued logic
+    means any comparison *to* NULL (even `NULL = NULL`) evaluates to UNKNOWN rather than TRUE, and
+    a `WHERE` clause drops an UNKNOWN row exactly like a FALSE one, silently, with no error to say
+    the query could never have matched anything — the fix is `IS NULL`, a different operator
+    entirely, not a different value; **`DELETE`/`UPDATE` with no `WHERE` clause** — the clause isn't
+    optional syntax narrowing an already-scoped statement, it's the only thing that ever scopes one,
+    so leaving it off targets every row in the table, no confirmation asked and no partial-credit
+    guess at what you probably meant; **`COUNT(*)` vs. `COUNT(column)`** — `COUNT(*)` counts every
+    row regardless of content, while `COUNT(column)` (like every other aggregate — `SUM`, `AVG`,
+    `MAX`, `MIN`) silently skips rows where that column is NULL, the first question's NULL-skipping
+    rule resurfacing in a completely different kind of statement; and **`WHERE` vs. `HAVING`** — SQL
+    has a real, fixed logical processing order (`FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT`
+    → `ORDER BY`) that doesn't match the order the clauses are typed in, so `WHERE COUNT(*) > 3` is
+    a genuine error in every mainstream engine, since `WHERE` runs before grouping even happens and
+    there's no aggregate value yet to compare against — `HAVING` exists specifically to filter after
+    aggregation, deliberately revisiting `WHERE`'s row-by-row job from the second question, but from
+    the "which clause can even see this value" angle, the same kind of second look REST's own fourth
+    question took at `PUT`'s idempotency from HTTP's first. `filename`s here switch to `.sql` files
+    rather than `.http` transcripts — a new code-listing convention for a new kind of code, the same
+    call `/http` made switching from Python snippets to wire-format requests in the first place;
+    `syn.kw` colors SQL keywords, `syn.fn` colors aggregate function calls (`COUNT(*)`), `syn.str`
+    colors string literals, and `syn.cm` carries each scenario's own `--` comment.
+
+    Wired in everywhere REST was: `App.tsx`'s lazy import + route (+ page-count comment, 39 → 40),
+    `scripts/routes.mjs`, `data/pages.ts`'s gallery card, `data/concepts.ts` (`stage: 5`, folded
+    into the existing "Stage 5 · APIs & Databases" section header rather than a new one), and
+    `PageGallery.tsx`'s archetype count (36 → 37). **Verified the array edit, not just the comment,
+    before running anything** — the standing instruction called out that a prior round in this
+    session shipped exactly this bug (editing `curriculum.ts`'s doc-comment prose while leaving the
+    stale entry in the `concepts` array itself), so this round ran the throwaway `npx tsx -e` script
+    up front, immediately after the edit, rather than after a failing test caught it: printed
+    `PATH_CONCEPTS.length` (22), the `UPCOMING_STAGES` sum (3), and `TOTAL_CONCEPTS` (25) directly
+    from the real modules, confirming the array itself had actually lost `'SQL basics'` rather than
+    trusting the prose above it said so. **A second stale comment caught the same way — by rereading
+    the file rather than assuming a prior round's sweep was complete** — `Roadmap.tsx`'s own JSX
+    comment above the stage-5 `PartialStage` call still read "its first two real concepts (HTTP item
+    41, REST item 42)"; corrected to "its first three real concepts (HTTP item 41, REST item 42, SQL
+    Basics item 43)" before the first build, the same class of drift item 40's "one real concept
+    built (Arrays, item 35)" comment and item 42's own stale find both already warned about.
+
+    `verify-interactions.mjs` gained a dedicated SQL Basics block mirroring REST's own (start
+    unanswered, three correct reaches the pass mark, earns completion, a wrong pick shows the real
+    explanation, try again resets), plus a Roadmap chip-chain step following REST's: complete SQL
+    Basics, confirm the stage-5 count reads `"3 OF 6"`, the path total reads `"15 of 25 concepts"`,
+    and the not-built count is *still* exactly 3 (SQL Basics completing is a progress event, not a
+    build event — it doesn't touch `UPCOMING_STAGES.concepts`, which already dropped to 3 the moment
+    the page was wired in). All ten of item 42's `(rm.match(/not built yet/g) ?? []).length === 4`
+    checks — spanning the whole Stage 3/4 chip-chain, not just the Stage 5 ones — reverted to
+    `=== 3`, the same "it drops for the entire file the instant the page exists, not just from its
+    own completion step onward" rule item 42 established for the identical situation. Added an
+    exact-match `page.getByRole('link', { name: 'SQL Basics', exact: true })` count for the "stage 5
+    shows its third real concept" check, the same collision-avoidance habit every prior lesson round
+    has used. 316 → 326 interaction checks (5 dedicated + 4 Roadmap, one fewer than REST's own 6+4
+    split since REST's dedicated block had grown a wrong-pick check HTTP's didn't originally have —
+    this round's dedicated block already included one from the start, matching REST's shape exactly
+    rather than growing into it).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run, unrelated to SQL Basics (it has no `.dc.html` prototype, same as HTTP and
+    REST before it). Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s
+    route/page/concept counts (40 lesson/tool pages, 41 routes total, 35 registered concepts — read
+    the routes figure off `npm run verify`'s own `41/41 routes clean` output rather than
+    hand-computed, the same lesson item 40, 41 and 42 all already flagged), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row (now naming HTTP, REST and SQL Basics, "three
+    remain" not "four").
+
+    `npm run build` run first, confirming `SqlBasics-D01UVHvk.js` built alongside `Http-CtaQCNoO.js`
+    and `Rest-CHeiMU8d.js`. `npm run verify` green after: 41/41 routes, no overflow at any width,
+    326/326 interaction checks, a11y clean with zero regression (35/19, unchanged). `npm run
+    typecheck` clean. `audit:content` at its 5-artifact baseline (re-verified).
+
+    **Stage 5 now has 3 of 6 concepts built: HTTP, REST, SQL Basics.** Three remain (`Joins`,
+    `Auth`, `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no
+    further change this round beyond the stale JSX comment above — `PartialStage`, extracted at item
+    41 specifically so a later Stage-5 concept wouldn't need one, held up on its third use in a row.

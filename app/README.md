@@ -158,8 +158,34 @@ than ported from a prototype:
   every lesson before it, and — like every Stage 4/5 round since Arrays — needed no `Roadmap.tsx`
   change: `PartialStage` is fully derived from `conceptsInStage(5)` and `UPCOMING_STAGES`'s `n: 5`
   entry, so removing `'REST'` from the latter's `concepts` array was the entire wiring change that
-  page needed. **Stage 5 now has two of six concepts built** (HTTP, REST); four remain (SQL basics,
-  Joins, Auth, Deploy).
+  page needed.
+- **SQL Basics** (`/sql-basics`) — Stage 5's third real page, and the first with no prior SQL
+  content anywhere on the site to build on or avoid repeating (grepped `src/pages/` and `src/data/`
+  for "SQL" first; the only hit was `curriculum.ts`'s own placeholder string). Since `Joins` is the
+  very next name in Stage 5's own remaining syllabus, all four questions stayed deliberately
+  single-table, so that lesson keeps real, untaught ground rather than a rerun of this one. Four
+  gotchas, each a different way SQL fails silently instead of erroring loudly: `WHERE phone = NULL`
+  matching zero rows, not the rows where `phone` really is NULL, because SQL's three-valued logic
+  means any comparison *to* NULL evaluates to UNKNOWN rather than TRUE, and `WHERE` drops UNKNOWN
+  rows exactly like FALSE ones, with no error to say the query could never have matched anything
+  (the right form is `IS NULL`); `DELETE`/`UPDATE` with no `WHERE` clause, which doesn't get refused
+  or scoped to "the one row that looks right" — it targets every row in the table, since `WHERE`
+  isn't optional syntax narrowing an already-scoped statement, it's the only thing that ever scopes
+  one; `COUNT(*)` (counts every row) vs. `COUNT(column)` (silently skips rows where that column is
+  NULL, the same NULL-skipping rule every aggregate function follows) — the first question's NULL
+  behavior resurfacing in a completely different kind of statement; and `WHERE` vs. `HAVING` — SQL's
+  real, fixed logical order (`FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY`) means
+  `WHERE COUNT(*) > 3` is a genuine error in every mainstream engine, since `WHERE` runs before
+  grouping even happens and there's no aggregate value yet to compare against — `HAVING` is the
+  clause built to filter after aggregation, deliberately revisiting `WHERE`'s row-by-row job from a
+  new angle, the same kind of second look REST's own fourth question took at `PUT`'s idempotency.
+  `filename`s here switch to `.sql` files rather than `.http` transcripts — a new code-listing
+  convention for a new kind of code, the same call `/http` made switching from Python snippets to
+  wire-format requests. Same archetype as every lesson before it, and needed no `Roadmap.tsx`
+  change either: removing `'SQL basics'` from `UPCOMING_STAGES`'s `n: 5` entry — as a real edit to
+  the array itself, not just the doc-comment prose above it — was the entire wiring change needed.
+  **Stage 5 now has three of six concepts built** (HTTP, REST, SQL Basics); three remain (Joins,
+  Auth, Deploy).
 
 ## Beyond the mockups
 
@@ -176,7 +202,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 34 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 35 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -187,7 +213,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 36 archetypes. Both have empty states.
+  gallery gained a filter across all 37 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -239,7 +265,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 40 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 41 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -277,7 +303,8 @@ extractor artifacts**, not omissions:
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
   Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 once HTTP had,
-  36 now that REST has) — see `PAGES.length` in `data/pages.ts` for the number that's actually true.
+  36 once REST had, 37 now that SQL Basics has) — see `PAGES.length` in `data/pages.ts` for the
+  number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

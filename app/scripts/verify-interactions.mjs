@@ -674,7 +674,47 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('rest: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first two (items 10, 30-42) ── */
+/* ── SQL Basics: 4 graded predict-the-outcome questions, Stage 5's 3rd lesson (item 43) ── */
+await resetProgress()
+await go('/sql-basics')
+let sb = await body()
+check('sql-basics: starts unanswered', sb.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: "0 — not the two you'd expect, not any other row, and nothing warns you why",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Nothing at all — every one of the 812 rows is deleted, not just the test one',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'COUNT(*) returns 5 (every row exists); COUNT(rating) returns 4 (the NULL rating is skipped)',
+    exact: true,
+  })
+  .click()
+sb = await body()
+check('sql-basics: three correct reaches the pass mark', sb.includes('Score: 3 of 4 correct'))
+check('sql-basics: earns completion at the pass mark', await completed('SQL Basics'))
+await page
+  .getByRole('button', {
+    name: 'It runs fine, returning only the customers with more than 3 orders',
+    exact: true,
+  })
+  .click()
+sb = await body()
+check(
+  'sql-basics: a wrong pick still shows the real explanation',
+  sb.includes("there's nothing to be greater than 3"),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('sql-basics: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first three (items 10, 30-43) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -710,9 +750,14 @@ check('roadmap: stage 5 shows its first real concept', httpChipCount > 0)
 // wouldn't risk, but the habit is now established for every stage-5 chip regardless.
 const restChipCount = await page.getByRole('link', { name: 'REST', exact: true }).count()
 check('roadmap: stage 5 shows its second real concept', restChipCount > 0)
+// Same reasoning again for 'SQL Basics' — checked by exact link match, not a substring.
+const sqlBasicsChipCount = await page
+  .getByRole('link', { name: 'SQL Basics', exact: true })
+  .count()
+check('roadmap: stage 5 shows its third real concept', sqlBasicsChipCount > 0)
 check(
-  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has four',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has three',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -795,8 +840,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has four',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has three',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -815,7 +860,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -834,7 +879,7 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -856,7 +901,7 @@ check('roadmap: completing Stacks & Queues moves the stage-4 count a third time'
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
   'roadmap: completing Stacks & Queues does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -881,7 +926,7 @@ check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.incl
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
   'roadmap: completing Trees does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Big-O', exact: true }).click()
@@ -911,7 +956,7 @@ check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.inclu
 check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
 check(
   'roadmap: completing Big-O does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'Sorting' }).click()
@@ -940,8 +985,8 @@ rm = await body()
 check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
 check(
-  'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has four',
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has three',
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'HTTP', exact: true }).click()
@@ -971,7 +1016,7 @@ check('roadmap: completing HTTP moves the stage-5 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total a thirteenth time', rm.includes('13 of 25 concepts'))
 check(
   "roadmap: completing HTTP does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 await page.getByRole('link', { name: 'REST', exact: true }).click()
@@ -1001,7 +1046,37 @@ check('roadmap: completing REST moves the stage-5 count again', rm.includes('2 O
 check('roadmap: it also moves the path total a fourteenth time', rm.includes('14 of 25 concepts'))
 check(
   "roadmap: completing REST does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 4,
+  (rm.match(/not built yet/g) ?? []).length === 3,
+)
+
+await page.getByRole('link', { name: 'SQL Basics', exact: true }).click()
+await page.waitForURL('**/sql-basics')
+check('roadmap: the SQL Basics chip really links to the lesson', page.url().endsWith('/sql-basics'))
+await page
+  .getByRole('button', {
+    name: "0 — not the two you'd expect, not any other row, and nothing warns you why",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'Nothing at all — every one of the 812 rows is deleted, not just the test one',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: 'COUNT(*) returns 5 (every row exists); COUNT(rating) returns 4 (the NULL rating is skipped)',
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing SQL Basics moves the stage-5 count a third time', rm.includes('3 OF 6'))
+check('roadmap: it also moves the path total a fifteenth time', rm.includes('15 of 25 concepts'))
+check(
+  "roadmap: completing SQL Basics does not consume any of stage 5's not-built chips",
+  (rm.match(/not built yet/g) ?? []).length === 3,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

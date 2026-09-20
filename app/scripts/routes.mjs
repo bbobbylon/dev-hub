@@ -34,6 +34,7 @@ export const ROUTES = [
   '/sorting',
   '/http',
   '/rest',
+  '/sql-basics',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',
