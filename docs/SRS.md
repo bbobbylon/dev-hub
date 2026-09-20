@@ -1,6 +1,6 @@
 # Software Requirements Specification — Dev Hub
 
-_Last updated: 2026-09-20 — describes the 40-page app plus the optional account/sync layer, on the
+_Last updated: 2026-09-20 — describes the 41-page app plus the optional account/sync layer, on the
 `implement-design-handoff` branch._
 
 ## 1. Executive Summary
@@ -26,7 +26,7 @@ trying it anonymously (progress is per-browser, not shared). A learner who wants
 follow them across devices can optionally create an account.
 
 **Main features:**
-- 40 standalone interactive lesson/tool pages spanning CLI/shell, Git, algorithms, data
+- 41 standalone interactive lesson/tool pages spanning CLI/shell, Git, algorithms, data
   structures, APIs, architecture, and framework concepts, plus a searchable gallery indexing all
   of them.
 - Real progress persistence: quiz scores, SM-2 spaced-repetition flashcard scheduling, milestone
@@ -61,7 +61,7 @@ follow them across devices can optionally create an account.
 - **Milestone checklists (Project Build-Along)** — a fixed list of capstone milestones can be
   checked/unchecked, and the checked state survives a reload.
 - **Concept completion** — every lesson and practice page can record the concept it teaches
-  (`data/concepts.ts` registers all 35, with the route that teaches each and the action that earns
+  (`data/concepts.ts` registers all 36, with the route that teaches each and the action that earns
   it). Where the page has a real finishing moment — a walkthrough stepped to its last frame, the
   tests run green, the mission's last command entered, the quick quiz answered perfectly — it
   records itself; the static field-guide pages offer an explicit "mark complete" control instead.
@@ -152,9 +152,9 @@ follow them across devices can optionally create an account.
 
 ## 6. Success Criteria
 
-- All 41 routes (40 lesson/tool pages + the gallery) render without console errors, at all three
+- All 42 routes (41 lesson/tool pages + the gallery) render without console errors, at all three
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
-  a backend has 43: the two account routes exist only then, and `scripts/routes.mjs` reads the same
+  a backend has 44: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
 - Every check in `scripts/verify-interactions.mjs` passes, covering every stateful page's actual
   behavior (quiz flow, flashcard scheduling, milestone persistence, step-through gating, search,

@@ -177,6 +177,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'joins',
+    title: 'Joins',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'INNER vs. LEFT JOIN row counts, a WHERE clause silently undoing a LEFT JOIN, many-to-many fan-out, and LEFT JOIN + IS NULL — predict what the join actually returns, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

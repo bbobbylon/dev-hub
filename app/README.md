@@ -186,6 +186,31 @@ than ported from a prototype:
   the array itself, not just the doc-comment prose above it — was the entire wiring change needed.
   **Stage 5 now has three of six concepts built** (HTTP, REST, SQL Basics); three remain (Joins,
   Auth, Deploy).
+- **Joins** (`/joins`) — Stage 5's fourth real page, and the first to reach across more than one
+  table: SQL Basics' own four questions were deliberately kept single-table, so this is where a
+  query first has to. Every one of the four gotchas was verified against a real SQLite engine
+  (Python's bundled `sqlite3` module), not just reasoned through by hand, before being written.
+  `INNER JOIN` vs. `LEFT JOIN` row-count (`INNER JOIN` on a `customers`/`orders` pair returns 4
+  rows, not 5, because the one customer with zero orders has nothing to pair with and simply gets
+  no row — not a row with blanks; `LEFT JOIN` on the identical query returns 5, padding her missing
+  columns with NULL); the classic "`LEFT JOIN`, then `WHERE` on the right table's column" trap —
+  SQL Basics' own first question flagged this exact page as where it would resurface, and it does:
+  `WHERE` runs after the join and has no memory of why a row exists, so it drops the very rows
+  `LEFT JOIN` was there to protect, landing on a result byte-identical to what plain `INNER JOIN`
+  would have given (verified both ways); a many-to-many fan-out — joining two child tables
+  (`orders`, `reviews`) straight to the same `customers` row multiplies instead of adding, so a
+  customer with 3 real orders and 2 real reviews gets `COUNT(o.id)`/`COUNT(r.id)` back as 6 and 6,
+  not 3 and 2, because the join produces one row per (order, review) *pair*; and `LEFT JOIN` +
+  `IS NULL` as a deliberate anti-join — reusing question 1's exact dataset to isolate the one
+  customer with no match, which only works because `IS NULL` is a dedicated operator built to test
+  for NULL itself (not `=`, which would fall into the same UNKNOWN trap question 2 and SQL Basics'
+  own first lesson both cover), and only works with `LEFT JOIN` — swap in `INNER JOIN` and the query
+  comes back empty, since there's no row left for `IS NULL` to catch. `filename`s stay `.sql`, the
+  convention SQL Basics established. Same archetype as every lesson before it, and needed no
+  `Roadmap.tsx` change either: removing `'Joins'` from `UPCOMING_STAGES`'s `n: 5` entry — the array
+  itself, not just the prose above it — was the entire wiring change needed.
+  **Stage 5 now has four of six concepts built** (HTTP, REST, SQL Basics, Joins); two remain
+  (Auth, Deploy).
 
 ## Beyond the mockups
 
@@ -202,7 +227,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 35 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 36 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -213,7 +238,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 37 archetypes. Both have empty states.
+  gallery gained a filter across all 38 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -265,7 +290,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 41 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 42 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -303,8 +328,8 @@ extractor artifacts**, not omissions:
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
   Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 once HTTP had,
-  36 once REST had, 37 now that SQL Basics has) — see `PAGES.length` in `data/pages.ts` for the
-  number that's actually true.
+  36 once REST had, 37 once SQL Basics had, 38 now that Joins has) — see `PAGES.length` in
+  `data/pages.ts` for the number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text

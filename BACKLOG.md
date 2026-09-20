@@ -1534,3 +1534,98 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     `Auth`, `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no
     further change this round beyond the stale JSX comment above — `PartialStage`, extracted at item
     41 specifically so a later Stage-5 concept wouldn't need one, held up on its third use in a row.
+
+44. ~~**Stage 5's fourth concept, Joins, was still an honest placeholder** (`['Joins', 'Auth',
+    'Deploy']` was all that remained of Stage 5's original six-item syllabus once HTTP, REST and SQL
+    Basics shipped at items 41-43).~~ — **done 2026-09-20.** Confirmed the exact next item against
+    `BACKLOG.md`'s own most recent entries first (item 43's closing line names `Joins` as the next of
+    the three remaining), then re-read `curriculum.ts` fresh rather than trusting the task hand-off's
+    own summary: Stage 5's `n: 5` entry listed `['Joins', 'Auth', 'Deploy']`, `Joins` first, confirming
+    both the list and the order.
+
+    **SQL Basics' own four questions were deliberately kept single-table, so Joins is the path's
+    first lesson to reach across more than one table at once.** Re-read `SqlBasics.tsx` fresh first,
+    per the standing instruction, and confirmed by grep that no `JOIN` keyword appears anywhere in any
+    of its four `.sql` listings — so nothing here risks repeating it, and the scoping question was
+    "what's the most genuine ground a JOIN lesson can stand on," not "what do I need to avoid." Every
+    one of the four gotchas was **verified against a real SQL engine before being written** — Python's
+    bundled `sqlite3` module, not just reasoned through by hand, since the standing instruction was
+    explicit that the four had to be "verified by thinking through the actual SQL semantics, not
+    assumed," and running the real thing is strictly stronger than that. **INNER JOIN vs. LEFT JOIN
+    row-count** — a `customers` table (5 rows, one with zero orders) joined to `orders` with
+    `INNER JOIN` returns 4 rows, not 5: the customer with no orders has nothing to pair with and
+    produces no row at all, not a row with blanks — that's the detail a plausible wrong answer
+    conflates, imagining `INNER JOIN` also NULL-pads the way `LEFT JOIN` does. `LEFT JOIN` on the
+    identical query returns 5, correctly padding her missing columns with NULL. **The classic "LEFT
+    JOIN, then WHERE on the right table's column" trap** — and this one isn't a coincidence: SQL
+    Basics' own first question closed by naming this exact page as where it would resurface ("a LEFT
+    JOIN's unmatched side comes back as NULL too, and this exact silent-empty-result behavior is the
+    first thing that trips people up about it"), so Joins' second question is that payoff, verified
+    two ways rather than one — the actual row count (`LEFT JOIN` + `WHERE o.status = 'shipped'`
+    returns 2 rows, not 5), and that swapping in `INNER JOIN` on the identical query produces a
+    byte-identical result set, proving the `LEFT` accomplished nothing once that `WHERE` clause was in
+    play. **Many-to-many fan-out inflating an aggregate** — joining two separate one-to-many relations
+    (`orders`, `reviews`) directly to the same `customers` row multiplies instead of adding: a
+    customer with 3 real orders and 2 real reviews gets `COUNT(o.id)`/`COUNT(r.id)` back as 6 and 6,
+    not 3 and 2, because the join produces one combined row per (order, review) *pair* with no way to
+    know the two are unrelated to each other. Verified the fix too — `COUNT(DISTINCT o.id)` correctly
+    returns 3. **LEFT JOIN + IS NULL as a deliberate anti-join** — the constructive flip side of
+    question 1, and it explicitly reuses question 1's exact dataset ("Same customers/orders as
+    question 1") so the payoff lands as a callback rather than a fresh scenario: `WHERE o.id IS NULL`
+    correctly isolates the one customer with no match, and only works because `IS NULL` is a dedicated
+    operator built to test for NULL itself, unlike `=`, which falls into the same UNKNOWN trap
+    question 2 covers. Verified that swapping in `INNER JOIN` here returns nothing, proving `LEFT
+    JOIN` isn't optional for this pattern, it's the entire mechanism. `filename`s stay `.sql`, the
+    convention SQL Basics established; `syn.kw` now also colors join types (`INNER JOIN`, `LEFT
+    JOIN`, `ON`) alongside the existing SQL keywords.
+
+    Wired in everywhere SQL Basics was: `App.tsx`'s lazy import + route (+ page-count comment, 40 →
+    41), `scripts/routes.mjs`, `data/pages.ts`'s gallery card, `data/concepts.ts` (`stage: 5`, folded
+    into the existing "Stage 5 · APIs & Databases" section header rather than a new one), and
+    `PageGallery.tsx`'s archetype count (37 → 38). **Verified the array edit, not just the comment,
+    before running anything** — same discipline item 43 established after the exact bug shipped once
+    earlier this session: ran the throwaway `npx tsx -e` script immediately after editing
+    `curriculum.ts`, printing `PATH_CONCEPTS.length` (23), the `UPCOMING_STAGES` sum (2), and
+    `TOTAL_CONCEPTS` (25) directly from the real modules, confirming the array itself had actually
+    lost `'Joins'` rather than trusting the prose above it said so. **A third stale comment caught the
+    same way — by rereading the file rather than assuming a prior round's sweep was complete** —
+    `Roadmap.tsx`'s own top-of-file comment still read "stage 5 has its first, HTTP, item 41," never
+    updated across items 42 or 43 even though the file's *other* stale comment (the JSX one directly
+    above the `PartialStage` call) was corrected both times; both are now accurate, closing the drift
+    the task hand-off flagged as having "needed correcting twice already."
+
+    `verify-interactions.mjs` gained a dedicated Joins block mirroring SQL Basics' own (start
+    unanswered, three correct reaches the pass mark, earns completion, a wrong pick shows the real
+    explanation, try again resets), plus a Roadmap chip-chain step following SQL Basics': complete
+    Joins, confirm the stage-5 count reads `"4 OF 6"`, the path total reads `"16 of 25 concepts"`, and
+    the not-built count is *still* exactly 2 (Joins completing is a progress event, not a build event
+    — it doesn't touch `UPCOMING_STAGES.concepts`, which already dropped to 2 the moment the page was
+    wired in). All eleven of item 43's `(rm.match(/not built yet/g) ?? []).length === 3` checks —
+    spanning the whole Stage 3/4 chip-chain, not just the Stage 5 ones — reverted to `=== 2`, the same
+    "it drops for the entire file the instant the page exists, not just from its own completion step
+    onward" rule item 43 established for the identical situation. Added an exact-match
+    `page.getByRole('link', { name: 'Joins', exact: true })` count for the "stage 5 shows its fourth
+    real concept" check, the same collision-avoidance habit every prior lesson round has used. 326 →
+    336 interaction checks (5 dedicated + 5 Roadmap — one more than SQL Basics' own 5+4 split, since
+    this round's Roadmap block needed both a chip-link check and its own completion step, matching the
+    shape every stage-5 concept before it has grown into).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run
+    audit:content` run, unrelated to Joins (it has no `.dc.html` prototype, same as HTTP, REST and SQL
+    Basics before it). Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s
+    route/page/concept counts (41 lesson/tool pages, 42 routes total, 36 registered concepts — read
+    the routes figure off a direct `verify:routes` run's own `42/42 routes clean` output rather than
+    hand-computed, the same lesson items 40 through 43 all already flagged), including
+    `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table row (now naming HTTP, REST, SQL Basics and Joins,
+    "two remain" not "three").
+
+    `npm run build` run first, confirming `Joins-CkhVAjJB.js` built alongside `Http-B6KkIsf0.js`,
+    `Rest-DmbV349A.js` and `SqlBasics-DcTpJeHu.js`. `npm run verify` green after: 42/42 routes, no
+    overflow at any width, 336/336 interaction checks, a11y clean with zero regression (35 failures
+    across 19 pairs, unchanged). `npm run typecheck` clean. `audit:content` at its 5-artifact baseline
+    (re-verified).
+
+    **Stage 5 now has 4 of 6 concepts built: HTTP, REST, SQL Basics, Joins.** Two remain (`Auth`,
+    `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no further
+    logic change this round beyond the two stale comments above — `PartialStage`, extracted at item 41
+    specifically so a later Stage-5 concept wouldn't need one, held up on its fourth use in a row.

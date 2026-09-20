@@ -5,7 +5,8 @@
  * including `/shell-scripting` and `/rebase-history` — this page is one of
  * the places those two link from. All five stages have at least one real,
  * built concept now (stage 3 and stage 4 have all six of their own; stage 5
- * has its first, HTTP, item 41) — no stage on this page is a fully locked
+ * has four — HTTP item 41, REST item 42, SQL Basics item 43, Joins item 44)
+ * — no stage on this page is a fully locked
  * placeholder any more, and the `LockedTag`/locked-`NumberNode` machinery a
  * fully-locked stage used to need is gone rather than left idle: once stage
  * 5 has a real concept, `UPCOMING_STAGES.filter((s) => s.n > 5)` is
@@ -460,9 +461,9 @@ export default function Roadmap() {
             connector="neutral"
           />
 
-          {/* stage 5 — its first three real concepts (HTTP item 41, REST item 42, SQL Basics
-              item 43); the last block on the page now, so its rail connector stops here instead
-              of continuing down. */}
+          {/* stage 5 — its first four real concepts (HTTP item 41, REST item 42, SQL Basics
+              item 43, Joins item 44); the last block on the page now, so its rail connector stops
+              here instead of continuing down. */}
           <PartialStage
             n={5}
             title="5 · APIs & Databases"
