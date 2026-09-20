@@ -152,9 +152,9 @@ follow them across devices can optionally create an account.
 
 ## 6. Success Criteria
 
-- All 42 routes (41 lesson/tool pages + the gallery) render without console errors, at all three
+- All 43 routes (42 lesson/tool pages + the gallery) render without console errors, at all three
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
-  a backend has 44: the two account routes exist only then, and `scripts/routes.mjs` reads the same
+  a backend has 45: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
 - Every check in `scripts/verify-interactions.mjs` passes, covering every stateful page's actual
   behavior (quiz flow, flashcard scheduling, milestone persistence, step-through gating, search,

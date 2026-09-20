@@ -1629,3 +1629,117 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     `Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no further
     logic change this round beyond the two stale comments above — `PartialStage`, extracted at item 41
     specifically so a later Stage-5 concept wouldn't need one, held up on its fourth use in a row.
+
+45. ~~**Stage 5's fifth concept, Auth, was still an honest placeholder** (`['Auth', 'Deploy']` was
+    all that remained of Stage 5's original six-item syllabus once HTTP, REST, SQL Basics and Joins
+    shipped at items 41-44).~~ — **done 2026-09-20.** Confirmed the exact next item against
+    `BACKLOG.md`'s own most recent entries first (item 44's closing line names `Auth` as the next of
+    the two remaining), then re-read `curriculum.ts` fresh rather than trusting the task hand-off's
+    own summary: Stage 5's `n: 5` entry listed `['Auth', 'Deploy']`, `Auth` first, confirming both.
+
+    **HTTP and REST both leaned on "the request needs to prove who's asking" without ever explaining
+    what that proof actually is, so Auth is the lesson that finally answers it — and had real overlap
+    to check for first.** Re-read `Http.tsx` fresh, per the standing instruction, and grepped it for
+    its own second question: confirmed it's exactly 401 Unauthorized vs. 403 Forbidden
+    (identity-absent vs. identity-known-but-refused), with nothing about tokens, sessions, or how a
+    server actually verifies anyone — so none of this round's four questions repeat that ground. Also
+    read `/api-anatomy` first (which mentions "the token is your ID card" and shows an `Authorization:
+    Bearer eyJhbGci…` header but never explains what's inside it or what makes it trustworthy) and
+    `Glossary.tsx`'s existing JWT entry ("signed, self-contained… anyone can read it, they just can't
+    forge a valid signature for it") — this round's second question turns that stated glossary fact
+    into something the learner watches actually happen and fails to forge, rather than repeating it as
+    a second flat definition. Every one of the four gotchas was **verified by tracing the real
+    mechanism through step by step**, the standing instruction's bar for a security claim specifically:
+    a plausible-sounding security fact isn't good enough on its own, it has to be correct.
+
+    **Why a fast hash is the wrong tool for a password** — genuinely new ground, since no prior lesson
+    on the path had touched password storage at all. `sha256(password)` isn't reversed by an attacker
+    who gets a leaked users table, it's guessed-and-checked: pick a candidate, hash it the identical
+    way, compare. SHA-256 is deliberately fast (built for cheap checksums, not secrecy), so consumer
+    GPU hardware burns through billions of guesses a second against it, cracking every weak password in
+    a leaked table in minutes regardless of whether the algorithm is technically reversible. A
+    purpose-built password hash (bcrypt/scrypt/Argon2) is deliberately *slow* and tunable, multiplying
+    an attacker's total cost across every guess by the same factor, while one real login barely notices
+    the extra milliseconds. **A JWT is signed, not encrypted** — its header and payload are just
+    base64, reversible by anyone holding the token with no secret required, which is exactly what makes
+    "the token is your ID card" and the Glossary's JWT entry true rather than contradicted. The third
+    segment is a signature computed once, at issue time, over exactly those bytes, using a secret only
+    the server holds — editing the decoded payload (`"role": "admin"`) and sending it back fails the
+    server's own recomputed-signature check, because "signed" means tamper-evident and freely readable,
+    the opposite of what "encrypted" would mean. **Cookie-held sessions vs. a manually-attached bearer
+    token trade one attack surface for a different one, not a strictly safer one for a strictly
+    riskier one** — a browser auto-attaches a cookie to any request aimed at that cookie's domain
+    regardless of which page triggered it (the CSRF mechanism, real whenever `SameSite`/a CSRF-token
+    check isn't in the way); a bearer token a page's own JS must read from storage and attach by hand
+    isn't auto-sent that way, so the identical forged cross-site form arrives with nothing attached —
+    but that same JS-readable storage is exactly what an XSS bug on the *real* site could read directly
+    and exfiltrate outright, a theft an `httpOnly` cookie is specifically built to block. Both halves
+    of this one were checked against real mechanics, not assumed: a plain HTML `<form>` submission
+    genuinely can't set a custom `Authorization` header (only a small allowed set of content types),
+    and same-origin policy genuinely blocks `evil.example`'s script from reading `api.example`'s
+    `localStorage`. **"Revoking" a JWT before it expires needs something bolted on beside the token
+    itself, because the server can't unsign what it already issued** — the direct, deliberate payoff of
+    question 2's signing fact, called back explicitly the same way Joins' own fourth question called
+    back its first: a stateless JWT scheme that only checks signature + `exp` (the entire reason to
+    skip a per-request database hit) has no mechanism that would even notice an account's password
+    changed after the token was signed, so a stolen token keeps working for every minute it has left,
+    full stop. Real fixes — a server-side revoked-id denylist, or short-lived access tokens paired with
+    a refresh step that *does* hit the database — each reintroduce some version of the lookup JWTs
+    exist to avoid, rather than the token scheme quietly handling it on its own.
+
+    The four are a deliberate arc, the same shape Joins' own four questions used: Q1 is how a server
+    ever gets to trust a request in the first place (password verification); Q2 establishes what the
+    token that trust produces actually is and isn't; Q3 asks where that token should live once issued,
+    given two real, opposite-shaped threats; Q4 uses Q2's signing fact from a new angle to show why
+    undoing a JWT is harder than it looks. `filename`s stay `.http`, the convention `/http` and `/rest`
+    established — every scenario here is fundamentally a request/response exchange (a signup, a login,
+    a forged cross-site POST), so there was no reason to invent a new code-listing convention the way
+    `/sql-basics` did for genuinely different content.
+
+    Wired in everywhere Joins was: `App.tsx`'s lazy import + route (+ page-count comment, 41 → 42),
+    `scripts/routes.mjs`, `data/pages.ts`'s gallery card, `data/concepts.ts` (`stage: 5`, folded into
+    the existing "Stage 5 · APIs & Databases" section header rather than a new one), and
+    `PageGallery.tsx`'s archetype count (38 → 39). **Verified the array edit, not just the comment,
+    before running anything** — same discipline items 43 and 44 both established: ran the throwaway
+    `npx tsx -e` script immediately after editing `curriculum.ts`, printing `PATH_CONCEPTS.length`
+    (24), the `UPCOMING_STAGES` sum (1), and `TOTAL_CONCEPTS` (25) directly from the real modules,
+    confirming the array itself had actually lost `'Auth'` rather than trusting the prose above it said
+    so. Checked `Roadmap.tsx`'s two known stale-comment spots explicitly this time, per the task's own
+    flag that one of the two had been missed on two of the last three rounds — both the top-of-file
+    doc comment ("stage 5 has four — HTTP item 41, REST item 42, SQL Basics item 43, Joins item 44")
+    and the JSX comment directly above the `PartialStage` call ("its first four real concepts") were
+    stale and are now both corrected to five, Auth item 45.
+
+    `verify-interactions.mjs` gained a dedicated Auth block mirroring Joins' own (start unanswered,
+    three correct reaches the pass mark, earns completion, a wrong pick shows the real explanation, try
+    again resets), plus a Roadmap chip-chain step following Joins': complete Auth, confirm the stage-5
+    count reads `"5 OF 6"`, the path total reads `"17 of 25 concepts"`, and the not-built count is
+    *still* exactly 1 (Deploy) — Auth completing is a progress event, not a build event, and Deploy was
+    already the only name left in `UPCOMING_STAGES.concepts` the moment Auth's page was wired in. All
+    twelve of item 44's `(rm.match(/not built yet/g) ?? []).length === 2` checks — spanning the whole
+    Stage 3/4 chip-chain, not just the Stage 5 ones — reverted to `=== 1`, the same "it drops for the
+    entire file the instant the page exists, not just from its own completion step onward" rule items
+    43 and 44 both established. Added an exact-match `page.getByRole('link', { name: 'Auth', exact:
+    true })` count for the "stage 5 shows its fifth real concept" check, the same collision-avoidance
+    habit every prior lesson round has used. 336 → 346 interaction checks (5 dedicated + 5 Roadmap —
+    matching Joins' own 5+5 split exactly).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run audit:content`
+    run, unrelated to Auth (it has no `.dc.html` prototype, same as HTTP, REST, SQL Basics and Joins
+    before it). Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept
+    counts (42 lesson/tool pages, 43 routes total, 37 registered concepts — read the routes figure off
+    a direct `verify:routes` run's own `43/43 routes clean` output rather than hand-computed, the same
+    lesson items 40 through 44 all already flagged), including `docs/ARCHITECTURE.md`'s `Roadmap.tsx`
+    table row (now naming HTTP, REST, SQL Basics, Joins and Auth, "one remains" not "two").
+
+    `npm run build` run first, confirming `Auth-J6iwLzOL.js` built alongside `Http-Rskc57O2.js`,
+    `Rest-DDUu6D2r.js`, `SqlBasics-nn5bIe_x.js` and `Joins-Bnu4eoqb.js`. `npm run verify` green after:
+    43/43 routes, no overflow at any width, 346/346 interaction checks, a11y clean with zero regression
+    (35 failures across 19 pairs, unchanged — the baseline note now reads "this run saw 43" routes,
+    up from 42, with no new pair). `npm run typecheck` clean. `audit:content` at its 5-artifact
+    baseline (re-verified).
+
+    **Stage 5 now has 5 of 6 concepts built: HTTP, REST, SQL Basics, Joins, Auth.** One remains
+    (`Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no further
+    logic change this round beyond the two stale comments above — `PartialStage`, extracted at item 41
+    specifically so a later Stage-5 concept wouldn't need one, held up on its fifth use in a row.

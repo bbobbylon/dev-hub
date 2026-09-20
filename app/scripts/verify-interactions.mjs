@@ -754,7 +754,47 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('joins: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first four (items 10, 30-44) ── */
+/* ── Auth: 4 graded predict-the-outcome questions, Stage 5's 5th lesson (item 45) ── */
+await resetProgress()
+await go('/auth')
+let au = await body()
+check('auth: starts unanswered', au.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: 'No — SHA-256 is a fast, general-purpose hash built for cheap checksums; an attacker never needs to reverse anything, just hash billions of guesses a second and compare, which cracks weak or common passwords almost immediately',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "Yes she can read it — base64 is an encoding, not encryption, reversible by anyone with no key needed — but no, she can't get the edited version accepted: the server recomputes the signature over her edited payload, and it won't match the token's real third segment, which only the actual secret could have produced",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "Yes under the cookie design — the browser attaches any cookie it holds for api.example to a request headed there, no matter which page triggered it. No under the bearer-token design — a plain HTML form can't set a custom Authorization header, and evil.example's script can't read api.example's localStorage either, so the forged request arrives with no credential attached at all",
+    exact: true,
+  })
+  .click()
+au = await body()
+check('auth: three correct reaches the pass mark', au.includes('Score: 3 of 4 correct'))
+check('auth: earns completion at the pass mark', await completed('Auth'))
+await page
+  .getByRole('button', {
+    name: 'It stops immediately — changing the password invalidates every token that was issued under the old one',
+    exact: true,
+  })
+  .click()
+au = await body()
+check(
+  'auth: a wrong pick still shows the real explanation',
+  au.includes("the server can't unsign what it already issued"),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('auth: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first five (items 10, 30-45) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -798,9 +838,12 @@ check('roadmap: stage 5 shows its third real concept', sqlBasicsChipCount > 0)
 // Same reasoning again for 'Joins' — checked by exact link match, not a substring.
 const joinsChipCount = await page.getByRole('link', { name: 'Joins', exact: true }).count()
 check('roadmap: stage 5 shows its fourth real concept', joinsChipCount > 0)
+// Same reasoning again for 'Auth' — checked by exact link match, not a substring.
+const authChipCount = await page.getByRole('link', { name: 'Auth', exact: true }).count()
+check('roadmap: stage 5 shows its fifth real concept', authChipCount > 0)
 check(
-  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has two',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has one',
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -884,7 +927,7 @@ check('roadmap: completing all six moves the stage-3 count to full', rm.includes
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
   'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has three',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -903,7 +946,7 @@ check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
   'roadmap: completing Arrays does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -922,7 +965,7 @@ check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
   'roadmap: completing Hash Maps does not consume a not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -944,7 +987,7 @@ check('roadmap: completing Stacks & Queues moves the stage-4 count a third time'
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
   'roadmap: completing Stacks & Queues does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -969,7 +1012,7 @@ check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.incl
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
   'roadmap: completing Trees does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Big-O', exact: true }).click()
@@ -999,7 +1042,7 @@ check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.inclu
 check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
 check(
   'roadmap: completing Big-O does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Sorting' }).click()
@@ -1029,7 +1072,7 @@ check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes
 check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
 check(
   'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has three',
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'HTTP', exact: true }).click()
@@ -1059,7 +1102,7 @@ check('roadmap: completing HTTP moves the stage-5 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total a thirteenth time', rm.includes('13 of 25 concepts'))
 check(
   "roadmap: completing HTTP does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'REST', exact: true }).click()
@@ -1089,7 +1132,7 @@ check('roadmap: completing REST moves the stage-5 count again', rm.includes('2 O
 check('roadmap: it also moves the path total a fourteenth time', rm.includes('14 of 25 concepts'))
 check(
   "roadmap: completing REST does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'SQL Basics', exact: true }).click()
@@ -1119,7 +1162,7 @@ check('roadmap: completing SQL Basics moves the stage-5 count a third time', rm.
 check('roadmap: it also moves the path total a fifteenth time', rm.includes('15 of 25 concepts'))
 check(
   "roadmap: completing SQL Basics does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 await page.getByRole('link', { name: 'Joins', exact: true }).click()
@@ -1149,7 +1192,37 @@ check('roadmap: completing Joins moves the stage-5 count a fourth time', rm.incl
 check('roadmap: it also moves the path total a sixteenth time', rm.includes('16 of 25 concepts'))
 check(
   "roadmap: completing Joins does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 2,
+  (rm.match(/not built yet/g) ?? []).length === 1,
+)
+
+await page.getByRole('link', { name: 'Auth', exact: true }).click()
+await page.waitForURL('**/auth')
+check('roadmap: the Auth chip really links to the lesson', page.url().endsWith('/auth'))
+await page
+  .getByRole('button', {
+    name: 'No — SHA-256 is a fast, general-purpose hash built for cheap checksums; an attacker never needs to reverse anything, just hash billions of guesses a second and compare, which cracks weak or common passwords almost immediately',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "Yes she can read it — base64 is an encoding, not encryption, reversible by anyone with no key needed — but no, she can't get the edited version accepted: the server recomputes the signature over her edited payload, and it won't match the token's real third segment, which only the actual secret could have produced",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "Yes under the cookie design — the browser attaches any cookie it holds for api.example to a request headed there, no matter which page triggered it. No under the bearer-token design — a plain HTML form can't set a custom Authorization header, and evil.example's script can't read api.example's localStorage either, so the forged request arrives with no credential attached at all",
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Auth moves the stage-5 count a fifth time', rm.includes('5 OF 6'))
+check('roadmap: it also moves the path total a seventeenth time', rm.includes('17 of 25 concepts'))
+check(
+  "roadmap: completing Auth does not consume stage 5's last not-built chip",
+  (rm.match(/not built yet/g) ?? []).length === 1,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

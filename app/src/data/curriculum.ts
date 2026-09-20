@@ -104,8 +104,19 @@ import { PATH_CONCEPTS } from './concepts'
  * (Python's bundled `sqlite3` module), not just reasoned through by hand, before being written.
  * `Joins`' own first question closes by reusing SQL Basics' exact dataset for its fourth question,
  * the same kind of callback SQL Basics' own first question set up ("keep this rule in your back
- * pocket for Joins... a LEFT JOIN's unmatched side comes back as NULL too"). Two remain (`Auth`,
- * `Deploy`).
+ * pocket for Joins... a LEFT JOIN's unmatched side comes back as NULL too"). Two remained after
+ * that round (`Auth`, `Deploy`).
+ *
+ * **Stage 5 has five real concepts now** — `Auth` → `auth` (item 45; the design's own placeholder
+ * already wrote it "Auth", so no casing footnote is needed, the same as `Joins`). Checked
+ * `Http.tsx` for overlap first, the same discipline every Stage 5 round has used — its own second
+ * question is exactly 401-vs-403 (identity-absent vs. identity-known-but-refused) and nothing about
+ * tokens or sessions, so this round's four questions go past it rather than repeating it: why a fast
+ * hash is the wrong tool for a password, a JWT being signed (not encrypted, so its payload is freely
+ * readable but not forgeable), cookie-held sessions vs. a manually-attached bearer token trading
+ * CSRF exposure for XSS exposure rather than one being simply safer, and why "revoking" a JWT before
+ * it expires needs a mechanism bolted on beside the token itself — the server can't unsign what it
+ * already issued. One remains (`Deploy`).
  */
 export const UPCOMING_STAGES = [
   {
@@ -132,11 +143,12 @@ export const UPCOMING_STAGES = [
   {
     n: 5,
     title: '5 · APIs & Databases',
-    // Same story again — not fully built yet (two of six remain), but no longer "not yet built"
-    // either, now that HTTP, REST, SQL Basics and Joins are real. Matches the exact 'IN PROGRESS'
-    // value Stage 4's own entry held from item 35 through item 39, before it became 'BUILT' at item 40.
+    // Same story again — not fully built yet (one of six remains), but no longer "not yet built"
+    // either, now that HTTP, REST, SQL Basics, Joins and Auth are real. Matches the exact
+    // 'IN PROGRESS' value Stage 4's own entry held from item 35 through item 39, before it became
+    // 'BUILT' at item 40.
     lock: 'IN PROGRESS',
-    concepts: ['Auth', 'Deploy'],
+    concepts: ['Deploy'],
     related: [
       { label: 'API Anatomy', route: '/api-anatomy' },
       { label: 'Project Build-Along', route: '/project-build-along' },
@@ -149,7 +161,7 @@ export const UPCOMING_STAGES = [
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
  * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 fully built, stage 5 four concepts in, as of item 44).
+ * built, stage 3 fully built, stage 4 fully built, stage 5 five concepts in, as of item 45).
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

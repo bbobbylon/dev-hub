@@ -185,6 +185,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'auth',
+    title: 'Auth',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'Why a fast hash is the wrong tool for a password, a JWT signed vs. encrypted, cookie CSRF vs. bearer-token XSS, and revoking a JWT that already shipped — predict what actually happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',

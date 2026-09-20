@@ -36,6 +36,7 @@ export const ROUTES = [
   '/rest',
   '/sql-basics',
   '/joins',
+  '/auth',
   '/decorator-pattern',
   '/video-lesson',
   '/architecture-deep-dive',

@@ -211,6 +211,30 @@ than ported from a prototype:
   itself, not just the prose above it — was the entire wiring change needed.
   **Stage 5 now has four of six concepts built** (HTTP, REST, SQL Basics, Joins); two remain
   (Auth, Deploy).
+- **Auth** (`/auth`) — Stage 5's fifth real page: HTTP and REST both leaned on "the request needs
+  to prove who's asking" without ever saying what that proof is, so this is where it finally gets
+  answered. Checked `Http.tsx` for overlap first — its own second question is exactly 401 vs. 403
+  (identity-absent vs. identity-known-but-refused), nothing about tokens or sessions, so none of
+  the four questions here repeat it. Why a fast hash is the wrong tool for a password (`sha256`
+  isn't reversed by an attacker, it's guessed-and-checked, and SHA-256 is deliberately fast — a
+  purpose-built password hash like bcrypt is deliberately slow instead, for exactly that reason); a
+  JWT being signed, not encrypted (its payload is freely readable by anyone holding it with no
+  secret needed — that's what makes `/api-anatomy`'s "the token is your ID card" true — but editing
+  it and sending it back fails the server's own signature check, since only the real secret could
+  produce a valid one); cookie-held sessions vs. a manually-attached bearer token trading CSRF
+  exposure for XSS exposure rather than one being simply safer (a cookie auto-attaches to any
+  request aimed at its domain regardless of who triggered it; a bearer token a page's own JS must
+  attach by hand isn't auto-sent that way, but that same JS-readable storage is exactly what an XSS
+  bug could read directly and steal); and why "revoking" a JWT before it expires needs a mechanism
+  bolted on beside the token itself, since the server can't unsign what it already issued — the
+  direct payoff of the JWT-signing question from a new angle, the same kind of callback Joins' own
+  fourth question used on its first. `filename`s stay `.http`, the convention HTTP and REST
+  established — every scenario here is a request/response exchange, so there was no reason for a
+  new code-listing convention. Same archetype as every lesson before it, and needed no
+  `Roadmap.tsx` change either: removing `'Auth'` from `UPCOMING_STAGES`'s `n: 5` entry — the array
+  itself, not just the prose above it — was the entire wiring change needed.
+  **Stage 5 now has five of six concepts built** (HTTP, REST, SQL Basics, Joins, Auth); one remains
+  (Deploy).
 
 ## Beyond the mockups
 
@@ -227,7 +251,7 @@ no backend at all.
   A session studies only what's actually due and then *ends*, instead of looping on the last card.
   The "due today" and "mastered" counts are computed, not decorative.
 - **Milestones persist** on the capstone brief.
-- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 36 concepts the
+- **Concepts are completed, not assumed** — `src/data/concepts.ts` registers all 37 concepts the
   app teaches, and every lesson page ends with a `<ConceptComplete>` panel that records one. Pages
   with a real finishing moment (a walkthrough stepped to its end, tests run green, the quick quiz
   aced) record it themselves; the static field-guide pages offer a button instead, and any completed
@@ -238,7 +262,7 @@ no backend at all.
 - **Time on page is tracked** in coarse ticks while the tab is visible, which is what makes the
   streak and the chart honest.
 - **Search works.** The Dev Hub's search box was decorative; it now filters the catalog, and the
-  gallery gained a filter across all 38 archetypes. Both have empty states.
+  gallery gained a filter across all 39 archetypes. Both have empty states.
 - **A global command palette** (Cmd/Ctrl+K, `src/components/CommandPalette.tsx`) jumps straight to
   any page from anywhere — the gallery's own filter only ever helped once you were already there.
   Built on the handoff's own `.dialog`/`.dialog-backdrop` classes, which no page had used until now.
@@ -290,7 +314,7 @@ serving from the wrong port) and tears it down when the suites finish. Run an
 individual suite on its own — `npm run verify:routes`, `audit:a11y`, etc. —
 and you're back to starting `npm run preview &` yourself first.
 
-- `verify:routes` — loads all 42 routes, asserting each renders real content, has an `<h1>`,
+- `verify:routes` — loads all 43 routes, asserting each renders real content, has an `<h1>`,
   logs no console errors, and doesn't overflow horizontally.
 - `verify:responsive` — re-checks every route at 390 / 768 / 1280px for horizontal overflow, and
   names the offending elements when it finds any. The breakpoints in `app.css` were written from
@@ -328,8 +352,8 @@ extractor artifacts**, not omissions:
   adding Control Flow — 24 once Control Flow shipped, 25 once Functions had, 26 once Collections
   had, 27 once Errors had, 28 once Files had, 29 once Arrays had, 30 once Hash Maps had, 31 once
   Stacks & Queues had, 32 once Trees had, 33 once Big-O had, 34 once Sorting had, 35 once HTTP had,
-  36 once REST had, 37 once SQL Basics had, 38 now that Joins has) — see `PAGES.length` in
-  `data/pages.ts` for the number that's actually true.
+  36 once REST had, 37 once SQL Basics had, 38 once Joins had, 39 now that Auth has) — see
+  `PAGES.length` in `data/pages.ts` for the number that's actually true.
 - One Code Playground entry is the prototype's hardcoded "ran the program" output line. Here it's
   the real stdout captured from actually running `SOURCE_JS` in a sandboxed Web Worker (BACKLOG
   item 9), not a copied string — it happens to compute to the exact same text, but a static text
