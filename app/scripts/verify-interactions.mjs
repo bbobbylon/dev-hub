@@ -794,7 +794,47 @@ check(
 await page.getByRole('button', { name: '↺ Try again' }).click()
 check('auth: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
 
-/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, Stage 5's first five (items 10, 30-45) ── */
+/* ── Deploy: 4 graded predict-the-outcome questions, Stage 5's 6th and final lesson (item 46) ── */
+await resetProgress()
+await go('/deploy')
+let dp = await body()
+check('deploy: starts unanswered', dp.includes('Score: 0 of 4 correct'))
+await page
+  .getByRole('button', {
+    name: 'No — Vite inlines every VITE_-prefixed variable as a literal string directly into the compiled JavaScript at build time, so the exact key ships inside dist/assets/*.js, readable by any visitor who opens dev tools or views the page source',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "No — VITE_API_BASE_URL was already substituted into a literal string inside dist/assets/index-8f2a.js back when npm run build last ran; restarting nginx just serves those same unchanged bytes. Only running the build again, with the new value set at that build's environment, produces new output files with the new URL baked in",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "No — the new version starts up alongside the old one, not in its place, and only takes over NEW requests once it's healthy; the old instance gets a grace period to finish requests it already accepted before it's actually shut down, so Ana's export completes normally on the old code",
+    exact: true,
+  })
+  .click()
+dp = await body()
+check('deploy: three correct reaches the pass mark', dp.includes('Score: 3 of 4 correct'))
+check('deploy: earns completion at the pass mark', await completed('Deploy'))
+await page
+  .getByRole('button', {
+    name: 'They succeed — PostgreSQL automatically keeps a hidden alias so a renamed column still answers to its old name until nothing references it anymore',
+    exact: true,
+  })
+  .click()
+dp = await body()
+check(
+  'deploy: a wrong pick still shows the real explanation',
+  dp.includes("there's no grace period or fallback on the database side for that"),
+)
+await page.getByRole('button', { name: '↺ Try again' }).click()
+check('deploy: try again resets the score', (await body()).includes('Score: 0 of 4 correct'))
+
+/* ── Roadmap: all six Stage 3 concepts, all six Stage 4 concepts, all six Stage 5 concepts — the whole five-stage path (items 10, 30-46) ── */
 await resetProgress()
 await go('/roadmap')
 let rm = await body()
@@ -841,9 +881,12 @@ check('roadmap: stage 5 shows its fourth real concept', joinsChipCount > 0)
 // Same reasoning again for 'Auth' — checked by exact link match, not a substring.
 const authChipCount = await page.getByRole('link', { name: 'Auth', exact: true }).count()
 check('roadmap: stage 5 shows its fifth real concept', authChipCount > 0)
+// Same reasoning again for 'Deploy' — checked by exact link match, not a substring.
+const deployChipCount = await page.getByRole('link', { name: 'Deploy', exact: true }).count()
+check('roadmap: stage 5 shows its sixth and final real concept', deployChipCount > 0)
 check(
-  'roadmap: neither stage 3 nor stage 4 has anything left not-yet-built; stage 5 still has one',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: no stage has anything left not-yet-built anymore — the whole five-stage path is built',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 check('roadmap: stage 3 count reflects real + not-built', rm.includes('0 OF 6'))
 check(
@@ -926,8 +969,8 @@ rm = await body()
 check('roadmap: completing all six moves the stage-3 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a sixth time', rm.includes('6 of 25 concepts'))
 check(
-  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4; Stage 5 still has three',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: Stage 3 has no not-built chips left; neither does Stage 4 or Stage 5 anymore',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Arrays' }).click()
@@ -945,8 +988,8 @@ rm = await body()
 check('roadmap: completing Arrays moves the stage-4 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total a seventh time', rm.includes('7 of 25 concepts'))
 check(
-  'roadmap: completing Arrays does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Arrays still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Hash Maps' }).click()
@@ -964,8 +1007,8 @@ rm = await body()
 check('roadmap: completing Hash Maps moves the stage-4 count again', rm.includes('2 OF 6'))
 check('roadmap: it also moves the path total an eighth time', rm.includes('8 of 25 concepts'))
 check(
-  'roadmap: completing Hash Maps does not consume a not-built chip either',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Hash Maps still leaves nothing not-built anywhere either',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Stacks & Queues' }).click()
@@ -986,8 +1029,8 @@ rm = await body()
 check('roadmap: completing Stacks & Queues moves the stage-4 count a third time', rm.includes('3 OF 6'))
 check('roadmap: it also moves the path total a ninth time', rm.includes('9 of 25 concepts'))
 check(
-  'roadmap: completing Stacks & Queues does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Stacks & Queues still leaves nothing not-built anywhere',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Trees' }).click()
@@ -1011,8 +1054,8 @@ rm = await body()
 check('roadmap: completing Trees moves the stage-4 count a fourth time', rm.includes('4 OF 6'))
 check('roadmap: it also moves the path total a tenth time', rm.includes('10 of 25 concepts'))
 check(
-  'roadmap: completing Trees does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Trees still leaves nothing not-built anywhere',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Big-O', exact: true }).click()
@@ -1041,8 +1084,8 @@ rm = await body()
 check('roadmap: completing Big-O moves the stage-4 count a fifth time', rm.includes('5 OF 6'))
 check('roadmap: it also moves the path total an eleventh time', rm.includes('11 of 25 concepts'))
 check(
-  'roadmap: completing Big-O does not consume a not-built chip',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Big-O still leaves nothing not-built anywhere',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Sorting' }).click()
@@ -1071,8 +1114,8 @@ rm = await body()
 check('roadmap: completing Sorting moves the stage-4 count to full', rm.includes('6 OF 6'))
 check('roadmap: it also moves the path total a twelfth time', rm.includes('12 of 25 concepts'))
 check(
-  'roadmap: Stage 4 has no not-built chips left once all six are done; Stage 5 still has three',
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: Stage 4 has no not-built chips left once all six are done; neither does Stage 5 anymore',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'HTTP', exact: true }).click()
@@ -1101,8 +1144,8 @@ rm = await body()
 check('roadmap: completing HTTP moves the stage-5 count', rm.includes('1 OF 6'))
 check('roadmap: it also moves the path total a thirteenth time', rm.includes('13 of 25 concepts'))
 check(
-  "roadmap: completing HTTP does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing HTTP still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'REST', exact: true }).click()
@@ -1131,8 +1174,8 @@ rm = await body()
 check('roadmap: completing REST moves the stage-5 count again', rm.includes('2 OF 6'))
 check('roadmap: it also moves the path total a fourteenth time', rm.includes('14 of 25 concepts'))
 check(
-  "roadmap: completing REST does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing REST still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'SQL Basics', exact: true }).click()
@@ -1161,8 +1204,8 @@ rm = await body()
 check('roadmap: completing SQL Basics moves the stage-5 count a third time', rm.includes('3 OF 6'))
 check('roadmap: it also moves the path total a fifteenth time', rm.includes('15 of 25 concepts'))
 check(
-  "roadmap: completing SQL Basics does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing SQL Basics still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Joins', exact: true }).click()
@@ -1191,8 +1234,8 @@ rm = await body()
 check('roadmap: completing Joins moves the stage-5 count a fourth time', rm.includes('4 OF 6'))
 check('roadmap: it also moves the path total a sixteenth time', rm.includes('16 of 25 concepts'))
 check(
-  "roadmap: completing Joins does not consume any of stage 5's not-built chips",
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Joins still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 await page.getByRole('link', { name: 'Auth', exact: true }).click()
@@ -1221,8 +1264,38 @@ rm = await body()
 check('roadmap: completing Auth moves the stage-5 count a fifth time', rm.includes('5 OF 6'))
 check('roadmap: it also moves the path total a seventeenth time', rm.includes('17 of 25 concepts'))
 check(
-  "roadmap: completing Auth does not consume stage 5's last not-built chip",
-  (rm.match(/not built yet/g) ?? []).length === 1,
+  'roadmap: completing Auth still leaves nothing not-built anywhere on the page',
+  (rm.match(/not built yet/g) ?? []).length === 0,
+)
+
+await page.getByRole('link', { name: 'Deploy', exact: true }).click()
+await page.waitForURL('**/deploy')
+check('roadmap: the Deploy chip really links to the lesson', page.url().endsWith('/deploy'))
+await page
+  .getByRole('button', {
+    name: 'No — Vite inlines every VITE_-prefixed variable as a literal string directly into the compiled JavaScript at build time, so the exact key ships inside dist/assets/*.js, readable by any visitor who opens dev tools or views the page source',
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "No — VITE_API_BASE_URL was already substituted into a literal string inside dist/assets/index-8f2a.js back when npm run build last ran; restarting nginx just serves those same unchanged bytes. Only running the build again, with the new value set at that build's environment, produces new output files with the new URL baked in",
+    exact: true,
+  })
+  .click()
+await page
+  .getByRole('button', {
+    name: "No — the new version starts up alongside the old one, not in its place, and only takes over NEW requests once it's healthy; the old instance gets a grace period to finish requests it already accepted before it's actually shut down, so Ana's export completes normally on the old code",
+    exact: true,
+  })
+  .click()
+await go('/roadmap')
+rm = await body()
+check('roadmap: completing Deploy moves the stage-5 count to full', rm.includes('6 OF 6'))
+check('roadmap: it also moves the path total an eighteenth time', rm.includes('18 of 25 concepts'))
+check(
+  'roadmap: completing Deploy still leaves nothing not-built anywhere — the whole five-stage path is now built',
+  (rm.match(/not built yet/g) ?? []).length === 0,
 )
 
 /* ── Gallery navigation: a card actually routes, logo comes back ──────── */

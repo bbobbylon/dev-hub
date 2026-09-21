@@ -1,7 +1,9 @@
 # Software Requirements Specification — Dev Hub
 
-_Last updated: 2026-09-20 — describes the 41-page app plus the optional account/sync layer, on the
-`implement-design-handoff` branch._
+_Last updated: 2026-09-21 — describes the 43-page app plus the optional account/sync layer, on the
+`implement-design-handoff` branch. The five-stage, 25-concept designed backend-developer path is now
+fully built (item 46, Deploy — the last of Stage 5); the only thing left in the designed course is
+the capstone, `Project Build-Along`, which already exists._
 
 ## 1. Executive Summary
 
@@ -26,7 +28,7 @@ trying it anonymously (progress is per-browser, not shared). A learner who wants
 follow them across devices can optionally create an account.
 
 **Main features:**
-- 41 standalone interactive lesson/tool pages spanning CLI/shell, Git, algorithms, data
+- 43 standalone interactive lesson/tool pages spanning CLI/shell, Git, algorithms, data
   structures, APIs, architecture, and framework concepts, plus a searchable gallery indexing all
   of them.
 - Real progress persistence: quiz scores, SM-2 spaced-repetition flashcard scheduling, milestone
@@ -44,7 +46,7 @@ follow them across devices can optionally create an account.
   from one searchable, grouped card gallery at `/`; typing in the search box filters the grid
   live with a real empty state. Unknown URLs render a 404 page (`NotFound.tsx`) rather than
   redirecting silently.
-- **Lesson pages (`src/pages/*.tsx`, 25 files)** — each teaches one concept via whatever
+- **Lesson pages (`src/pages/*.tsx`, 36 files)** — each teaches one concept via whatever
   interaction fits it best: a step-through code walkthrough (Shell Scripting, Rebase & History,
   Algorithm Visualizer), a labeled diagram (API Anatomy, Architecture Deep Dive, Data Structures
   Visual), a checkpoint quiz (Quiz Mode, CLI Basics), a spaced-repetition deck (Flashcards), a
@@ -61,7 +63,7 @@ follow them across devices can optionally create an account.
 - **Milestone checklists (Project Build-Along)** — a fixed list of capstone milestones can be
   checked/unchecked, and the checked state survives a reload.
 - **Concept completion** — every lesson and practice page can record the concept it teaches
-  (`data/concepts.ts` registers all 36, with the route that teaches each and the action that earns
+  (`data/concepts.ts` registers all 38, with the route that teaches each and the action that earns
   it). Where the page has a real finishing moment — a walkthrough stepped to its last frame, the
   tests run green, the mission's last command entered, the quick quiz answered perfectly — it
   records itself; the static field-guide pages offer an explicit "mark complete" control instead.
@@ -152,9 +154,9 @@ follow them across devices can optionally create an account.
 
 ## 6. Success Criteria
 
-- All 43 routes (42 lesson/tool pages + the gallery) render without console errors, at all three
+- All 44 routes (43 lesson/tool pages + the gallery) render without console errors, at all three
   verified breakpoints — enforced by `npm run verify` before any deploy. A build configured against
-  a backend has 45: the two account routes exist only then, and `scripts/routes.mjs` reads the same
+  a backend has 46: the two account routes exist only then, and `scripts/routes.mjs` reads the same
   `VITE_API_BASE_URL` so the suites expect exactly what the build actually registered.
 - Every check in `scripts/verify-interactions.mjs` passes, covering every stateful page's actual
   behavior (quiz flow, flashcard scheduling, milestone persistence, step-through gating, search,

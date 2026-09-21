@@ -3,16 +3,20 @@
  * "you are here" states and progress toward `TOTAL_CONCEPTS` via
  * `useProgress()`. Stage 2's chip grid links out to individual lesson pages,
  * including `/shell-scripting` and `/rebase-history` — this page is one of
- * the places those two link from. All five stages have at least one real,
- * built concept now (stage 3 and stage 4 have all six of their own; stage 5
- * has five — HTTP item 41, REST item 42, SQL Basics item 43, Joins item 44,
- * Auth item 45) — no stage on this page is a fully locked
+ * the places those two link from. **All five stages are fully built now**
+ * (stage 3 and stage 4 have all six of their own; stage 5 does too as of
+ * item 46 — HTTP item 41, REST item 42, SQL Basics item 43, Joins item 44,
+ * Auth item 45, Deploy item 46) — the entire designed backend-developer path
+ * this page renders is complete, no stage on this page is a fully locked
  * placeholder any more, and the `LockedTag`/locked-`NumberNode` machinery a
  * fully-locked stage used to need is gone rather than left idle: once stage
- * 5 has a real concept, `UPCOMING_STAGES.filter((s) => s.n > 5)` is
- * permanently empty (this is a five-stage path; there is no stage 6), so the
- * block that used to render it could never run again either. See
- * `PartialStage`'s own comment for the rest of this round's restructuring.
+ * 5 had its first real concept, `UPCOMING_STAGES.filter((s) => s.n > 5)`
+ * became permanently empty (this is a five-stage path; there is no stage 6),
+ * so the block that used to render it could never run again either. Every
+ * `UPCOMING_STAGES` entry's `concepts` array is `[]` now too, so the
+ * `NotBuiltChip` this file renders has nothing left anywhere on the page to
+ * show — "not built yet" no longer appears here at all. See `PartialStage`'s
+ * own comment for the rest of the item-41 restructuring this all sits on.
  *
  * Every chip state, stage badge and count on this page is derived from
  * `state.concepts` against `data/concepts.ts`; none of it is hardcoded. It
@@ -461,9 +465,10 @@ export default function Roadmap() {
             connector="neutral"
           />
 
-          {/* stage 5 — its first five real concepts (HTTP item 41, REST item 42, SQL Basics
-              item 43, Joins item 44, Auth item 45); the last block on the page now, so its rail
-              connector stops here instead of continuing down. */}
+          {/* stage 5 — fully built: all six real concepts (HTTP item 41, REST item 42, SQL Basics
+              item 43, Joins item 44, Auth item 45, Deploy item 46), nothing left not-yet-built —
+              the last block on the page, so its rail connector stops here instead of continuing
+              down, and, being the last of the five stages, the whole designed path is now built. */}
           <PartialStage
             n={5}
             title="5 · APIs & Databases"

@@ -117,6 +117,28 @@ import { PATH_CONCEPTS } from './concepts'
  * CSRF exposure for XSS exposure rather than one being simply safer, and why "revoking" a JWT before
  * it expires needs a mechanism bolted on beside the token itself — the server can't unsign what it
  * already issued. One remains (`Deploy`).
+ *
+ * **Stage 5 has all six real concepts now — the stage is complete, and so is the entire five-stage
+ * designed path.** `Deploy` → `deploy` (item 46; the design's own placeholder already wrote it
+ * "Deploy", so no casing footnote is needed, the same as `Joins`/`Auth`). Checked `ApiAnatomy.tsx`
+ * for overlap first, the same discipline every Stage 5 round has used — zero hits for "deploy",
+ * "environment", "secret", "runtime", "container", "rolling" or "migration" — so this round's four
+ * questions cover genuinely new ground: a `VITE_`-prefixed variable in a frontend build tool is
+ * statically baked into the shipped JS at build time rather than read at runtime, so a secret put
+ * there leaks to every visitor regardless of never being committed to git; that same baking means
+ * changing the source variable and restarting a static file server does nothing — only a fresh
+ * build re-runs the substitution; a rolling/blue-green deploy starts the new version alongside the
+ * old one rather than swapping instantly, so an in-flight request on the old version keeps running
+ * to completion during a grace period; and, because that means old and new code briefly query the
+ * same database at once, a migration has to stay backward-compatible with the previous version of
+ * the code, since an outright column rename breaks the old version's queries for as long as the
+ * rollout takes to finish replacing it. None remain — Stage 5 is fully built (`http`, `rest`,
+ * `sql-basics`, `joins`, `auth`, `deploy`, all six in `data/concepts.ts` now), matching Stage 3's
+ * and Stage 4's own `lock: 'BUILT'` entries below, and this is the *last* stage in a five-stage
+ * path, so there is no seventh concept left anywhere in `UPCOMING_STAGES` to build toward — every
+ * one of `n: 3`/`n: 4`/`n: 5`'s `concepts` arrays is now `[]`. The only thing left in the whole
+ * designed course is the capstone (`Project Build-Along`, already built, already linked from this
+ * stage's own `related`), not a new concept.
  */
 export const UPCOMING_STAGES = [
   {
@@ -143,12 +165,12 @@ export const UPCOMING_STAGES = [
   {
     n: 5,
     title: '5 · APIs & Databases',
-    // Same story again — not fully built yet (one of six remains), but no longer "not yet built"
-    // either, now that HTTP, REST, SQL Basics, Joins and Auth are real. Matches the exact
-    // 'IN PROGRESS' value Stage 4's own entry held from item 35 through item 39, before it became
-    // 'BUILT' at item 40.
-    lock: 'IN PROGRESS',
-    concepts: ['Deploy'],
+    // Same story as stage 3/4's `lock` above — all six of its concepts are real now (HTTP, REST,
+    // SQL Basics, Joins, Auth, Deploy), so `lock` moved 'IN PROGRESS' → 'BUILT' at item 46, the
+    // exact same transition Stage 4's own entry made at item 40. This is the last of the five
+    // stages, so the whole designed path is now fully built.
+    lock: 'BUILT',
+    concepts: [],
     related: [
       { label: 'API Anatomy', route: '/api-anatomy' },
       { label: 'Project Build-Along', route: '/project-build-along' },
@@ -160,8 +182,11 @@ export const UPCOMING_STAGES = [
  * Concepts in the designed backend-developer path, across all five Roadmap stages: every built
  * concept's `data/concepts.ts` registry entry (`PATH_CONCEPTS`) plus every not-yet-built one's
  * `UPCOMING_STAGES` placeholder — added together regardless of which stages currently sit in
- * which pile, so the total stays put as a concept moves from one to the other (stage 1/2 fully
- * built, stage 3 fully built, stage 4 fully built, stage 5 five concepts in, as of item 45).
+ * which pile, so the total stays put as a concept moves from one to the other. As of item 46, every
+ * stage is fully built (1/2 always were; 3, 4 and now 5 all six of their own), so every
+ * `UPCOMING_STAGES` entry's `concepts` array is empty and this sum is entirely `PATH_CONCEPTS.length`
+ * — still computed as a sum rather than hardcoded to it, since a sixth Roadmap stage would need a
+ * design decision this file shouldn't quietly make on its own.
  */
 export const TOTAL_CONCEPTS =
   PATH_CONCEPTS.length + UPCOMING_STAGES.reduce((n, s) => n + s.concepts.length, 0)

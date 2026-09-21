@@ -1743,3 +1743,141 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     (`Deploy`), plus the capstone project still ahead of it. `Roadmap.tsx` itself needed no further
     logic change this round beyond the two stale comments above — `PartialStage`, extracted at item 41
     specifically so a later Stage-5 concept wouldn't need one, held up on its fifth use in a row.
+
+46. ~~**Stage 5's sixth and final concept, Deploy, was still an honest placeholder** (`['Deploy']` was
+    all that remained of Stage 5's original six-item syllabus once HTTP, REST, SQL Basics, Joins and
+    Auth shipped at items 41-45).~~ — **done 2026-09-21. This completes Stage 5 (6 of 6) and the
+    entire five-stage designed path — the only thing left in the whole course now is the capstone,
+    `Project Build-Along`, which already existed and needed nothing from this round.** Confirmed the
+    exact next item against `BACKLOG.md`'s own most recent entries first (item 45's closing line names
+    `Deploy` as the one remaining), then re-read `curriculum.ts` fresh rather than trusting the task
+    hand-off's own summary: Stage 5's `n: 5` entry listed exactly `['Deploy']`, confirming both.
+
+    **Every lesson before this one taught how to build a correct app; this one is the gap between
+    "it works on my machine" and "it's live for real users."** Checked for overlap first, the same
+    discipline every Stage 5 round has used: grepped `ApiAnatomy.tsx` for "deploy", "environment",
+    "secret", "runtime", "container", "rolling" and "migration" — zero hits, so nothing here repeats
+    it. `Glossary.tsx` already has an `Environment Variable` entry ("read at runtime so secrets…
+    never get committed to the repo") and `data/concepts.ts` has an off-path Stage-1
+    `environment-variables` concept with no lesson page — both real, both shell-level basics, neither
+    conflicting with this lesson's actual ground: what an env var does inside a *frontend build tool*
+    specifically, and what actually happens to traffic and data during a deploy. Every one of the four
+    gotchas was **verified by tracing the real mechanism through step by step**, the standing
+    instruction's bar for an infra claim specifically — plausible-sounding isn't good enough, it has
+    to be correct.
+
+    **Q1 and Q2 share one mechanism, looked at from two angles — the same "one mechanism, two angles"
+    shape Auth's own Q1/Q2 pair and Q2/Q4 pair both used.** Q1: a `VITE_`-prefixed variable in this
+    app's own build tool isn't read at runtime the way a shell export is — Vite statically substitutes
+    every `import.meta.env.VITE_*` reference with a literal string *at build time* (the same idea as
+    webpack's `DefinePlugin`; Vite's own docs say outright that `VITE_`-prefixed values "will be
+    inlined into the client bundle" and must never be treated as secret). A secret key put there
+    doesn't stay out of the client just because it's "an environment variable, not a git commit" — it
+    ends up as plain text inside `dist/assets/*.js`, shipped to every visitor, openable in dev tools
+    with no breach required. Q2 takes that same fact one step later: once a value is baked into the
+    built files, changing the *source* variable and restarting the server doesn't touch it — restarting
+    a static file server re-serves the same bytes; only a fresh `npm run build` re-runs the
+    substitution. **Grounded in this app's own real code, not a hypothetical** — `lib/api.ts`
+    (`export const API_BASE = import.meta.env.VITE_API_BASE_URL`) and `.github/workflows/
+    deploy-pages.yml` (which never sets it, confirmed by reading the workflow file directly, which is
+    exactly why `App.tsx`'s own comment says `/sign-in` 404s on the live GitHub Pages build) are the
+    real files Q2's scenario is built from. The contrast that makes both land: a genuine *runtime* env
+    var — a backend process reading `process.env.DATABASE_URL` — really is re-read fresh whenever that
+    process starts, so restarting *that* (not a static file server) picks up a change with no rebuild
+    at all. "Bakes at build, reads at run" is the one sentence worth keeping.
+
+    **Q3 and Q4 share a second mechanism, also looked at from two angles.** Q3: a deploy is not an
+    atomic swap. A rolling/blue-green rollout starts the new instance *alongside* the old one, waits
+    for a readiness probe before routing new traffic to it, and gives the old instance a grace period
+    (SIGTERM + a drain window — `terminationGracePeriodSeconds` is the literal Kubernetes name) to
+    finish requests it already accepted before it's actually killed — an in-flight request on the old
+    version keeps running to completion, unaffected by the new version coming up beside it. Q4 uses
+    that fact directly, the same way Auth's own Q4 reused its Q2's signing fact: if old and new code
+    briefly run *at the same time* against *the same database* during that rollout window, a migration
+    has to work for both versions at once, not just the one shipping it — a hard `RENAME COLUMN`
+    breaks the old version outright the instant it runs, and every request still routed to an instance
+    on the old code errors for as long as the rollout takes to finish replacing it. The real fix
+    (expand/contract: add the new column first, ship code that tolerates both, drop the old column only
+    in a *later* deploy once nothing references it) is the direct, constructive answer to the failure
+    Q3 explains the mechanism for.
+
+    The four are a deliberate two-part arc, the same shape every Stage 5 lesson before this one used.
+    `filename`s here are `.sh` — a deploy/terminal transcript, a new code-listing convention for
+    genuinely new content, the same call `/sql-basics` made switching from `.http` to `.sql`; every
+    scenario really is a terminal/log transcript, not a request or a query. `syn.kw` colors the command
+    itself, `syn.fn` colors the subcommand/flag, `syn.str` colors quoted values and file paths, and
+    `syn.cm` carries each scenario's own `#` scene-setting and log/output lines — the same role split
+    `/http`'s own build note assigned, ported to the new file type.
+
+    Wired in everywhere Auth was: `App.tsx`'s lazy import + route (+ page-count comment, 42 → 43),
+    `scripts/routes.mjs`, `data/pages.ts`'s gallery card, `data/concepts.ts` (`stage: 5`, folded into
+    the existing "Stage 5 · APIs & Databases" section header, now re-labeled "all six concepts
+    built — stage complete"), and `PageGallery.tsx`'s archetype count (39 → 40, both the JS comment and
+    the rendered lede paragraph). **Verified the array edit, not just the comment, before running
+    anything** — same discipline items 43-45 all established: ran the throwaway `npx tsx -e` script
+    immediately after editing `curriculum.ts`, printing `PATH_CONCEPTS.length` (25), the
+    `UPCOMING_STAGES` sum (0), and `TOTAL_CONCEPTS` (25) directly from the real modules, confirming the
+    array itself had actually lost `'Deploy'` rather than trusting the prose above it said so. Checked
+    `Roadmap.tsx`'s two known stale-comment spots explicitly, per the task's own repeated flag — both
+    the top-of-file doc comment ("stage 5 has five — … Auth item 45") and the JSX comment directly
+    above the `PartialStage` call ("its first five real concepts") were stale and are now both
+    corrected to all six, Deploy item 46, with `lock: 'BUILT'` replacing `'IN PROGRESS'` on the `n: 5`
+    entry itself, matching the exact transition Stage 3's and Stage 4's own entries made once each hit
+    six.
+
+    **This round hit the same "true zero" boundary case item 40 hit, and this time it's permanent, not
+    temporary.** At item 40 (Stage 4 finishing while Stage 5 was still `laterStages`-locked and used a
+    different `NOT YET BUILT` tag, not `NotBuiltChip`), the app-wide "not built yet" count briefly went
+    to zero and the checks were switched to `!rm.includes('not built yet')` — then reverted back to a
+    numeric count once Stage 5 graduated at item 41 and started contributing chips of its own. This
+    time there is no stage left to graduate: Stage 3, 4 and 5 all sit at `concepts: []` now, this is a
+    five-stage path with no stage 6, so the zero is permanent. Kept the existing numeric-count style
+    (`(rm.match(/not built yet/g) ?? []).length === 0`) rather than switching to a boolean absence
+    check — it's the same file-wide invariant the last thirteen rounds already asserted this way, just
+    with its value finally landing on the number the whole path was counting down to, and switching
+    styles only to switch back (as item 40 already learned the hard way) would be needless churn on a
+    check that just needs one digit changed. All fourteen of item 45's
+    `(rm.match(/not built yet/g) ?? []).length === 1` checks — spanning the whole Stage 3/4/5
+    chip-chain — moved to `=== 0`; the messages naming a specific remaining count ("Stage 5 still has
+    three", "does not consume any of stage 5's not-built chips", "stage 5's last not-built chip") were
+    also corrected, since those specific claims are no longer true even at the point in the walkthrough
+    they originally described — Stage 5 has had zero not-built chips since before the walkthrough even
+    starts now, not just from Deploy's own completion step onward.
+
+    `verify-interactions.mjs` gained a dedicated Deploy block mirroring Auth's own (start unanswered,
+    three correct reaches the pass mark, earns completion, a wrong pick shows the real explanation, try
+    again resets), plus a Roadmap chip-chain step following Auth's: complete Deploy, confirm the
+    stage-5 count reads `"6 OF 6"` (full, for the first time), the path total reads `"18 of 25
+    concepts"`, and the not-built count is *still* exactly 0 — now permanently, since nothing remains
+    anywhere in `UPCOMING_STAGES` to ever add a chip back. Added an exact-match `page.getByRole('link',
+    { name: 'Deploy', exact: true })` count for the "stage 5 shows its sixth and final real concept"
+    check, the same collision-avoidance habit every prior lesson round has used. Checked all twelve of
+    Deploy's own option strings for collisions against each other and against every other question on
+    the page before writing the clicks — none, no `.nth()` needed. 346 → 356 interaction checks (5
+    dedicated + 5 Roadmap — matching Auth's own 5+5 split exactly).
+
+    `audit:content` stayed at its 5-artifact baseline — confirmed with a fresh `npm run audit:content`
+    run, unrelated to Deploy (it has no `.dc.html` prototype, same as every other Stage 5 lesson).
+    Swept `docs/SRS.md`, `docs/ARCHITECTURE.md`, and `app/README.md`'s route/page/concept counts (43
+    lesson/tool pages, 44 routes total, 38 registered concepts — read the routes figure off a direct
+    `verify:routes` run's own `44/44 routes clean` output rather than hand-computed, the same lesson
+    items 40 through 45 all already flagged), including `docs/ARCHITECTURE.md`'s `Roadmap.tsx` table
+    row (now naming all six Stage 5 lessons, "the five-stage path is fully built" not "one remains"),
+    and checked every doc for a stale "the designed path isn't fully built yet"-shaped claim now that
+    it actually is — `docs/SRS.md` and `README.md` both had one, corrected in the same pass.
+
+    `npm run build` run first, confirming `Deploy-BVaWkRy8.js` built alongside `Http-BtCDxvGe.js`,
+    `Rest-BgVPBtFx.js`, `SqlBasics-pmOJtTMG.js`, `Joins-dLSSeaBZ.js` and `Auth-vlzw6cxO.js`. `npm run
+    verify` green after: 44/44 routes, no overflow at any width, 356/356 interaction checks, a11y clean
+    with zero regression (35 failures across 19 pairs, unchanged — the baseline note now reads "this
+    run saw 44" routes, up from 43, with no new pair). `npm run typecheck` clean. `audit:content` at
+    its 5-artifact baseline (re-verified).
+
+    **Stage 5 now has all 6 of 6 concepts built: HTTP, REST, SQL Basics, Joins, Auth, Deploy — and so
+    does every other stage on the path.** Nothing remains in `UPCOMING_STAGES` anywhere; the entire
+    five-stage, 25-concept designed course is built. `Roadmap.tsx` itself needed no further logic
+    change this round beyond the stale comments above — `PartialStage`, extracted at item 41
+    specifically so later Stage-5 concepts wouldn't need one, held up on its sixth and final use. The
+    only thing left in the whole app's designed course now is the capstone (`Project Build-Along`,
+    already built, already linked from Stage 5's own `related`) — not a new concept, not a new page,
+    just the existing finish line this whole path was building toward.

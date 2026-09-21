@@ -36,8 +36,9 @@ export interface Concept {
   label: string
   /** Route that teaches it, or `undefined` when the path names a concept this app has no page for. */
   route?: string
-  /** Roadmap stage (1-5 each have at least one built concept now — stage 3 and stage 4 all six of
-   *  their own), or `null` when off the path. */
+  /** Roadmap stage (1-5 each have at least one built concept now — stage 3, stage 4 and, as of
+   *  item 46, stage 5 too all six of their own, the whole five-stage path built out), or `null`
+   *  when off the path. */
   stage: 1 | 2 | 3 | 4 | 5 | null
   /** What records it — prose for the next reader, kept in step with the page's `<ConceptComplete>`. */
   earnedBy: string
@@ -188,7 +189,7 @@ export const CONCEPTS: Concept[] = [
     earnedBy: 'scoring at or above the pass mark on the four predict-the-value questions',
   },
 
-  // ── Stage 5 · APIs & Databases (five concepts built so far)
+  // ── Stage 5 · APIs & Databases (all six concepts built — stage complete)
   {
     slug: 'http',
     label: 'HTTP',
@@ -221,6 +222,13 @@ export const CONCEPTS: Concept[] = [
     slug: 'auth',
     label: 'Auth',
     route: '/auth',
+    stage: 5,
+    earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
+  },
+  {
+    slug: 'deploy',
+    label: 'Deploy',
+    route: '/deploy',
     stage: 5,
     earnedBy: 'scoring at or above the pass mark on the four predict-the-outcome questions',
   },

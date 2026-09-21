@@ -193,6 +193,14 @@ export const PAGES: PageEntry[] = [
     group: 'learn',
   },
   {
+    slug: 'deploy',
+    title: 'Deploy',
+    kind: 'PREDICT-THE-VALUE',
+    tone: 'accent',
+    blurb: 'A secret baked into a client bundle at build time, a runtime env var that needs no rebuild, a rolling deploy that runs old and new code side by side, and a migration that has to survive both — predict what actually happens, then see why.',
+    group: 'learn',
+  },
+  {
     slug: 'decorator-pattern',
     title: 'Decorator Pattern',
     kind: 'PATTERN DEEP-DIVE',
