@@ -1881,3 +1881,129 @@ Turned up while adding Stage 3's second lesson. Numbered from 30 so earlier refe
     only thing left in the whole app's designed course now is the capstone (`Project Build-Along`,
     already built, already linked from Stage 5's own `related`) — not a new concept, not a new page,
     just the existing finish line this whole path was building toward.
+
+## Found while auditing (2026-09-22)
+
+The designed course finished at item 46 (Deploy) — nothing left to build in the five-stage,
+25-concept path. With no new lesson content pending, this pass was a genuine audit-for-real-
+improvements sweep rather than a content round: baseline the whole verification toolchain first,
+then look for real, concrete problems (a11y regressions, stale docs, dead code, broken links,
+buggy demos, UX rough edges) rather than manufacture busywork to justify the pass. Numbered from
+47 so the references above stay valid.
+
+47. **Baseline confirmed genuinely healthy; the app itself has no functional bugs — every real
+    finding this round was in the docs, not the code.** Captured the full baseline before touching
+    anything: `npm run build` clean, `npm run typecheck` clean, `npm run verify` green — **44/44
+    routes clean, no overflow at any width, 356/356 interaction checks passed, a11y clean with zero
+    regression (35 failures across 19 pairs)** — and `npm run audit:content` still at its 5-artifact
+    baseline (CLI Basics' 2 clipboard-payload phrases, Code Playground's captured-output line, Page
+    Gallery's frozen prototype count, Quiz Mode's template-literal sentence — all known extractor
+    artifacts, none a real omission). Every one of those numbers matches item 46's own closing
+    figures exactly, confirming the app hadn't drifted since.
+
+    Went well past the automated suites before concluding there was nothing left to fix in the app
+    itself: grepped every `to=`/`href=` route string and every data-driven link source
+    (`data/concepts.ts`'s `route` fields, `data/curriculum.ts`'s `related` pointers, both hand-
+    duplicated `ConceptSidebar` arrays in `CliBasics.tsx`/`ShellScripting.tsx`, `DevHub.tsx`'s
+    `TOPICS`) against `scripts/routes.mjs`'s `ROUTES` — zero broken links. Confirmed every file
+    under `src/components/`, `src/data/` and `src/lib/` is actually imported somewhere (no dead
+    files). Grepped for `TODO`/`FIXME`/`HACK`, leftover `console.log` debugging, `href="#"`, and
+    `dangerouslySetInnerHTML` — none. Checked `package-lock.json` against `package.json` (`npm ci
+    --dry-run` → "up to date," every pinned version matches) and the real GitHub Actions deploy
+    workflow against what `DEPLOYMENT.md` claims about it (action versions, Node 24, the `master`
+    branch trigger) — accurate, no drift. Beyond what the automated suites check (they only watch
+    for console *errors* on a page's *initial* load), started `vite preview` by hand and drove real
+    interaction — answering quiz questions, flipping/rating flashcards, building a Decorator order,
+    opening/searching/closing the command palette, stepping the terminal mission, actually running
+    Code Playground's sandboxed tests, revealing Debugging Challenge's hints — while capturing every
+    console message of any type (log/warn/error) and every uncaught page error: **zero**, across all
+    of it, on top of a separate all-44-routes sweep that also came back at zero non-error console
+    messages. That's a real, checked result, not an assumption — the "no console errors" gate in
+    `verify-routes.mjs` never watches for a warning, and never watches past the initial page load at
+    all, so a hidden React key/uncontrolled-input warning firing only mid-interaction would have
+    gotten through it invisibly. It didn't happen.
+
+    **What was actually stale, all in documentation, none in the shipped app:**
+
+    - **`app/README.md`'s opening paragraph said "Three pages were added afterward"** — true when
+      first written, but the bulleted list right below that sentence, in the same file, has grown to
+      **twenty** entries (Rebase & History and Shell Scripting through Deploy) as the five-stage path
+      filled in one lesson at a time across dozens of later sessions, and the count was never bumped
+      past its original value even once. The most prominent, first-read claim in the app's main doc
+      was contradicted by its own very next paragraph. Corrected to name the real total (43
+      lesson/tool pages today) and frame the twenty as the path's own build-out rather than a fixed
+      historical fact.
+    - **`app/README.md`'s Accessibility section quoted a contrast count that had already been fixed
+      and re-baselined.** It read "**39 across 20**" today, and separately, a few paragraphs later,
+      "the surviving pairs (**19** now...)" — two different pair counts in the same section. The 39/20
+      figure was real once (documented at item 18, when the baseline was first recorded) but a
+      2026-09-16 investigation (item 26) found one genuine dark-ground contrast bug behind part of
+      that count — `CodeListing`'s shared line-number gutter set `--color-neutral-600` on its own
+      `--color-neutral-900` pane background (3.29:1, needs 4.5), invisible on every page except Shell
+      Scripting because the contrast checker skips text under 2 characters and Shell Scripting was
+      the only page whose gutter reached a two-digit line number — fixed it to `--color-neutral-500`
+      (4.90:1) across all four pages sharing that component, and re-recorded the baseline **39 → 35
+      failures, 20 → 19 pairs**. That fix and re-record are real and current — confirmed directly
+      against the live `scripts/a11y-baseline.json` (`contrastTotal: 35`, 19 keys in `pairs`) and
+      against this session's own from-scratch `npm run audit:a11y` run, both matching exactly — but
+      `app/README.md`'s prose was never updated to say so, so it's been quoting the pre-fix number for
+      six items' worth of sessions (roughly items 27 through 46). Rewrote the section to tell the
+      real, complete story: 137→31/18 originally, drifted to 39/20 as later pages arrived, the
+      2026-09-16 investigation found the inherited failures were almost entirely the accepted
+      accent-fill category (not eligible for the `-700` treatment — re-applying it would only have
+      silenced a documented, deliberate ~3:1 brand tradeoff) plus the one real `CodeListing` bug,
+      fixed that bug, landed at 35/19, and has held there since. Also corrected the *prescription* at
+      the end of the section: it used to say "the standing content work is to put the newer pages
+      through the same `-700` ramp treatment" — but the 2026-09-16 investigation already checked that
+      premise by hand and found it doesn't hold for what's left, so leaving that sentence in place
+      would point a future session at a fix that's already been tried and doesn't apply.
+    - **`docs/ARCHITECTURE.md`'s `CodePlayground.tsx` row was flatly wrong, not just outdated.** It
+      read "'running tests' is fully simulated, not real execution" — but `CodePlayground.tsx`'s own
+      file-header doc comment says the opposite in as many words ("'Run tests' really runs `SOURCE_JS`
+      ... in a Web Worker ... the pass/fail state is not scripted"), and BACKLOG item 9 documents
+      exactly that feature shipping. This one predates the file's own "Last updated: 2026-09-21"
+      claim — it was never touched when item 9 landed, so the doc has been actively misleading about
+      one page's core mechanic for the entire time since. Corrected the row, and while fixing it
+      noticed `lib/sandboxRun.ts` — the module that actually runs the sandboxed code, `CodePlayground`'s
+      one real dependency beyond shared chrome — was missing from §4's `lib/` table entirely (only
+      `progress.ts`/`api.ts`/`auth.tsx`/`progressSync.ts`/`progressFile.ts` were listed) and from §3's
+      directory tree (`lib/` there still showed only `progress.ts`, as if the other five files in that
+      directory didn't exist). Added the missing table row and fixed the tree.
+    - **`docs/ARCHITECTURE.md` §3's file counts and §6's `verify` row both predate BACKLOG item 28**
+      (2026-09-12, `npm run verify` was changed from a plain `&&`-chain of the four suites to
+      `node scripts/run-verify.mjs`, which starts and owns its own `vite preview` server with
+      `strictPort: true` and always tears it down). §6's table still described the *old* command
+      (`verify:routes && verify:responsive && verify:interactions && audit:a11y`) as if that's what
+      `npm run verify` runs — it isn't, `package.json` has run `node scripts/run-verify.mjs` for
+      forty-some items now — and §8's script table never gained a row for `run-verify.mjs` itself.
+      §3's directory tree also still said `pages/` has "30 files" (actually 47) and `scripts/` has "8
+      files" (actually 9 `.mjs` scripts plus the baseline JSON) — both counts frozen from before the
+      Stage 3/4/5 lesson rounds and item 28 respectively. Fixed all four: the `verify` row now
+      describes what it actually runs, `run-verify.mjs` has its own §8 row explaining what it owns and
+      why (the exact stale-port failure mode item 28 fixed), and both file counts in §3 are current.
+    - **`docs/UI-DESIGN.md` was the stalest of the four** — front matter still read "Last updated:
+      2026-09-08 — describes the 25-page app," and §2 said "each of the 26 pages wants a meaningfully
+      different nav/hero/column arrangement." Both numbers are from a point in the port roughly 38
+      lesson pages ago; the app is 47 files / 43 lesson pages today. The design-system sections
+      themselves (§1 palette/type/spacing, §3 layout patterns, §6 styling conventions) are still
+      accurate — none of that changed — so only the front matter, the page-count sentence, and §5's
+      accessibility numbers (same 39/20-vs-19 staleness as `app/README.md`, since this section is a
+      condensed copy of that one) needed correcting, not a rewrite.
+
+    **Investigated and deliberately left alone:** `docs/ARCHITECTURE.md` §7's per-page "Depends on"
+    column omits `ConceptComplete` for roughly a third of the ~35 pages that actually render it (some
+    rows list it explicitly, most don't, with no obvious pattern separating them) — checked whether
+    this was a real, fixable inconsistency or just documentation granularity, and it's the latter:
+    §4's own `ConceptComplete` row already says "Used by: every lesson and practice page," so the
+    per-row omissions aren't false claims the way the `CodePlayground` one was, just uneven detail
+    across a 43-row table. Rewriting all of it for one gate of thoroughness would be a large,
+    low-value diff against a table that's already correct at the level it actually asserts things,
+    so it was left as is rather than force-fixed to justify the pass.
+
+    Re-ran the full baseline after every doc fix to confirm nothing was disturbed (doc-only changes,
+    so an identical result was expected, not assumed): `npm run build` clean, a second full
+    `npm run verify` — **44/44 routes clean, no overflow at any width, 356/356 interaction checks
+    passed, a11y clean with zero regression (35 failures across 19 pairs, unchanged)** — and
+    `npm run typecheck` clean. `git status`/`git diff --stat` confirm only `app/README.md`,
+    `docs/ARCHITECTURE.md` and `docs/UI-DESIGN.md` changed; nothing under `src/` or `scripts/` was
+    touched, so this entry is documentation-only by construction, not just by intent.

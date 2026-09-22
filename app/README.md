@@ -4,8 +4,10 @@ A React implementation of the **Coding Learning App Redesign** handed off from C
 (see `../README.md`, `../chats/`, and the `.dc.html` prototypes in `../project/`).
 
 All 23 designed pages are implemented, plus the gallery that indexes them — and the progress the
-mockups only depicted is now real. Three pages were added afterward, in the app's own style rather
-than ported from a prototype:
+mockups only depicted is now real. Twenty pages were added afterward, in the app's own style
+rather than ported from a prototype (43 lesson/tool pages total today) — starting with three
+(Rebase & History, Shell Scripting, Variables) and growing one lesson at a time as the five-stage,
+25-concept designed backend-developer path filled in behind them, finishing with Deploy:
 
 - **Rebase & History** — the Roadmap mockup already named it as Version Control's fourth concept,
   but no design existed for it.
@@ -404,14 +406,26 @@ design system's 2px accent ring on all of them, and tab order follows the visual
 the design system's own rule — *"for paragraph-size text in the accent use a deep ramp step rather
 than the accent itself"* — to the neutral ramp, which the prototypes had not done. That took the
 audit from 137 failures across 51 colour pairs down to **31 across 18**, with zero new failures
-introduced (verified by diffing the failure sets before and after). It reads **39 across 20** today:
-the pages added since that pass brought their own inherited pairs with them (Shell Scripting alone
-accounts for 7 of the reported lines), and none of them have been through the same treatment.
+introduced (verified by diffing the failure sets before and after). It drifted to 39 across 20 as
+later pages brought their own inherited pairs with them (Shell Scripting alone accounted for 7 of
+the reported lines) — until a 2026-09-16 investigation checked every one of those newer failures
+individually against the "what remains" list below rather than assuming the `-700` treatment would
+apply again. Nearly all of them turned out to already be the accepted accent-fill category (tuned
+to ~3:1 on purpose — see below), so re-running that treatment on them would only have silenced a
+documented, deliberate tradeoff. One was a genuine, different bug: `CodeListing`'s line-number
+gutter set `--color-neutral-600` on its own `--color-neutral-900` pane background — a *dark*-ground
+case, not the *light*-ground one the `-700` pass fixed — so darkening it further would only fail
+harder; the fix was a **lighter** step, `--color-neutral-500` (4.90:1), shared by all four pages
+using that component (Shell Scripting, Code Playground, Debugging Challenge, Python Variables) even
+though only Shell Scripting's two-digit line numbers had surfaced it (the check skips text under 2
+characters, so the other three were failing the same way invisibly). That took it back down to
+**35 across 19**, where it's held steady since, through every lesson page added afterward.
 
-**Why it's baselined.** Those 39 are inherited and accepted, so a plain pass/fail could only ever
+**Why it's baselined.** Those 35 are inherited and accepted, so a plain pass/fail could only ever
 say "fail" — and a check that can never pass is one nobody can gate on. That's precisely how the
-count drifted 31 → 39 unnoticed: the script was correct, it just wasn't in `npm run verify` and
-couldn't be. `scripts/a11y-baseline.json` records the accepted set, and the audit now fails on:
+count drifted 31 → 39 unnoticed the first time: the script was correct, it just wasn't in
+`npm run verify` and couldn't be. `scripts/a11y-baseline.json` records the accepted set, and the
+audit now fails on:
 
 - a contrast pair that isn't in the baseline,
 - a rise in the *total* failure count with no new pair — which is the "new page repeats an
@@ -420,11 +434,10 @@ couldn't be. `scripts/a11y-baseline.json` records the accepted set, and the audi
 
 Fixing something never fails; it prints a nudge to re-record. Re-record deliberately with
 `npm run audit:a11y -- --update-baseline`, which leaves a reviewable diff — not to turn a red run
-green. The standing content work is to put the newer pages through the same `-700` ramp treatment
-the original pass applied, and shrink the baseline as that lands.
-Tokens on dark grounds — the
-terminal, code panes, gutters — were deliberately left alone, since darkening them would *reduce*
-contrast.
+green. The 2026-09-16 investigation above is the standing answer to "is there more low-hanging
+fruit here": there isn't — every remaining pair was checked by hand and is the accent-fill category
+below, not unswept `-700` work. Tokens on dark grounds — the terminal, code panes, gutters — were
+deliberately left alone otherwise, since darkening them would *reduce* contrast, not improve it.
 
 Measured against the two light grounds, the ramp splits cleanly at step 700:
 

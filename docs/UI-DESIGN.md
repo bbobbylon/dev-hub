@@ -1,6 +1,9 @@
 # UI/UX Design Documentation — Dev Hub
 
-_Last updated: 2026-09-08 — describes the 25-page app on the `implement-design-handoff` branch._
+_Last updated: 2026-09-22 — describes the 47-file / 43-lesson-page app (the five-stage, 25-concept
+designed backend-developer path is now fully built; see `docs/ARCHITECTURE.md` §7 for the current
+page-by-page list). The design system itself (§1, §3, §6) hasn't changed since 2026-09-08 and is
+still accurate as written._
 
 Dev Hub's visual language is "Organic" — the design system handed off from the original Claude
 Design prototypes (`../project/`) and ported verbatim into `app/src/styles/organic.css`. This
@@ -42,7 +45,7 @@ Lucide.
 
 Defined in `app/src/components/` (full API in `docs/ARCHITECTURE.md` §4) and composed directly
 into each page — there is no shared page-shell/layout component; that was tried and dropped
-because each of the 26 pages wants a meaningfully different nav/hero/column arrangement, and a
+because each page wants a meaningfully different nav/hero/column arrangement, and a
 shared shell ended up hiding more than it saved.
 
 | Component | Role |
@@ -115,14 +118,17 @@ pairs down to 31 across 18, with zero new failures introduced.
 | `accent-2-600` | 3.53:1 | 3.14:1 | fails |
 | `accent-2-700` | 5.43:1 | 4.82:1 | **passes** |
 
-**Known, deliberate exceptions (not regressions):** the remaining ~19 failing pairs are the
-accent *fill* itself — cream-on-terracotta primary buttons, `.btn-ghost` accent text,
-accent-tinted labels on accent panels, and the terminal's accent-on-dark — measuring 2.7–3.9:1,
-which matches the ~3:1 the design system says that pair is tuned for ("enough for icons, large
-text and interface chrome, not body copy"). Fixing these means changing the accent color itself,
-a brand decision out of scope for a port. Dark-ground surfaces (code panes, the terminal, line
-gutters) were also left alone, since darkening an already-dark token would reduce contrast, not
-improve it.
+**Known, deliberate exceptions (not regressions):** the currently-baselined set is 35 failures
+across 19 pairs (`app/scripts/a11y-baseline.json`; see `app/README.md`'s "Accessibility" section
+for the full history of how it moved from the 31/18 this pass originally landed on, including a
+real dark-ground contrast bug in `CodeListing`'s line-number gutter found and fixed 2026-09-16).
+Nearly all of those 19 pairs are the accent *fill* itself — cream-on-terracotta primary buttons,
+`.btn-ghost` accent text, accent-tinted labels on accent panels, and the terminal's accent-on-dark
+— measuring 2.7–3.9:1, which matches the ~3:1 the design system says that pair is tuned for
+("enough for icons, large text and interface chrome, not body copy"). Fixing these means changing
+the accent color itself, a brand decision out of scope for a port. Dark-ground surfaces (code
+panes, the terminal, line gutters) were also left alone otherwise, since darkening an
+already-dark token would reduce contrast, not improve it.
 
 ## 6. Styling Conventions
 
